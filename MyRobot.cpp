@@ -1,8 +1,8 @@
 //TODO:
 //Auto
-//Sonar code 
-#include "WPILib.h" 
-#include "SmartDashboard/SmartDashboard.h" 
+//Sonar code
+#include "WPILib.h"
+#include "SmartDashboard/SmartDashboard.h"
 #include "Command.h"
 #include <iostream>
 #include <math.h>
@@ -12,8 +12,8 @@ class RobotDemo : public SimpleRobot
 {
   RobotDrive myRobot;
   float potVal, multiplier, servoXState, servoYState, throttle, ServoXJoyPos, ServoYJoyPos;
-  int cameraMode, lastToggle;
-  int cameraPreset, collectorSpeed;
+  int lastToggle;
+  int collectorSpeed;
   bool collectorExtended, toggleCollector;
   bool shooting, compressing;
   float DownSpeed, downLimit, upLimit;
@@ -26,7 +26,9 @@ class RobotDemo : public SimpleRobot
   Compressor compressor;
   Jaguar Left1, Left2, Left3, Right1, Right2, Right3, RightArmMotor1, RightArmMotor2, LeftArmMotor1, LeftArmMotor2, CollectorMotor1;
   AnalogChannel armPot;
+  //Ultrasonic
   AnalogChannel BallSonicLeft, BallSonicRight, WallSonicLeft, WallSonicRight;
+  DigitalOutput BallLeft, BallRight, WallLeft, WallRight;
 public:
   RobotDemo():
     //Joysticks
@@ -39,6 +41,11 @@ public:
     BallSonicRight(2),
     WallSonicLeft(3),
     WallSonicRight(4),
+    BallLeft(1,4),
+    WallLeft(1,5),
+    BallRight(2,4),
+    WallRight(2,5),
+
     //Compressor
     //compressor(2,3,1,1),
     compressor(2, 5, 1, 1), //Solenoids
@@ -67,19 +74,17 @@ public:
     RightArmMotor1(2, 4),
     RightArmMotor2(2, 5),
     //Collector Motor
-    CollectorMotor1(1,6),
-    myRobot(Left1,Left2,Right1,Right2) {
-    GetWatchdog().SetEnabled(false);
-  }
+    CollectorMotor1(1, 6),
+    myRobot(Left1, Left2, Right1, Right2) {
+      GetWatchdog().SetEnabled(false);
+    }
   void RobotInit() {
     //Initializing robot
     lastToggle = 0;
     DashboardSetup();
-    cameraMode = 0;
     servoXState = 90;
     servoYState = 90;
     multiplier = 1.0f;
-    cameraPreset = 0;
     downLimit = 40;
     upLimit = 130;
     compressor.Start();
@@ -98,21 +103,21 @@ public:
     SmartDashboard::PutNumber("armPot", potToDegrees(armPot.GetAverageVoltage()));
     SmartDashboard::PutNumber("Log Level", 1);
     //Ultrasonic
-    SmartDashboard::PutNumber("Wall Left", voltToDistance(WallSonicLeft.GetAverageVoltage()));
-    SmartDashboard::PutNumber("Wall Right", voltToDistance(WallSonicRight.GetAverageVoltage()));
-    SmartDashboard::PutNumber("Ball Left", voltToDistance(BallSonicLeft.GetAverageVoltage(),false));
-    SmartDashboard::PutNumber("Ball Right", voltToDistance(BallSonicRight.GetAverageVoltage(),false));
+    SmartDashboard::PutNumber("Wall Left", voltToDistance(WallSonicLeft.GetAverageVoltage(),true));
+    SmartDashboard::PutNumber("Wall Right", voltToDistance(WallSonicRight.GetAverageVoltage(),true));
+    SmartDashboard::PutNumber("Ball Left", voltToDistance(BallSonicLeft.GetAverageVoltage()));
+    SmartDashboard::PutNumber("Ball Right", voltToDistance(BallSonicRight.GetAverageVoltage()));
+    SmartDashboard::PutBoolean("Use ultrasonic",false);
   }
   void updateDashboard() {
     SmartDashboard::PutNumber("Throttle", throttle);
     collectorSpeed = SmartDashboard::GetNumber("collectorSpeed");
     SmartDashboard::PutNumber("armPot", potToDegrees(armPot.GetAverageVoltage()));
     //Ultrasonic
-    SmartDashboard::PutNumber("Wall Left", voltToDistance(WallSonicLeft.GetAverageVoltage()));
-    SmartDashboard::PutNumber("Wall Right", voltToDistance(WallSonicRight.GetAverageVoltage()));
-    SmartDashboard::PutNumber("Ball Left", voltToDistance(BallSonicLeft.GetAverageVoltage(),false));
-    SmartDashboard::PutNumber("Ball Right", voltToDistance(BallSonicRight.GetAverageVoltage(),false));
-    SmartDashboard::PutNumber("Tanval", tan((WallSonicLeft.GetAverageVoltage() - WallSonicRight.GetAverageVoltage()) / 18.0f));
+    SmartDashboard::PutNumber("Wall Left", voltToDistance(WallSonicLeft.GetAverageVoltage(),true));
+    SmartDashboard::PutNumber("Wall Right", voltToDistance(WallSonicRight.GetAverageVoltage(),true));
+    SmartDashboard::PutNumber("Ball Left", voltToDistance(BallSonicLeft.GetAverageVoltage()));
+    SmartDashboard::PutNumber("Ball Right", voltToDistance(BallSonicRight.GetAverageVoltage()));
     DownSpeed = SmartDashboard::GetNumber("DownSpeed");
     downLimit = SmartDashboard::GetNumber("downLimit");
     upLimit = SmartDashboard::GetNumber("upLimit");
@@ -124,19 +129,26 @@ public:
     }
   }
   void shootRobot(float power=0, bool override=false) {
-    override=true;
+    if(!SmartDashboard::GetBoolean("Use ultrasonic")){
+      override=true;
+    }
     //Needs a limit to help the driver aim
     //In this case its checking that we are no more than 15 degrees off
     //The override is in place in case an ultrasonic becomes damaged and we are unable to validate the distance through software
-    float averageAtan = (atan(voltToDistance(WallSonicLeft.GetAverageVoltage())-voltToDistance(WallSonicRight.GetAverageVoltage()))/18.0f);
-    if(averageAtan<=15&&(voltToDistance(WallSonicLeft.GetAverageVoltage()))<=100&&(voltToDistance(WallSonicRight.GetAverageVoltage()))<=100&&(override==false)){
+    float averageAtan = atan((abs(voltToDistance(BallSonicLeft.GetAverageVoltage()) - voltToDistance(BallSonicRight.GetAverageVoltage())))/20.0f)*360.0f/(2.0f*3.141592653589793f);
+    if(override==true){
+      printf("%f\n",power);
+      setMotorValue(4, 1, cvt(power));
+      setMotorValue(5, 1, cvt(power));
+      setMotorValue(4, 2, cvt(-power));
+      setMotorValue(5, 2, cvt(-power));
+    }else if(averageAtan<=30.0f&&(voltToDistance(WallSonicLeft.GetAverageVoltage(),true))<=100&&(voltToDistance(WallSonicRight.GetAverageVoltage(),true))<=100){
       setMotorValue(4, 1, cvt(power));
       setMotorValue(5, 1, cvt(power));
       setMotorValue(4, 2, cvt(-power));
       setMotorValue(5, 2, cvt(-power));
     }
-    if(averageAtan>=16.0f&&(voltToDistance(WallSonicLeft.GetAverageVoltage()))<=100&&(voltToDistance(WallSonicRight.GetAverageVoltage()))<=100&&(override==false)){
-    //If it is above the limit, display a warning but still give the shooter a chance to run
+    if(averageAtan>=16.0f&&(voltToDistance(WallSonicLeft.GetAverageVoltage(),true))<=100&&(voltToDistance(WallSonicRight.GetAverageVoltage(),true))){
     //printf/smartdashboard: warning
       setMotorValue(4, 1, cvt(power));
       setMotorValue(5, 1, cvt(power));
@@ -144,17 +156,10 @@ public:
       setMotorValue(5, 2, cvt(-power));
     }
     //Allow shooting regardless of the angle or distance
-    if(override==true){
-      printf("%f\n",power);
-      setMotorValue(4, 1, cvt(power));
-      setMotorValue(5, 1, cvt(power));
-      setMotorValue(4, 2, cvt(-power));
-      setMotorValue(5, 2, cvt(-power));
-    }
   }
   void logMsg(std::string message, int level){
     if((int)SmartDashboard::GetNumber("Log Level") % level == 0){
-      printf((message.append("\n")).c_str());
+      printf((message+"\n").c_str());
     }
   }
   void driveRobot(float x, float y) {
@@ -183,34 +188,12 @@ public:
     string s = ss.str();
     return s;
   }
-  //camera functions
-  void camerafaceManual(int changex, int changey) {
-    servoYState = changey;
-    servoXState = changex;
-    setMotorValue(7, 2, servoXState);
-    setMotorValue(8, 2, servoYState);
-  }
-  void cameraReset() {
-    servoXState = 90;
-    servoYState = 90;
-    setMotorValue(7, 2, servoXState);
-    setMotorValue(8, 2, servoYState);
-  }
-  float voltToDistance(float a, bool type=true) {
-    if(type){
-      return a / 0.00488f / 2.54f;
+  float voltToDistance(float a,bool wall=false) {
+    if(wall){
+      return (a / 0.00488f) / 2.54f;
     }else{
-      return a / 0.00097656f / 25.4f;
+      return (a / 0.000976562f) / 25.4f;
     }
-  }
-  float getAverageDistance(float tests, bool type = true){
-      float avg = 0;
-      for(int i = 0;i<tests;i++)
-      {
-        avg += (voltToDistance(WallSonicLeft.GetAverageVoltage(),type)+voltToDistance(WallSonicRight.GetAverageVoltage(),type)/2);
-      }
-      avg = avg/tests;
-      return avg;
   }
   float potToDegrees(float a) {
     float max = -.0003948;
@@ -288,31 +271,78 @@ public:
     }
   }
   void alignRobot() {
-    float yoyo = atan(voltToDistance(WallSonicLeft.GetAverageVoltage()) - voltToDistance(WallSonicRight.GetAverageVoltage())) / 18.0f;
+    float yoyo = atan((abs(voltToDistance(BallSonicLeft.GetAverageVoltage()) - voltToDistance(BallSonicRight.GetAverageVoltage())))/20.0f)*360.0f/(2.0f*3.141592653589793f);
     SmartDashboard::PutNumber("Distance", yoyo);
   }
-  void Test() {}
+//  float getSonar(int sonar){
+//    switch(sonar){
+  void Test() {
+  }
   void Autonomous() {
-    int last=(voltToDistance(WallSonicLeft.GetAverageVoltage())+voltToDistance(WallSonicRight.GetAverageVoltage())/2);
     myRobot.SetSafetyEnabled(false);
     cmd = SmartDashboard::GetString("Auto");
-    int commandIndex = 0;
-    int i = 0;
+    int commandIndex=0;
+    int i=0;
+    int cur=0;
+    int averageAmount=5;
     compressing=false;
     collectorSole1.Set(false);
     collectorSole2.Set(true);
-    int avgDist=0;
-    int curDist=0;
+    int avgDist;
+    float avgLeft=0;
+    float avgRight=0;
+    float curDist;
+    WallLeft.Set(1);
+    BallLeft.Set(1);
+    WallRight.Set(0);
+    BallRight.Set(0);
+    float thisIsATest;
     while (IsEnabled() && IsAutonomous()) {
-      if(i<5){
-        avgDist+=(voltToDistance(WallSonicLeft.GetAverageVoltage())+voltToDistance(WallSonicRight.GetAverageVoltage())/2);
-      }else if(i==5){
-        avgDist/=5;
+      //Collect left average values from cur values 0 to 12
+      if(cur<12){
+        WallLeft.Set(1);
+        BallLeft.Set(1);
+        WallRight.Set(0);
+        BallRight.Set(0);
+        avgLeft+=voltToDistance(WallSonicLeft.GetAverageVoltage());
+      //After 12 cur iterations, find the average (data was recorded 12 times, divide by 12)
+      }else if(cur==12){
+        avgLeft/=12;
+      //Collect right average values from cur values 38 to 50
+      }else if(cur<50&&cur>38){
+        WallLeft.Set(0);
+        BallLeft.Set(0);
+        WallRight.Set(1);
+        BallRight.Set(1);
+        avgRight+=voltToDistance(WallSonicRight.GetAverageVoltage());
+      //After 50 cur iterations, find the average (data was recorded 12 times, divide by 12)
+      }else if(cur==50){
+        cur=0;
+        avgRight/=12;
+        thisIsATest=atan((abs(avgLeft-avgRight))/20.0f)*360.0f/(2.0f*3.141592653589793f);
+        SmartDashboard::PutNumber("Tanval", atan((abs(avgLeft-avgRight))/20.0f)*360.0f/(2.0f*3.141592653589793f));
       }
-      int tmp=(voltToDistance(WallSonicLeft.GetAverageVoltage())+voltToDistance(WallSonicRight.GetAverageVoltage())/2);
-      if (i>=10&&tmp>=avgDist-36&&abs(tmp-last)<10.0f) {
-        driveRobot(1, 0);
-      } else if (i>1400&&i < 1600 && 125 >= potToDegrees(armPot.GetAverageVoltage())) {
+      //Calculate the inital distance and average it averageAmount times.
+      if(i<averageAmount){
+        avgDist+=(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)+voltToDistance(WallSonicRight.GetAverageVoltage(),true)/2);
+      }else{
+        avgDist/=averageAmount;
+      }
+      //Calculate the average distance from the wall
+      curDist=thisIsATest;
+      if(i%100==0){
+        printf("Difference: %f\n",avgDist-curDist);
+      }
+      if (i>=5&&avgDist-curDist<=36.0f) {
+        float xPower, yPower;
+        xPower=1;
+        yPower=(avgDist-curDist)/36.0f;
+        if(yPower>1){
+          yPower=1;
+        }
+        driveRobot(yPower, xPower);
+        setMotorValue(6, 1, 1);
+      } else if (i>1400&&i<1600&&125>=potToDegrees(armPot.GetAverageVoltage())) {
         driveRobot(0, 0);
         shootRobot(1, false);
         setMotorValue(6, 1, 1);
@@ -334,21 +364,31 @@ public:
         compressing = true;
         logMsg("Starting the compressor",2);
       }
-      last=(voltToDistance(WallSonicLeft.GetAverageVoltage())+voltToDistance(WallSonicRight.GetAverageVoltage())/2);
       Wait(0.005f);
-      printf("%d\n",i);
       i++;
+      cur++;
+    }
     compressing = false;
     compressor.Stop();
   }
   void OperatorControl() {
     myRobot.SetSafetyEnabled(false);
     int i = 0;
+    int cur=0;
+    bool swap=false;
     collectorSole1.Set(true);
     collectorSole2.Set(false);
     compressing = false;
     logMsg("Starting Teleop",1);
     while (IsEnabled() && IsOperatorControl()) {
+      if(cur==50){
+        cur=0;
+        WallLeft.Set(swap?1:0);
+        BallRight.Set(swap?1:0);
+        WallRight.Set(swap?0:1);
+        BallRight.Set(swap?0:1);
+        swap=!swap;
+      }
       throttle = (-Lstick.GetRawAxis(4)+1)/2;
       driveRobot(Rstick.GetY(),Rstick.GetZ()+Rstick.GetX());
       //Log things
@@ -368,28 +408,6 @@ public:
         logMsg("Starting the compressor... again",2);
       }
       updateDashboard();
-      /*
-      if(LbuttonSevenState) {
-        cameraPreset++;
-        if(cameraPreset>3) {
-          cameraPreset=0;
-        }
-        switch(cameraPreset) {
-        case 0:
-          camerafaceManual(-90,0);
-          break;
-        case 1:
-          camerafaceManual(90,0);
-          break;
-        case 2:
-          camerafaceManual(0,-90);
-          break;
-        case 3:
-          camerafaceManual(0,90);
-          break;
-        }
-      }
-      */
       if (Lstick.GetRawButton(1)==1&&(upLimit>=potToDegrees(armPot.GetAverageVoltage()))) {
         //Move arm motors based on throttle
         if (collectorExtended == false) {
@@ -417,8 +435,7 @@ public:
         if (collectorExtended == true) {
           shootRobot(-DownSpeed, false);
           logMsg("Collector is extended, going to fire",17);
-        }
-      } else {
+        } } else {
         shooting = false;
         //Stop all motors
         shootRobot(0, true);
@@ -439,9 +456,11 @@ public:
       } else if (!shooting) {
         setMotorValue(6, 1, 0);
       }
+      cur++;
       i++;
       Wait(0.005f);
     }
   }
 };
 START_ROBOT_CLASS(RobotDemo);
+
