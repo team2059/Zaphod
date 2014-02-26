@@ -1,9 +1,8 @@
-//TODO:
-//Auto
+//TODO this 
 //Sonar code
 #include "WPILib.h"
 #include "SmartDashboard/SmartDashboard.h"
-#include "Command.h"
+//#include "Command.h"
 #include <iostream>
 #include <math.h>
 #include <vector>
@@ -14,10 +13,9 @@ class RobotDemo : public SimpleRobot
   float potVal, multiplier, servoXState, servoYState, throttle, ServoXJoyPos, ServoYJoyPos;
   int lastToggle;
   int collectorSpeed;
-  bool collectorExtended, toggleCollector;
-  bool shooting, compressing;
+  bool collectorExtended, toggleCollector, shooting, compressing;
   float DownSpeed, downLimit, upLimit;
-  string cmd;
+  //string cmd;
   Joystick Rstick, Lstick;
   Servo Servo1, Servo2;
   Solenoid collectorSole1, collectorSole2;
@@ -45,7 +43,6 @@ public:
     WallLeft(1,5),
     BallRight(2,4),
     WallRight(2,5),
-
     //Compressor
     //compressor(2,3,1,1),
     compressor(2, 5, 1, 1), //Solenoids
@@ -98,7 +95,7 @@ public:
     SmartDashboard::PutNumber("downLimit", downLimit);
     SmartDashboard::PutNumber("upLimit", upLimit);
     SmartDashboard::PutNumber("DownSpeed", 0.100);
-    SmartDashboard::PutString("Auto", cmd);
+    //SmartDashboard::PutString("Auto", cmd);
     SmartDashboard::PutNumber("collectorSpeed", 127);
     SmartDashboard::PutNumber("armPot", potToDegrees(armPot.GetAverageVoltage()));
     SmartDashboard::PutNumber("Log Level", 1);
@@ -107,13 +104,13 @@ public:
     SmartDashboard::PutNumber("Wall Right", voltToDistance(WallSonicRight.GetAverageVoltage(),true));
     SmartDashboard::PutNumber("Ball Left", voltToDistance(BallSonicLeft.GetAverageVoltage()));
     SmartDashboard::PutNumber("Ball Right", voltToDistance(BallSonicRight.GetAverageVoltage()));
-    SmartDashboard::PutBoolean("Use ultrasonic",false);
+    SmartDashboard::PutBoolean("Use Ultrasonic",false);
+    SmartDashboard::PutBoolean("Reverse Robot",false);
   }
   void updateDashboard() {
     SmartDashboard::PutNumber("Throttle", throttle);
     collectorSpeed = SmartDashboard::GetNumber("collectorSpeed");
     SmartDashboard::PutNumber("armPot", potToDegrees(armPot.GetAverageVoltage()));
-    //Ultrasonic
     SmartDashboard::PutNumber("Wall Left", voltToDistance(WallSonicLeft.GetAverageVoltage(),true));
     SmartDashboard::PutNumber("Wall Right", voltToDistance(WallSonicRight.GetAverageVoltage(),true));
     SmartDashboard::PutNumber("Ball Left", voltToDistance(BallSonicLeft.GetAverageVoltage()));
@@ -129,9 +126,7 @@ public:
     }
   }
   void shootRobot(float power=0, bool override=false) {
-    if(!SmartDashboard::GetBoolean("Use ultrasonic")){
-      override=true;
-    }
+    override=true;
     //Needs a limit to help the driver aim
     //In this case its checking that we are no more than 15 degrees off
     //The override is in place in case an ultrasonic becomes damaged and we are unable to validate the distance through software
@@ -280,78 +275,67 @@ public:
   }
   void Autonomous() {
     myRobot.SetSafetyEnabled(false);
-    cmd = SmartDashboard::GetString("Auto");
+    //cmd = SmartDashboard::GetString("Auto");
+    int avgDist;
     int commandIndex=0;
     int i=0;
     int cur=0;
     int averageAmount=5;
-    compressing=false;
-    collectorSole1.Set(false);
-    collectorSole2.Set(true);
-    int avgDist;
+    float initalDriveTime=1.4; //The amount of time in seconds that we will drive forward at the start of the match
+    float shooterMaxAngle=125; //The maximum angle that the arm can shoot to during all of auto
+    float shooterDelay = 4;    //The amount of time in seconds between the inital drive time and the shooter firing
+    float shooterDuration = .5;//The amount of time in seconds that the shooter motors will be moving
+    shooterDelay = (initalDriveTime*200)+(shooterDelay*4); //Do math to figure out the times to start the shooting
+    float sampleCount=12;
     float avgLeft=0;
     float avgRight=0;
     float curDist;
-    WallLeft.Set(1);
-    BallLeft.Set(1);
-    WallRight.Set(0);
-    BallRight.Set(0);
     float thisIsATest;
-    while (IsEnabled() && IsAutonomous()) {
-      //Collect left average values from cur values 0 to 12
-      if(cur<12){
-        WallLeft.Set(1);
-        BallLeft.Set(1);
-        WallRight.Set(0);
-        BallRight.Set(0);
-        avgLeft+=voltToDistance(WallSonicLeft.GetAverageVoltage());
-      //After 12 cur iterations, find the average (data was recorded 12 times, divide by 12)
-      }else if(cur==12){
-        avgLeft/=12;
-      //Collect right average values from cur values 38 to 50
-      }else if(cur<50&&cur>38){
-        WallLeft.Set(0);
-        BallLeft.Set(0);
-        WallRight.Set(1);
-        BallRight.Set(1);
-        avgRight+=voltToDistance(WallSonicRight.GetAverageVoltage());
-      //After 50 cur iterations, find the average (data was recorded 12 times, divide by 12)
-      }else if(cur==50){
-        cur=0;
-        avgRight/=12;
-        thisIsATest=atan((abs(avgLeft-avgRight))/20.0f)*360.0f/(2.0f*3.141592653589793f);
-        SmartDashboard::PutNumber("Tanval", atan((abs(avgLeft-avgRight))/20.0f)*360.0f/(2.0f*3.141592653589793f));
-      }
-      //Calculate the inital distance and average it averageAmount times.
-      if(i<averageAmount){
-        avgDist+=(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)+voltToDistance(WallSonicRight.GetAverageVoltage(),true)/2);
-      }else{
-        avgDist/=averageAmount;
-      }
-      //Calculate the average distance from the wall
-      curDist=thisIsATest;
-      if(i%100==0){
-        printf("Difference: %f\n",avgDist-curDist);
-      }
-      if (i>=5&&avgDist-curDist<=36.0f) {
-        float xPower, yPower;
-        xPower=1;
-        yPower=(avgDist-curDist)/36.0f;
-        if(yPower>1){
-          yPower=1;
+    compressing=false;
+    collectorSole1.Set(false);
+    collectorSole2.Set(true);
+    WallLeft.Set(1);
+    BallLeft.Set(0);
+    WallRight.Set(1);
+    BallRight.Set(0);
+    while(IsEnabled()&&IsAutonomous()){
+      if(SmartDashboard::GetBoolean("Use Ultrasonic")){
+        if(cur<sampleCount) {
+          WallLeft.Set(1);
+          WallRight.Set(0);
+          avgLeft+=voltToDistance(WallSonicLeft.GetAverageVoltage(),true);
+        }else if(cur==sampleCount){
+          avgLeft/=12;
+        }else if(cur<sampleCount*4&&cur>3*sampleCount){
+          WallLeft.Set(0);
+          WallRight.Set(1);
+          avgRight+=voltToDistance(WallSonicRight.GetAverageVoltage(),true);
+        }else if(cur==sampleCount*4){
+          avgRight/=12;
+          thisIsATest=atan((abs(avgLeft-avgRight))/20.0f)*360.0f/(2.0f*3.141592653589793f);
+        }else if(cur==sampleCount*6){
+          cur=0;
         }
-        driveRobot(yPower, xPower);
-        setMotorValue(6, 1, 1);
-      } else if (i>1400&&i<1600&&125>=potToDegrees(armPot.GetAverageVoltage())) {
-        driveRobot(0, 0);
-        shootRobot(1, false);
-        setMotorValue(6, 1, 1);
-      } else if (i>1500&&i<1700) {
-        driveRobot(-1,0);
-      } else {
-        driveRobot(0, 0);
-        shootRobot(0, true);
-        setMotorValue(6, 1, 0);
+        if(i>164){
+          SmartDashboard::PutNumber("Tanval", thisIsATest);
+        }
+      }else{
+        if (i<=initalDriveTime*200) {
+          setMotorValue(6, 1, 1);
+        } else if (i>shooterDelay&&i<shooterDelay+(shooterDuration*200)&&shooterMaxAngle>=potToDegrees(armPot.GetAverageVoltage())) {
+          driveRobot(0, 0);
+          shootRobot(1, true);
+          setMotorValue(6, 1, 1);
+        } else if (i>1500&&i<1700) {
+          shootRobot(.1,true);
+          //driveRobot(-1,0);
+        } else {
+          /*
+          driveRobot(0, 0);
+          shootRobot(0, true);
+          setMotorValue(6, 1, 0);
+          */
+        }
       }
       updateDashboard();
       if (i % 100 == 0 && compressing && compressor.GetPressureSwitchValue() == 1) {
@@ -370,6 +354,80 @@ public:
     }
     compressing = false;
     compressor.Stop();
+//    while (IsEnabled() && IsAutonomous()) {
+//      //Collect left average values from cur values 0 to 12
+//      if(cur<12){
+//        WallLeft.Set(1);
+//        BallLeft.Set(1);
+//        WallRight.Set(0);
+//        BallRight.Set(0);
+//        avgLeft+=voltToDistance(WallSonicLeft.GetAverageVoltage(),true);
+//      //After 12 cur iterations, find the average (data was recorded 12 times, divide by 12)
+//      }else if(cur==12){
+//        avgLeft/=12;
+//      //Collect right average values from cur values 38 to 50
+//      }else if(cur<100&&cur>88){
+//        WallLeft.Set(0);
+//        BallLeft.Set(0);
+//        WallRight.Set(1);
+//        BallRight.Set(1);
+//        avgRight+=voltToDistance(WallSonicRight.GetAverageVoltage(),true);
+//      //After 50 cur iterations, find the average (data was recorded 12 times, divide by 12)
+//      }else if(cur==100){
+//        cur=0;
+//        avgRight/=12;
+//        thisIsATest=atan((abs(avgLeft-avgRight))/20.0f)*360.0f/(2.0f*3.141592653589793f);
+//        SmartDashboard::PutNumber("Tanval", atan((abs(avgLeft-avgRight))/20.0f)*360.0f/(2.0f*3.141592653589793f));
+//      }
+//      //Calculate the inital distance and average it averageAmount times.
+//      if(i<averageAmount){
+//        avgDist+=(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)+voltToDistance(WallSonicRight.GetAverageVoltage(),true)/2);
+//      }else{
+//        avgDist/=averageAmount;
+//      }
+//      //Calculate the average distance from the wall
+//      curDist=thisIsATest;
+//      if(i%100==0){
+//        printf("Difference: %f\n",avgDist-curDist);
+//      }
+//      if (i>=5&&avgDist-curDist<=36.0f) {
+//        float xPower, yPower;
+//        xPower=1;
+//        yPower=(avgDist-curDist)/36.0f;
+//        if(yPower>1){
+//          yPower=1;
+//        }
+//        driveRobot(yPower, xPower);
+//        setMotorValue(6, 1, 1);
+//      } else if (i>1400&&i<1600&&125>=potToDegrees(armPot.GetAverageVoltage())) {
+//        driveRobot(0, 0);
+//        shootRobot(1, false);
+//        setMotorValue(6, 1, 1);
+//      } else if (i>1500&&i<1700) {
+//        shootRobot(.1,false);
+//        //driveRobot(-1,0);
+//      } else {
+//        /*
+//        driveRobot(0, 0);
+//        shootRobot(0, true);
+//        setMotorValue(6, 1, 0);
+//        */
+//      }
+//      updateDashboard();
+//      if (i % 100 == 0 && compressing && compressor.GetPressureSwitchValue() == 1) {
+//        compressor.Stop();
+//        compressing = false;
+//        logMsg("Stopping the compressor",2);
+//      }
+//      if (i % 100 == 0 && !compressing && compressor.GetPressureSwitchValue() == 0) {
+//        compressor.Start();
+//        compressing = true;
+//        logMsg("Starting the compressor",2);
+//      }
+//      Wait(0.005f);
+//      i++;
+//      cur++;
+    //}
   }
   void OperatorControl() {
     myRobot.SetSafetyEnabled(false);
@@ -390,7 +448,11 @@ public:
         swap=!swap;
       }
       throttle = (-Lstick.GetRawAxis(4)+1)/2;
-      driveRobot(Rstick.GetY(),Rstick.GetZ()+Rstick.GetX());
+      if(SmartDashboard::GetBoolean("Reverse Robot")){
+        driveRobot(-Rstick.GetY(),Rstick.GetZ()+Rstick.GetX());
+      }else{
+        driveRobot(Rstick.GetY(),Rstick.GetZ()+Rstick.GetX());
+      }
       //Log things
       if (i % 200 == 0) {
         //logMsg(toString(compressor.GetPressureSwitchValue()),2);
