@@ -128,6 +128,8 @@ public:
       upLimit = 167;
     }
   }
+  void calcRobot(){
+  }
   void shootRobot(float power=0, bool override=false) {
     override=true;
     //Needs a limit to help the driver aim
