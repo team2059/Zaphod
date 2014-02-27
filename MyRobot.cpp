@@ -1,7 +1,7 @@
 //Sonar code
 #include "WPILib.h"
 #include "SmartDashboard/SmartDashboard.h"
-#include "Command.h"
+//#include "Command.h"
 #include <iostream>
 #include <math.h>
 #include <vector>
@@ -95,9 +95,9 @@ public:
   }
   void DashboardSetup() {
     SmartDashboard::PutNumber("Throttle", throttle);
-    SmartDashboard::PutNumber("downLimit", downLimit);
-    SmartDashboard::PutNumber("upLimit", upLimit);
-    SmartDashboard::PutNumber("DownSpeed", 0.100);
+    SmartDashboard::PutNumber("downLimit", 35.0f);
+    SmartDashboard::PutNumber("upLimit", 120.0f);
+    SmartDashboard::PutNumber("DownSpeed", 0.1f);
     //SmartDashboard::PutString("Auto", cmd);
     SmartDashboard::PutNumber("collectorSpeed", 127);
     SmartDashboard::PutNumber("armPot", potToDegrees(armPot.GetAverageVoltage()));
@@ -268,15 +268,10 @@ public:
       }
     }
   }
-  void alignRobot() {
-    float yoyo = atan((abs(voltToDistance(BallSonicLeft.GetAverageVoltage()) - voltToDistance(BallSonicRight.GetAverageVoltage())))/20.0f)*360.0f/(2.0f*3.141592653589793f);
-    SmartDashboard::PutNumber("Distance", yoyo);
-  }
   void Test() {
   }
   void Autonomous() {
     myRobot.SetSafetyEnabled(false);
-    //cmd = SmartDashboard::GetString("Auto");
     int avgDist;
     int commandIndex=0;
     int i=0;
@@ -284,9 +279,9 @@ public:
     int averageAmount=5;
     float initalDriveTime=1.4; //The amount of time in seconds that we will drive forward at the start of the match
     float shooterMaxAngle=125; //The maximum angle that the arm can shoot to during all of auto
-    float shooterDelay = 4;    //The amount of time in seconds between the inital drive time and the shooter firing
+    float shooterDelay = 2;    //The amount of time in seconds between the inital drive time and the shooter firing
     float shooterDuration = .5;//The amount of time in seconds that the shooter motors will be moving
-    shooterDelay = (initalDriveTime*200)+(shooterDelay*4); //Do math to figure out the times to start the shooting
+    shooterDelay = (shooterDelay*200); //Do math to figure out the times to start the shooting
     float sampleCount=12;
     float avgLeft=0;
     float avgRight=0;
@@ -300,52 +295,33 @@ public:
     WallRight.Set(1);
     BallRight.Set(0);
     while(IsEnabled()&&IsAutonomous()) {
-      if(SmartDashboard::GetBoolean("Use Ultrasonic")) {
-        if(cur<sampleCount) {
-          WallLeft.Set(1);
-          WallRight.Set(0);
-          avgLeft+=voltToDistance(WallSonicLeft.GetAverageVoltage(),true);
-        } else if(cur==sampleCount) {
-          avgLeft/=12;
-        } else if(cur<sampleCount*4&&cur>3*sampleCount) {
-          WallLeft.Set(0);
-          WallRight.Set(1);
-          avgRight+=voltToDistance(WallSonicRight.GetAverageVoltage(),true);
-        } else if(cur==sampleCount*4) {
-          avgRight/=12;
-          thisIsATest=atan((abs(avgLeft-avgRight))/20.0f)*360.0f/(2.0f*3.141592653589793f);
-        } else if(cur==sampleCount*6) {
-          cur=0;
-        }
-        if(i>164) {
-          SmartDashboard::PutNumber("Tanval", thisIsATest);
-        }
-      } else {
-        if(i<=initalDriveTime*200) {
-          //Drive initialDriveTime amount of time
-          driveRobot(1.0f,0.0f);
-        } else if(i>shooterDelay&&i<shooterDelay+(shooterDuration*200)&&shooterMaxAngle>=potToDegrees(armPot.GetAverageVoltage())) {
+        //Drive initial amount of time
+        //if(i<=initalDriveTime*200) {
+        if(i<280) {
+          driveRobot(-0.6f,0.0f);
+        //} else if(i>shooterDelay&&i<shooterDelay+(shooterDuration*200)&&shooterMaxAngle>=potToDegrees(armPot.GetAverageVoltage())) {
+        } else if(i>720&&i<820&&125>=potToDegrees(armPot.GetAverageVoltage())) {
           //Shooting
           driveRobot(0.0f, 0.0f);
-          shootRobot(1.0f, true);
+          shootRobot(0.45f, true);
           setMotorValue(6, 1, 1);
         }
-        if(i>480&&i<430+initalDriveTime){
-          driveRobot(-1.0f,0.0f);
+        //if(i>480&&i<430+initalDriveTime){
+        if(i>820&&i<980){
+          driveRobot(0.0f,0.0f);
           setMotorValue(6, 1, 0);
-          //TODO
-        } else if(i>430+initalDriveTime/*&&ballLimit.Get()==1*/) {
+          shootRobot(-0.4f, true);
+        //} else if(i>430+initalDriveTime/*&&ballLimit.Get()==1*/) {
+        } else if(i<900&&i>1200) {
+          driveRobot(0.6f,0.0f);
+          setMotorValue(6, 1, 1);
+        //} else if(/*ballLimit.Get()==1&&*/i>430+initalDriveTime) {
+        } else if(i<1200&&i>1480) {
           driveRobot(-0.6f,0.0f);
-          setMotorValue(6, 1, 1);
-          //TODO
-        } else if(/*ballLimit.Get()==1&&*/i>430+initalDriveTime) {
-          driveRobot(1.0f,0.0f);
           setMotorValue(6, 1, 0);
+        }else if(i>1480&&i<1580&&125>=potToDegrees(armPot.GetAverageVoltage())){
+          shootRobot(0.45f,true);
         }
-        if(i>480&&i<480){
-          shootRobot(0.25f,true);
-        }
-      }
       updateDashboard();
       if(i % 100 == 0 && compressing && compressor.GetPressureSwitchValue() == 1) {
         compressor.Stop();
@@ -405,6 +381,18 @@ public:
         logMsg("Starting the compressor... again",2);
       }
       updateDashboard();
+      if(Lstick.GetRawButton(3)){
+        SmartDashboard::PutNumber("upLimit",100.0f);
+      }
+      if(Lstick.GetRawButton(4)){
+        SmartDashboard::PutNumber("upLimit",120.0f);
+      }
+      if(Lstick.GetRawButton(5)){
+        SmartDashboard::PutNumber("upLimit",90.0f);
+      }
+      if(Lstick.GetRawButton(6)){
+        SmartDashboard::PutNumber("upLimit",130.0f);
+      }
       if(Lstick.GetRawButton(1)==1&&(upLimit>=potToDegrees(armPot.GetAverageVoltage()))) {
         //Move arm motors based on throttle
         if(collectorExtended == false) {
