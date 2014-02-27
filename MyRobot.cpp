@@ -1,7 +1,7 @@
 //Sonar code
 #include "WPILib.h"
 #include "SmartDashboard/SmartDashboard.h"
-//#include "Command.h"
+#include "Command.h"
 #include <iostream>
 #include <math.h>
 #include <vector>
@@ -127,8 +127,6 @@ public:
     if(upLimit > 167) {
       upLimit = 167;
     }
-  }
-  void calcRobot(){
   }
   void shootRobot(float power=0, bool override=false) {
     override=true;
@@ -324,15 +322,17 @@ public:
         }
       } else {
         if(i<=initalDriveTime*200) {
+          //Drive initialDriveTime amount of time
           driveRobot(1.0f,0.0f);
-          //setMotorValue(6, 1, 1);
         } else if(i>shooterDelay&&i<shooterDelay+(shooterDuration*200)&&shooterMaxAngle>=potToDegrees(armPot.GetAverageVoltage())) {
-          driveRobot(0, 0);
-          shootRobot(1, true);
+          //Shooting
+          driveRobot(0.0f, 0.0f);
+          shootRobot(1.0f, true);
           setMotorValue(6, 1, 1);
         }
         if(i>480&&i<430+initalDriveTime){
-          driveRobot(-1,0);
+          driveRobot(-1.0f,0.0f);
+          setMotorValue(6, 1, 0);
           //TODO
         } else if(i>430+initalDriveTime/*&&ballLimit.Get()==1*/) {
           driveRobot(-0.6f,0.0f);
@@ -340,6 +340,7 @@ public:
           //TODO
         } else if(/*ballLimit.Get()==1&&*/i>430+initalDriveTime) {
           driveRobot(1.0f,0.0f);
+          setMotorValue(6, 1, 0);
         }
         if(i>480&&i<480){
           shootRobot(0.25f,true);
