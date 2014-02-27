@@ -86,7 +86,7 @@ public:
     servoYState = 90;
     multiplier = 1.0f;
     downLimit = 40;
-    upLimit = 130;
+    upLimit = 130.0;
     compressor.Start();
     shooting = false;
     compressing = true;
@@ -120,7 +120,7 @@ public:
     SmartDashboard::PutNumber("Ball Right", voltToDistance(BallSonicRight.GetAverageVoltage()));
     DownSpeed = SmartDashboard::GetNumber("DownSpeed");
     downLimit = SmartDashboard::GetNumber("downLimit");
-    upLimit = SmartDashboard::GetNumber("upLimit");
+    SmartDashboard::PutNumber("upLimit",upLimit);
     if(downLimit < 35) {
       downLimit = 35;
     }
@@ -135,7 +135,6 @@ public:
     //The override is in place in case an ultrasonic becomes damaged and we are unable to validate the distance through software
     float averageAtan = atan((abs(voltToDistance(BallSonicLeft.GetAverageVoltage()) - voltToDistance(BallSonicRight.GetAverageVoltage())))/20.0f)*360.0f/(2.0f*3.141592653589793f);
     if(override==true) {
-      printf("%f\n",power);
       setMotorValue(4, 1, cvt(power));
       setMotorValue(5, 1, cvt(power));
       setMotorValue(4, 2, cvt(-power));
@@ -295,33 +294,68 @@ public:
     WallRight.Set(1);
     BallRight.Set(0);
     while(IsEnabled()&&IsAutonomous()) {
-        //Drive initial amount of time
-        //if(i<=initalDriveTime*200) {
-        if(i<280) {
-          driveRobot(-0.6f,0.0f);
-        //} else if(i>shooterDelay&&i<shooterDelay+(shooterDuration*200)&&shooterMaxAngle>=potToDegrees(armPot.GetAverageVoltage())) {
-        } else if(i>720&&i<820&&125>=potToDegrees(armPot.GetAverageVoltage())) {
-          //Shooting
+      //Drive initial amount of time
+      //if(i<=initalDriveTime*200) {
+      setMotorValue(6, 1, 1);
+      if(SmartDashboard::GetBoolean("Use Ultrasonic")){
+      }else{
+        if(i<100) {
+          //Forward .5s
+          driveRobot(-1.0f,0.0f);
+          shootRobot(0.0f, true);
+        }else if(i>=100&&i<=200){//zero
+          driveRobot(0.0f, 0.0f);
+          shootRobot(0.0f, true);
+        } else if(i>700&&i<800&&/*120*/95.0f>=potToDegrees(armPot.GetAverageVoltage())) {
+          //Shoot .45 power
           driveRobot(0.0f, 0.0f);
           shootRobot(0.45f, true);
-          setMotorValue(6, 1, 1);
-        }
-        //if(i>480&&i<430+initalDriveTime){
-        if(i>820&&i<980){
+        } else if(i>700&&i<800&&/*120*/95.0f<=potToDegrees(armPot.GetAverageVoltage())) {
+          driveRobot(0.0f, 0.0f);
+          shootRobot(0.0f, true);
+        } else if(i>800&&i<960&&40.0f<=potToDegrees(armPot.GetAverageVoltage())) {
+          //Lower shooter .15 power
           driveRobot(0.0f,0.0f);
-          setMotorValue(6, 1, 0);
-          shootRobot(-0.4f, true);
-        //} else if(i>430+initalDriveTime/*&&ballLimit.Get()==1*/) {
-        } else if(i<900&&i>1200) {
-          driveRobot(0.6f,0.0f);
-          setMotorValue(6, 1, 1);
-        //} else if(/*ballLimit.Get()==1&&*/i>430+initalDriveTime) {
-        } else if(i<1200&&i>1480) {
-          driveRobot(-0.6f,0.0f);
-          setMotorValue(6, 1, 0);
-        }else if(i>1480&&i<1580&&125>=potToDegrees(armPot.GetAverageVoltage())){
+          shootRobot(-0.15f, true);
+        } else if(i>800&&i<960&&40.0f>=potToDegrees(armPot.GetAverageVoltage())) {
+          driveRobot(0.0f,0.0f);
+          shootRobot(0.0f, true);
+        } else if(i>=970&&i<=980) {//zero
+          driveRobot(0.0f,0.0f);
+          shootRobot(0.0f, true);
+        } else if(i>980&&i<1080) {
+          //Drive backward .5s
+          //Collect ball
+          driveRobot(1.0f,0.0f);
+          shootRobot(0.0f,true);
+        }else if(i>=1080&&i<=1280){//zero
+          //Collect ball
+          driveRobot(0.0f,0.0f);
+          shootRobot(0.0f,true);
+        } else if(i>1280&&i<1380) {
+          //Drive forward .5s
+          driveRobot(-1.0f,0.0f);
+          shootRobot(0.0f,true);
+        } else if(i>=1380&&i<=1580){//zero
+          driveRobot(0.0f,0.0f);
+          shootRobot(0.0f,true);
+        } else if(i>1660&&i<1760&&/*120*/95.0f>=potToDegrees(armPot.GetAverageVoltage())){
+          //Shoot at .45 power
+          driveRobot(0.0f,0.0f);
           shootRobot(0.45f,true);
+        } else if(i>1660&&i<1760&&/*120*/95.0f<=potToDegrees(armPot.GetAverageVoltage())){
+          driveRobot(0.0f,0.0f);
+          shootRobot(0.0f,true);
+        } else if(i>1760&&40.0f>=potToDegrees(armPot.GetAverageVoltage())) {
+          //Stop robot after auto, let down shooter
+          driveRobot(0.0f,0.0f);
+          shootRobot(-0.15f,true);
+        } else if(i>1760&&40.0f<=potToDegrees(armPot.GetAverageVoltage())) {
+          //Stop all motors
+          driveRobot(0.0f,0.0f);
+          shootRobot(0.0f,true);
         }
+      }
       updateDashboard();
       if(i % 100 == 0 && compressing && compressor.GetPressureSwitchValue() == 1) {
         compressor.Stop();
@@ -337,6 +371,7 @@ public:
       i++;
       cur++;
     }
+    i=0;
     compressing = false;
     compressor.Stop();
   }
@@ -380,19 +415,19 @@ public:
         compressing = true;
         logMsg("Starting the compressor... again",2);
       }
-      updateDashboard();
       if(Lstick.GetRawButton(3)){
-        SmartDashboard::PutNumber("upLimit",100.0f);
+        upLimit=100.0f;
       }
       if(Lstick.GetRawButton(4)){
-        SmartDashboard::PutNumber("upLimit",120.0f);
+        upLimit=120.0f;
       }
       if(Lstick.GetRawButton(5)){
-        SmartDashboard::PutNumber("upLimit",90.0f);
+        upLimit=90.0f;
       }
       if(Lstick.GetRawButton(6)){
-        SmartDashboard::PutNumber("upLimit",130.0f);
+        upLimit=130.0f;
       }
+      updateDashboard();
       if(Lstick.GetRawButton(1)==1&&(upLimit>=potToDegrees(armPot.GetAverageVoltage()))) {
         //Move arm motors based on throttle
         if(collectorExtended == false) {
