@@ -107,6 +107,10 @@ public:
     SmartDashboard::PutNumber("Wall Right", voltToDistance(WallSonicRight.GetAverageVoltage(),true));
     SmartDashboard::PutNumber("Ball Left", voltToDistance(BallSonicLeft.GetAverageVoltage()));
     SmartDashboard::PutNumber("Ball Right", voltToDistance(BallSonicRight.GetAverageVoltage()));
+    SmartDashboard::PutNumber("AutoDistance",0.0f);
+    SmartDashboard::PutNumber("AutoYValue",50.0f);
+    SmartDashboard::PutNumber("AutoPower",0.52f);
+    SmartDashboard::PutNumber("AutoAngle",120.0f);
     SmartDashboard::PutBoolean("Use Ultrasonic",false);
     SmartDashboard::PutBoolean("Daniel Mode",false);
   }
@@ -346,7 +350,10 @@ public:
           */
         }
       }else{
-        int x=0;
+        int x=SmartDashboard::GetNumber("AutoDistance");
+        int y=SmartDashboard::GetNumber("AutoYValue");
+        int power=SmartDashboard::GetNumber("AutoPower");
+        int angle=SmartDashboard::GetNumber("AutoAngle");
         setMotorValue(6, 1, 1);
         if(i<200+x) {
           //Forward .5s
@@ -356,46 +363,46 @@ public:
           //Wait
           driveRobot(0.0f, 0.0f);
           shootRobot(0.0f, true);
-        } else if(i>400+x&&i<500+x&&/*120*/120.0f>=potToDegrees(armPot.GetAverageVoltage())) {
-          //Shoot .45 power
+        } else if(i>400+x&&i<500+x&&/*120*/angle>=potToDegrees(armPot.GetAverageVoltage())) {
+          //Shoot
           driveRobot(0.0f, 0.0f);
-          shootRobot(0.52f, true);
-        } else if(i>400+x&&i<500+x&&/*120*/120.0f<=potToDegrees(armPot.GetAverageVoltage())) {
+          shootRobot(power, true);
+        } else if(i>400+x&&i<500+x&&/*120*/angle<=potToDegrees(armPot.GetAverageVoltage())) {
           //Wait
           driveRobot(0.0f, 0.0f);
           shootRobot(0.0f, true);
-        } else if(i>500+x&&i<700+2*x) {
+        } else if(i>500+x&&i<700+2*x+y) {
           //Drive backward 1s, Collect ball
           if(40.0f<=potToDegrees(armPot.GetAverageVoltage())){
             shootRobot(-0.15f);
           }
           driveRobot(1.0f,0.1f);
           shootRobot(0.0f,true);
-        }else if(i>=700+2*x&&i<=900+2*x){
+        }else if(i>=700+2*x+y&&i<=900+2*x+y){
           //Wait
           driveRobot(0.0f,0.0f);
           shootRobot(0.0f,true);
-        } else if(i>900+2*x&&i<1100+3*x) {
+        } else if(i>900+2*x+y&&i<1100+3*x+2*y) {
           //Drive forward 1s
           driveRobot(-1.0f,0.1f);
           shootRobot(0.0f,true);
-        } else if(i>=1100+3*x&&i<=1200+3*x){
+        } else if(i>=1100+3*x+2*y&&i<=1200+3*x+2*y){
           //Wait
           driveRobot(0.0f,0.0f);
           shootRobot(0.0f,true);
-        } else if(i>1200+3*x&&i<1300+3*x&&/*120*/130.0f>=potToDegrees(armPot.GetAverageVoltage())){
-          //Shoot at .45 power
+        } else if(i>1200+3*x+2*y&&i<1300+3*x+2*y&&/*120*/angle>=potToDegrees(armPot.GetAverageVoltage())){
+          //Shoot
           driveRobot(0.0f,0.0f);
-          shootRobot(SmartDashboard::GetNumber("AutoShootSpeed"),true);
-        } else if(i>1200+3*x&&i<1300+3*x&&/*120*/130.0f<=potToDegrees(armPot.GetAverageVoltage())){
+          shootRobot(power,true);
+        } else if(i>1200+3*x+2*y&&i<1300+3*x+2*y&&/*120*/angle<=potToDegrees(armPot.GetAverageVoltage())){
           //Wait
           driveRobot(0.0f,0.0f);
           shootRobot(0.0f,true);
-        } else if(i>1300+3*x&&40.0f>=potToDegrees(armPot.GetAverageVoltage())) {
+        } else if(i>1300+3*x+2*y&&40.0f>=potToDegrees(armPot.GetAverageVoltage())) {
           //Stop robot after auto, let down shooter
           driveRobot(0.0f,0.0f);
           shootRobot(-0.15f,true);
-        } else if(i>1300+3*x&&40.0f<=potToDegrees(armPot.GetAverageVoltage())) {
+        } else if(i>1300+3*x+2*y&&40.0f<=potToDegrees(armPot.GetAverageVoltage())) {
           //Stop all motors
           driveRobot(0.0f,0.0f);
           shootRobot(0.0f,true);
