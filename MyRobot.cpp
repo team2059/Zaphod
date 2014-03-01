@@ -139,7 +139,7 @@ public:
       upLimit = 167;
     }
   }
-  void shootRobot(float power=0) {
+  void shootRobot(float power=0.0f) {
     //Needs a limit to help the driver aim
     //In this case its checking that we are no more than 15 degrees off
     //The override is in place in case an ultrasonic becomes damaged and we are unable to validate the distance through software
@@ -296,28 +296,25 @@ public:
       float correctionForward=SmartDashboard::GetNumber("AutoCorrectionForward");
       float correctionBackward=SmartDashboard::GetNumber("AutoCorrectionBackward");
       if(SmartDashboard::GetBoolean("Use Ultrasonic")){
-        if(i<400&&voltToDistance(WallSonicLeft.GetAverageVoltage()>40.0f,true)){
+        if(/*i<400&&*/voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>40.0f){
           driveRobot(1.0f,correctionForward);
-          shootRobot(0.0f,0.0f);
-        }else if(i<200&&voltToDistance(WallSonicLeft.GetAverageVoltage()<=40.0f,true)){
+          shootRobot(0.0f);
+        }else if(/*i<200&&*/voltToDistance(WallSonicLeft.GetAverageVoltage(),true)<=40.0f){
           driveRobot(0.0f,0.0f);
-          shootRobot(0.0f,0.0f);
+          shootRobot(0.0f);
         }
       }else if(SmartDashboard::GetBoolean("TestDrive")){
         if(cur<100){
           cur=0;
-          if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)<=40.0f){
+          if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=40.0f){
             printf("Cur!!: %d\n",cur);
+          }else{
+            printf("NoCur: %d\n",cur);
           }
+        }else{
+          printf("Cur: %d\n",cur);
         }
       }else{
-        int x=SmartDashboard::GetNumber("AutoXVale");
-        int y=SmartDashboard::GetNumber("AutoYValue");
-        int z=SmartDashboard::GetNumber("AutoZValue");
-        float power=SmartDashboard::GetNumber("AutoPower");
-        int angle=SmartDashboard::GetNumber("AutoAngle");
-        float correctionForward=SmartDashboard::GetNumber("AutoCorrectionForward");
-        float correctionBackward=SmartDashboard::GetNumber("AutoCorrectionBackward");
         if(i<1700+x+y+z){
           setMotorValue(6, 1, 1);
         }
