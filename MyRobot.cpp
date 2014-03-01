@@ -26,12 +26,8 @@ class RobotDemo : public SimpleRobot
   //Ultrasonic
   AnalogChannel BallSonicLeft, BallSonicRight, WallSonicLeft, WallSonicRight;
   DigitalOutput BallLeft, BallRight, WallLeft, WallRight;
-  //DigitalInput ballLimit;
 public:
   RobotDemo():
-    //Limit Switches
-    //TODO
-    //ballLimit(),
     //Joysticks
     Rstick(1),
     Lstick(2),
@@ -108,11 +104,13 @@ public:
     SmartDashboard::PutNumber("Ball Left", voltToDistance(BallSonicLeft.GetAverageVoltage()));
     SmartDashboard::PutNumber("Ball Right", voltToDistance(BallSonicRight.GetAverageVoltage()));
 
-    SmartDashboard::PutNumber("AutoDistance",70.0f);
+    SmartDashboard::PutNumber("AutoXVale",70.0f);
     SmartDashboard::PutNumber("AutoYValue",150.0f);
-    SmartDashboard::PutNumber("AutoPower",0.54f);
+    SmartDashboard::PutNumber("AutoZValue",150.0f);
+    SmartDashboard::PutNumber("AutoPower",0.50f);
     SmartDashboard::PutNumber("AutoAngle",130.0f);
-    SmartDashboard::PutNumber("AutoCorrection",0.06f);
+    SmartDashboard::PutNumber("AutoCorrectionForward",0.06f);
+    SmartDashboard::PutNumber("AutoCorrectionBackward",0.09f);
 
     SmartDashboard::PutNumber("ShortRange",0.465f);
     SmartDashboard::PutNumber("ShooterButtonPower10",0.605f);
@@ -120,6 +118,7 @@ public:
     SmartDashboard::PutNumber("ShooterButtonPower8",0.5f);
 
     SmartDashboard::PutBoolean("Use Ultrasonic",false);
+    SmartDashboard::PutBoolean("TestDrive",false);
     SmartDashboard::PutBoolean("Daniel Mode",false);
   }
   void updateDashboard() {
@@ -287,71 +286,44 @@ public:
     BallLeft.Set(0);
     WallRight.Set(1);
     BallRight.Set(0);
+    int stoppedTime=-1;
     while(IsEnabled()&&IsAutonomous()) {
-      //Drive initial amount of time
-      //if(i<=initalDriveTime*200) {
-      //setMotorValue(6, 1, 1);
+      int x=SmartDashboard::GetNumber("AutoXVale");
+      int y=SmartDashboard::GetNumber("AutoYValue");
+      int z=SmartDashboard::GetNumber("AutoZValue");
+      float power=SmartDashboard::GetNumber("AutoPower");
+      int angle=SmartDashboard::GetNumber("AutoAngle");
+      float correctionForward=SmartDashboard::GetNumber("AutoCorrectionForward");
+      float correctionBackward=SmartDashboard::GetNumber("AutoCorrectionBackward");
       if(SmartDashboard::GetBoolean("Use Ultrasonic")){
-        if(voltToDistance(WallSonicRight.GetAverageVoltage())<40.0f){
-          driveRobot(1.0f,0.0f);
+        if(i<400&&voltToDistance(WallSonicLeft.GetAverageVoltage()>40.0f,true)){
+          driveRobot(1.0f,correctionForward);
+          shootRobot(0.0f,0.0f);
+        }else if(i<200&&voltToDistance(WallSonicLeft.GetAverageVoltage()<=40.0f,true)){
+          driveRobot(0.0f,0.0f);
+          shootRobot(0.0f,0.0f);
         }
-        //Collect left average values from cur values 0 to 12
-        if(cur<12){
-          avgRight+=WallSonicRight.GetAverageVoltage();
-        }else if(cur==12){
-          avgRight/=12;
+      }else if(SmartDashboard::GetBoolean("TestDrive")){
+        if(cur<100){
           cur=0;
-          thisIsATest=avgRight;
-        }
-        if(i==12){
-          avgDist=thisIsATest;
-        }
-        //Calculate the inital distance and average it averageAmount times.
-        if(i<averageAmount){
-          avgDist+=(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)+voltToDistance(WallSonicRight.GetAverageVoltage(),true)/2);
-        }else{
-          avgDist/=averageAmount;
-        }
-        //Calculate the average distance from the wall
-        curDist=thisIsATest;
-        if(i%100==0){
-          printf("Difference: %f\n",avgDist-curDist);
-        }
-        if (i>=5&&avgDist-curDist<=36.0f) {
-          float xPower, yPower;
-          xPower=1;
-          yPower=(avgDist-curDist)/36.0f;
-          if(yPower>1){
-            yPower=1;
+          if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)<=40.0f){
+            printf("Cur!!: %d\n",cur);
           }
-          //driveRobot(yPower, xPower);
-          //setMotorValue(6, 1, 1);
-        } else if (i>1400&&i<1600&&125>=potToDegrees(armPot.GetAverageVoltage())) {
-          //driveRobot(0, 0);
-          //shootRobot(1);
-          //setMotorValue(6, 1, 1);
-        } else if (i>1500&&i<1700) {
-          //shootRobot(.1);
-          //driveRobot(-1,0);
-        } else {
-          /*
-          driveRobot(0, 0);
-          shootRobot(0);
-          setMotorValue(6, 1, 0);
-          */
         }
       }else{
-        int x=SmartDashboard::GetNumber("AutoDistance");
+        int x=SmartDashboard::GetNumber("AutoXVale");
         int y=SmartDashboard::GetNumber("AutoYValue");
+        int z=SmartDashboard::GetNumber("AutoZValue");
         float power=SmartDashboard::GetNumber("AutoPower");
         int angle=SmartDashboard::GetNumber("AutoAngle");
-        float correction=SmartDashboard::GetNumber("AutoCorrection");
-        if(i<1700+3*x+2*y){
+        float correctionForward=SmartDashboard::GetNumber("AutoCorrectionForward");
+        float correctionBackward=SmartDashboard::GetNumber("AutoCorrectionBackward");
+        if(i<1700+x+y+z){
           setMotorValue(6, 1, 1);
         }
         if(i<200+x) {
-          //Forward .5s
-          driveRobot(-1.0f,correction);
+          //Forward
+          driveRobot(-1.0f,0.07f);
           shootRobot(0.0f);
         }else if(i>=200+x&&i<=400+x){
           //Wait
@@ -365,38 +337,38 @@ public:
           //Wait
           driveRobot(0.0f, 0.0f);
           shootRobot(0.0f);
-        } else if(i>500+x&&i<700+2*x+y) {
-          //Drive backward 1s, Collect ball
+        } else if(i>500+x&&i<700+x+y) {
+          //Drive backward
           if(40.0f<=potToDegrees(armPot.GetAverageVoltage())){
             shootRobot(-0.30f);
           }
-          driveRobot(0.6f,correction);
+          driveRobot(0.6f,correctionBackward);
           shootRobot(0.0f);
-        } else if(i>=700+2*x+y&&i<=1300+2*x+y){
+        } else if(i>=700+x+y&&i<=1300+x+y){
           //Wait
           driveRobot(0.0f,0.0f);
           shootRobot(0.0f);
-        } else if(i>1300+2*x+y&&i<1500+3*x+2*y) {
-          //Drive forward 1s
-          driveRobot(-1.0f,correction);
+        } else if(i>1300+x+y&&i<1500+x+y+z) {
+          //Drive forward
+          driveRobot(-0.9f,0.063f);
           shootRobot(0.0f);
-        } else if(i>=1500+3*x+2*y&&i<=1600+3*x+2*y){
+        } else if(i>=1500+x+y+z&&i<=1600+x+y+z){
           //Wait
           driveRobot(0.0f,0.0f);
           shootRobot(0.0f);
-        } else if(i>1600+3*x+2*y&&i<1700+3*x+2*y&&/*120*/angle>=potToDegrees(armPot.GetAverageVoltage())){
+        } else if(i>1600+x+y+z&&i<1700+x+y+z&&/*120*/angle>=potToDegrees(armPot.GetAverageVoltage())){
           //Shoot
           driveRobot(0.0f,0.0f);
           shootRobot(power);
-        } else if(i>1600+3*x+2*y&&i<1700+3*x+2*y&&/*120*/angle<=potToDegrees(armPot.GetAverageVoltage())){
+        } else if(i>1600+x+y+z&&i<1700+x+y+z&&/*120*/angle<=potToDegrees(armPot.GetAverageVoltage())){
           //Wait
           driveRobot(0.0f,0.0f);
           shootRobot(0.0f);
-        } else if(i>1700+3*x+2*y&&40.0f<=potToDegrees(armPot.GetAverageVoltage())) {
+        } else if(i>1700+x+y+z&&40.0f<=potToDegrees(armPot.GetAverageVoltage())) {
           //Stop robot after auto, let down shooter
           driveRobot(0.0f,0.0f);
           shootRobot(-0.15);
-        } else if(i>1700+3*x+2*y&&40.0f>=potToDegrees(armPot.GetAverageVoltage())) {
+        } else if(i>1700+x+y+z&&40.0f>=potToDegrees(armPot.GetAverageVoltage())) {
           //Stop all motors
           driveRobot(0.0f,0.0f);
           shootRobot(0.0f);
@@ -481,7 +453,6 @@ public:
       if(Lstick.GetRawButton(6)){
         upLimit=130.0f;
       }
-      //TODO
       updateDashboard();
       if(Lstick.GetRawButton(1)==1&&Lstick.GetRawButton(2)==1){
         throttle=SmartDashboard::GetNumber("ShortRange");
