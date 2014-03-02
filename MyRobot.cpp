@@ -1,4 +1,6 @@
-//Sonar code
+//TODO
+//Add a button on joystick that activates "auto" to drive to 40 inches away and another to shoot when at 40 inches away (use the little joystick on both drive and shooter stick)
+//Sonar in auto: drive till 40in away (dashboard value) and shoot
 #include "WPILib.h"
 #include "SmartDashboard/SmartDashboard.h"
 //#include "Command.h"
@@ -10,14 +12,13 @@ class RobotDemo : public SimpleRobot
 {
   RobotDrive myRobot;
   float potVal, multiplier, servoXState, servoYState, throttle, ServoXJoyPos, ServoYJoyPos;
-  int lastToggle;
-  bool collectorExtended, toggleCollector, shooting, compressing;
+  bool collectorExtended, shooting, compressing;
   float upLimit;
   //string cmd;
   Joystick Rstick, Lstick;
   Servo Servo1, Servo2;
   Solenoid collectorSole1, collectorSole2;
-  DigitalInput pneumaticLS, shootTopLS, shootBottomLS;
+  //Do we need this? TODO - Austen
   Relay collectorSpike, lightingSpike;
   Compressor compressor;
   Jaguar Left1, Left2, Left3, Right1, Right2, Right3, RightArmMotor1, RightArmMotor2, LeftArmMotor1, LeftArmMotor2, CollectorMotor1;
@@ -25,12 +26,10 @@ class RobotDemo : public SimpleRobot
   //Ultrasonic
   AnalogChannel BallSonicLeft, BallSonicRight, WallSonicLeft, WallSonicRight;
   DigitalOutput BallLeft, BallRight, WallLeft, WallRight;
-  //DigitalInput ballLimit;
 public:
   RobotDemo():
     //Limit Switches
     //TODO
-    //ballLimit(),
     //Joysticks
     Rstick(1),
     Lstick(2),
@@ -50,10 +49,6 @@ public:
     //Solenoids
     collectorSole1(1),
     collectorSole2(2),
-    //Limit switches
-    pneumaticLS(1),
-    shootTopLS(2),
-    shootBottomLS(3),
     //Driver Motors
     Left1(1, 1),
     Left2(1, 2),
@@ -79,7 +74,6 @@ public:
     }
   void RobotInit() {
     //Initializing robot
-    lastToggle = 0;
     DashboardSetup();
     servoXState = 90;
     servoYState = 90;
@@ -88,7 +82,6 @@ public:
     compressor.Start();
     shooting = false;
     compressing = true;
-    toggleCollector = false;
     throttle=0;
   }
   void DashboardSetup() {
