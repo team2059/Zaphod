@@ -1,9 +1,10 @@
 //TODO
 //Add a button on joystick that activates "auto" to drive to 40 inches away and another to shoot when at 40 inches away (use the little joystick on both drive and shooter stick)
 //Sonar in auto: drive till 40in away (dashboard value) and shoot
+//**
+//#include "Command.h"
 #include "WPILib.h"
 #include "SmartDashboard/SmartDashboard.h"
-//#include "Command.h"
 #include <iostream>
 #include <math.h>
 #include <vector>
@@ -11,15 +12,12 @@
 class RobotDemo : public SimpleRobot
 {
   RobotDrive myRobot;
-  float potVal, multiplier, servoXState, servoYState, throttle, ServoXJoyPos, ServoYJoyPos;
+  float potVal, multiplier, throttle;
   bool collectorExtended, shooting, compressing;
   float upLimit;
-  //string cmd;
   Joystick Rstick, Lstick;
-  Servo Servo1, Servo2;
   Solenoid collectorSole1, collectorSole2;
-  //Do we need this? TODO - Austen
-  Relay collectorSpike, lightingSpike;
+  Relay collectorSpike;
   Compressor compressor;
   Jaguar Left1, Left2, Left3, Right1, Right2, Right3, RightArmMotor1, RightArmMotor2, LeftArmMotor1, LeftArmMotor2, CollectorMotor1;
   AnalogChannel armPot;
@@ -28,8 +26,6 @@ class RobotDemo : public SimpleRobot
   DigitalOutput BallLeft, BallRight, WallLeft, WallRight;
 public:
   RobotDemo():
-    //Limit Switches
-    //TODO
     //Joysticks
     Rstick(1),
     Lstick(2),
@@ -49,19 +45,15 @@ public:
     //Solenoids
     collectorSole1(1),
     collectorSole2(2),
-    //Driver Motors
-    Left1(1, 1),
-    Left2(1, 2),
-    Left3(1, 3),
-    Right1(2, 1),
-    Right2(2, 2),
-    Right3(2, 3),
-    //Servos
-    Servo1(1, 7),
-    Servo2(1, 8),
+    //Drive Motors
+    Left1(1,1),
+    Left2(1,2),
+    Left3(1,3),
+    Right1(2,1),
+    Right2(2,2),
+    Right3(2,3),
     //Spikes
     collectorSpike(2, 7),
-    lightingSpike(2, 8),
     //Shooter Motors
     LeftArmMotor1(1, 4),
     LeftArmMotor2(1, 5),
@@ -73,10 +65,8 @@ public:
       GetWatchdog().SetEnabled(false);
     }
   void RobotInit() {
-    //Initializing robot
+    printf("Initalizing Zaphod...\n");
     DashboardSetup();
-    servoXState = 90;
-    servoYState = 90;
     multiplier = 1.0f;
     upLimit = 130.0;
     compressor.Start();
@@ -90,23 +80,23 @@ public:
     //SmartDashboard::PutString("Auto", cmd);
     SmartDashboard::PutNumber("armPot", potToDegrees(armPot.GetAverageVoltage()));
     SmartDashboard::PutNumber("Log Level", 1);
-    //Ultrasonic
+    //Ultrasonic values (converted to inches)
     SmartDashboard::PutNumber("Wall Left", voltToDistance(WallSonicLeft.GetAverageVoltage(),true));
     SmartDashboard::PutNumber("Wall Right", voltToDistance(WallSonicRight.GetAverageVoltage(),true));
     SmartDashboard::PutNumber("Ball Left", voltToDistance(BallSonicLeft.GetAverageVoltage()));
     SmartDashboard::PutNumber("Ball Right", voltToDistance(BallSonicRight.GetAverageVoltage()));
-
+    //Autonomous values
     SmartDashboard::PutNumber("AutoDistance",350.0f);
     SmartDashboard::PutNumber("AutoYValue",350.0f);
     SmartDashboard::PutNumber("AutoPower",0.455f);
     SmartDashboard::PutNumber("AutoAngle",130.0f);
     SmartDashboard::PutNumber("AutoCorrection",0.06f);
-
-    SmartDashboard::PutNumber("ShortRange",0.465f);
+    //Operator Controlled values
+    SmartDashboard::PutNumber("ShortRange",0.465f); //The amount of power for the shooter when against the low goal
     SmartDashboard::PutNumber("ShooterButtonPower10",0.605f);
     SmartDashboard::PutNumber("ShooterButtonPower7",1.0f);
     SmartDashboard::PutNumber("ShooterButtonPower8",0.5f);
-
+    //Other booleans
     SmartDashboard::PutBoolean("OneBallAuto",true);
     SmartDashboard::PutBoolean("Daniel Mode",false);
     SmartDashboard::PutBoolean("CollectorState",false);
@@ -124,9 +114,6 @@ public:
     }
   }
   void shootRobot(float power=0) {
-    //Needs a limit to help the driver aim
-    //In this case its checking that we are no more than 15 degrees off
-    //The override is in place in case an ultrasonic becomes damaged and we are unable to validate the distance through software
     setMotorValue(4, 1, cvt(power));
     setMotorValue(5, 1, cvt(power));
     setMotorValue(4, 2, cvt(-power));
@@ -157,7 +144,6 @@ public:
     setMotorValue(3, 2, rightPower);
   }
   template<typename numbertype> string toString(numbertype a) {
-    //TODO
     stringstream ss;
     ss<<a;
     string s = ss.str();
@@ -233,10 +219,8 @@ public:
         case 6:
           break;
         case 7:
-          Servo1.SetAngle(value);
           break;
         case 8:
-          Servo2.SetAngle(value);
           break;
         case 9:
           break;
@@ -254,11 +238,12 @@ public:
     int i=0;
     int cur=0;
     int averageAmount=5;
-    float initalDriveTime=1.4; //The amount of time in seconds that we will drive forward at the start of the match
+    float initalDriveTime=2.75; //The amount of time in seconds that we will drive forward at the start of the match
     float shooterMaxAngle=125; //The maximum angle that the arm can shoot to during all of auto
     float shooterDelay = 2;    //The amount of time in seconds between the inital drive time and the shooter firing
     float shooterDuration = .5;//The amount of time in seconds that the shooter motors will be moving
     shooterDelay = (shooterDelay*200); //Do math to figure out the times to start the shooting
+    initalDriveTime = (initalDriveTime*200);
     float sampleCount=12;
     float avgRight=0;
     float curDist;
@@ -272,15 +257,15 @@ public:
     BallRight.Set(0);
     SmartDashboard::PutBoolean("CollectorState",true);
     while(IsEnabled()&&IsAutonomous()) {
+      int x=SmartDashboard::GetNumber("AutoDistance");
+      int y=SmartDashboard::GetNumber("AutoYValue");
+      float power=SmartDashboard::GetNumber("AutoPower");
+      int angle=SmartDashboard::GetNumber("AutoAngle");
+      float correction=SmartDashboard::GetNumber("AutoCorrection");
       //Drive initial amount of time
       //if(i<=initalDriveTime*200) {
       //setMotorValue(6, 1, 1);
       if(SmartDashboard::GetBoolean("OneBallAuto")){
-        int x=SmartDashboard::GetNumber("AutoDistance");
-        int y=SmartDashboard::GetNumber("AutoYValue");
-        float power=SmartDashboard::GetNumber("AutoPower");
-        int angle=SmartDashboard::GetNumber("AutoAngle");
-        float correction=SmartDashboard::GetNumber("AutoCorrection");
         setMotorValue(6, 1, 1);
         if(i<200+x) {
           //Forward .5s
@@ -290,11 +275,11 @@ public:
           //Wait
           driveRobot(0.0f, 0.0f);
           shootRobot(0.0f);
-        } else if(i>400+x&&i<500+x&&/*120*/angle>=potToDegrees(armPot.GetAverageVoltage())) {
+        } else if(i>400+x&&i<500+x&&angle>=potToDegrees(armPot.GetAverageVoltage())) {
           //Shoot
           driveRobot(0.0f, 0.0f);
           shootRobot(power);
-        } else if(i>400+x&&i<500+x&&/*120*/angle<=potToDegrees(armPot.GetAverageVoltage())) {
+        } else if(i>400+x&&i<500+x&&angle<=potToDegrees(armPot.GetAverageVoltage())) {
           //Wait
           driveRobot(0.0f, 0.0f);
           shootRobot(0.0f);
@@ -304,11 +289,6 @@ public:
           shootRobot(0.0f);
         }
       }else{
-        int x=SmartDashboard::GetNumber("AutoDistance");
-        int y=SmartDashboard::GetNumber("AutoYValue");
-        float power=SmartDashboard::GetNumber("AutoPower");
-        int angle=SmartDashboard::GetNumber("AutoAngle");
-        float correction=SmartDashboard::GetNumber("AutoCorrection");
         if(i<1700+3*x+2*y){
           setMotorValue(6, 1, 1);
         }
@@ -320,11 +300,11 @@ public:
           //Wait
           driveRobot(0.0f, 0.0f);
           shootRobot(0.0f);
-        } else if(i>400+x&&i<500+x&&/*120*/angle>=potToDegrees(armPot.GetAverageVoltage())) {
+        } else if(i>400+x&&i<500+x&&angle>=potToDegrees(armPot.GetAverageVoltage())) {
           //Shoot
           driveRobot(0.0f, 0.0f);
           shootRobot(power);
-        } else if(i>400+x&&i<500+x&&/*120*/angle<=potToDegrees(armPot.GetAverageVoltage())) {
+        } else if(i>400+x&&i<500+x&&angle<=potToDegrees(armPot.GetAverageVoltage())) {
           //Wait
           driveRobot(0.0f, 0.0f);
           shootRobot(0.0f);
