@@ -1,10 +1,9 @@
 //TODO
 //Add a button on joystick that activates "auto" to drive to 40 inches away and another to shoot when at 40 inches away (use the little joystick on both drive and shooter stick)
 //Sonar in auto: drive till 40in away (dashboard value) and shoot
-//**
-//#include "Command.h"
 #include "WPILib.h"
 #include "SmartDashboard/SmartDashboard.h"
+//#include "Command.h"
 #include <iostream>
 #include <math.h>
 #include <vector>
@@ -17,6 +16,7 @@ class RobotDemo : public SimpleRobot
   float upLimit;
   Joystick Rstick, Lstick;
   Solenoid collectorSole1, collectorSole2;
+  //Do we need this? TODO - Austen
   Relay collectorSpike;
   Compressor compressor;
   Jaguar Left1, Left2, Left3, Right1, Right2, Right3, RightArmMotor1, RightArmMotor2, LeftArmMotor1, LeftArmMotor2, CollectorMotor1;
@@ -65,7 +65,6 @@ public:
       GetWatchdog().SetEnabled(false);
     }
   void RobotInit() {
-    printf("Initalizing Zaphod...\n");
     DashboardSetup();
     multiplier = 1.0f;
     upLimit = 130.0;
@@ -80,7 +79,7 @@ public:
     //SmartDashboard::PutString("Auto", cmd);
     SmartDashboard::PutNumber("armPot", potToDegrees(armPot.GetAverageVoltage()));
     SmartDashboard::PutNumber("Log Level", 1);
-    //Ultrasonic values (converted to inches)
+    //Ultrasonic
     SmartDashboard::PutNumber("Wall Left", voltToDistance(WallSonicLeft.GetAverageVoltage(),true));
     SmartDashboard::PutNumber("Wall Right", voltToDistance(WallSonicRight.GetAverageVoltage(),true));
     SmartDashboard::PutNumber("Ball Left", voltToDistance(BallSonicLeft.GetAverageVoltage()));
@@ -91,13 +90,14 @@ public:
     SmartDashboard::PutNumber("AutoPower",0.455f);
     SmartDashboard::PutNumber("AutoAngle",130.0f);
     SmartDashboard::PutNumber("AutoCorrection",0.06f);
-    //Operator Controlled values
-    SmartDashboard::PutNumber("ShortRange",0.465f); //The amount of power for the shooter when against the low goal
+    //Shooter presets
+    SmartDashboard::PutNumber("ShortRange",0.465f); //Power for the shooter when against the low goal
     SmartDashboard::PutNumber("ShooterButtonPower10",0.605f);
     SmartDashboard::PutNumber("ShooterButtonPower7",1.0f);
     SmartDashboard::PutNumber("ShooterButtonPower8",0.5f);
-    //Other booleans
+    //Bool switches
     SmartDashboard::PutBoolean("OneBallAuto",true);
+    SmartDashboard::PutBoolean("Use Ultrasonic",false);
     SmartDashboard::PutBoolean("Daniel Mode",false);
     SmartDashboard::PutBoolean("CollectorState",false);
   }
@@ -144,6 +144,7 @@ public:
     setMotorValue(3, 2, rightPower);
   }
   template<typename numbertype> string toString(numbertype a) {
+    //TODO
     stringstream ss;
     ss<<a;
     string s = ss.str();
@@ -238,12 +239,10 @@ public:
     int i=0;
     int cur=0;
     int averageAmount=5;
-    float initalDriveTime=2.75; //The amount of time in seconds that we will drive forward at the start of the match
     float shooterMaxAngle=125; //The maximum angle that the arm can shoot to during all of auto
     float shooterDelay = 2;    //The amount of time in seconds between the inital drive time and the shooter firing
     float shooterDuration = .5;//The amount of time in seconds that the shooter motors will be moving
     shooterDelay = (shooterDelay*200); //Do math to figure out the times to start the shooting
-    initalDriveTime = (initalDriveTime*200);
     float sampleCount=12;
     float avgRight=0;
     float curDist;
@@ -262,9 +261,6 @@ public:
       float power=SmartDashboard::GetNumber("AutoPower");
       int angle=SmartDashboard::GetNumber("AutoAngle");
       float correction=SmartDashboard::GetNumber("AutoCorrection");
-      //Drive initial amount of time
-      //if(i<=initalDriveTime*200) {
-      //setMotorValue(6, 1, 1);
       if(SmartDashboard::GetBoolean("OneBallAuto")){
         setMotorValue(6, 1, 1);
         if(i<200+x) {
@@ -287,6 +283,12 @@ public:
           //Kill robit
           driveRobot(0.0f, 0.0f);
           shootRobot(0.0f);
+        }
+      }else if(SmartDashboard::GetBoolean("Use Ultrasonic")){
+        if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=40.0f){
+          driveRobot(1.0f,correction);
+        }else{
+          driveRobot(0.0f,0.0f);
         }
       }else{
         if(i<1700+3*x+2*y){
