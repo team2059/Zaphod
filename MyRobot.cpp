@@ -3,7 +3,6 @@
 //Sonar in auto: drive till 40in away (dashboard value) and shoot
 #include "WPILib.h"
 #include "SmartDashboard/SmartDashboard.h"
-//#include "Command.h"
 #include <iostream>
 #include <math.h>
 #include <vector>
@@ -21,7 +20,6 @@ class RobotDemo : public SimpleRobot
   Compressor compressor;
   Jaguar Left1, Left2, Left3, Right1, Right2, Right3, RightArmMotor1, RightArmMotor2, LeftArmMotor1, LeftArmMotor2, CollectorMotor1;
   AnalogChannel armPot;
-  //Ultrasonic
   AnalogChannel BallSonicLeft, BallSonicRight, WallSonicLeft, WallSonicRight;
   DigitalOutput BallLeft, BallRight, WallLeft, WallRight;
 public:
@@ -100,6 +98,9 @@ public:
     SmartDashboard::PutBoolean("Use Ultrasonic",false);
     SmartDashboard::PutBoolean("Daniel Mode",false);
     SmartDashboard::PutBoolean("CollectorState",false);
+    SmartDashboard::PutBoolean("Compressor Enabled", allowCompressing);
+    SmartDashboard::PutBoolean("Compressor Running", compressing);
+    //Battery voltage
   }
   void updateDashboard() {
     SmartDashboard::PutNumber("Throttle", throttle);
@@ -109,6 +110,8 @@ public:
     SmartDashboard::PutNumber("Ball Left", voltToDistance(BallSonicLeft.GetAverageVoltage()));
     SmartDashboard::PutNumber("Ball Right", voltToDistance(BallSonicRight.GetAverageVoltage()));
     SmartDashboard::PutNumber("upLimit", upLimit);
+    SmartDashboard::PutBoolean("Compressor Running", compressing);
+    allowCompressing = SmartDashboard::GetBoolean("Compressor Enabled");
     if(upLimit > 167) {
       upLimit = 167;
     }
@@ -144,7 +147,6 @@ public:
     setMotorValue(3, 2, rightPower);
   }
   template<typename numbertype> string toString(numbertype a) {
-    //TODO
     stringstream ss;
     ss<<a;
     string s = ss.str();
@@ -236,6 +238,7 @@ public:
     myRobot.SetSafetyEnabled(false);
     int avgDist;
     int commandIndex=0;
+    int averageAmount=5;
     int i=0;
     int cur=0;
     int averageAmount=5;
@@ -294,9 +297,10 @@ public:
         if(i<1700+3*x+2*y){
           setMotorValue(6, 1, 1);
         }
-        if(i<200+x) {
-          //Forward .5s
-          driveRobot(-1.0f,correction);
+      }
+      if(i-c==1&&c>startShootingFirst){ //The next 'step' in auto, shooting the motors when startShootingFirst is true
+        shootRobot(power);
+        if(c==stopShootingFirst){ //Stop the motors when the end time is reached
           shootRobot(0.0f);
         }else if(i>=200+x&&i<=400+x){
           //Wait
@@ -347,6 +351,98 @@ public:
           shootRobot(0.0f);
         }
       }
+    //  if(i-c==2&&c>getSecondBallStart){
+    //
+    //}
+    //  **Start of time based auto
+    //  if(SmartDashboard::GetBoolean("OneBallAuto")){
+    //    setMotorValue(6, 1, 1);
+    //    if(i<200+x) {
+    //      //Forward .5s
+    //      driveRobot(-1.0f,correction);
+    //      shootRobot(0.0f);
+    //    }else if(i>=200+x&&i<=400+x){
+    //      //Wait
+    //      driveRobot(0.0f, 0.0f);
+    //      shootRobot(0.0f);
+    //    } else if(i>400+x&&i<500+x&&angle>=potToDegrees(armPot.GetAverageVoltage())) {
+    //      //Shoot
+    //      driveRobot(0.0f, 0.0f);
+    //      shootRobot(power);
+    //    } else if(i>400+x&&i<500+x&&angle<=potToDegrees(armPot.GetAverageVoltage())) {
+    //      //Wait
+    //      driveRobot(0.0f, 0.0f);
+    //      shootRobot(0.0f);
+    //    } else if(i>=500) {
+    //      //Kill robit
+    //      driveRobot(0.0f, 0.0f);
+    //      shootRobot(0.0f);
+    //    }
+    //  }else if(SmartDashboard::GetBoolean("Use Ultrasonic")){
+    //    if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=40.0f){
+    //      driveRobot(1.0f,correction);
+    //      i=0;
+    //    }else{
+    //    driveRobot(0.0f, 0.0f);
+    //    }
+    //    else if()
+    //  }else{
+    //    if(i<1700+3*x+2*y){
+    //      setMotorValue(6, 1, 1);
+    //    }
+    //    if(i<200+x) {
+    //      //Forward .5s
+    //      driveRobot(-1.0f,correction);
+    //      shootRobot(0.0f);
+    //    }else if(i>=200+x&&i<=400+x){
+    //      //Wait
+    //      driveRobot(0.0f, 0.0f);
+    //      shootRobot(0.0f);
+    //    } else if(i>400+x&&i<500+x&&angle>=potToDegrees(armPot.GetAverageVoltage())) {
+    //      //Shoot
+    //      driveRobot(0.0f, 0.0f);
+    //      shootRobot(power);
+    //    } else if(i>400+x&&i<500+x&&angle<=potToDegrees(armPot.GetAverageVoltage())) {
+    //      //Wait
+    //      driveRobot(0.0f, 0.0f);
+    //      shootRobot(0.0f);
+    //    } else if(i>500+x&&i<700+2*x+y) {
+    //      //Drive backward 1s, Collect ball
+    //      if(40.0f<=potToDegrees(armPot.GetAverageVoltage())){
+    //        shootRobot(-0.30f);
+    //      }
+    //      driveRobot(0.6f,correction);
+    //      shootRobot(0.0f);
+    //    } else if(i>=700+2*x+y&&i<=1300+2*x+y){
+    //      //Wait
+    //      driveRobot(0.0f,0.0f);
+    //      shootRobot(0.0f);
+    //    } else if(i>1300+2*x+y&&i<1500+3*x+2*y) {
+    //      //Drive forward 1s
+    //      driveRobot(-1.0f,correction);
+    //      shootRobot(0.0f);
+    //    } else if(i>=1500+3*x+2*y&&i<=1600+3*x+2*y){
+    //      //Wait
+    //      driveRobot(0.0f,0.0f);
+    //      shootRobot(0.0f);
+    //    } else if(i>1600+3*x+2*y&&i<1700+3*x+2*y&&/*120*/angle>=potToDegrees(armPot.GetAverageVoltage())){
+    //      //Shoot
+    //      driveRobot(0.0f,0.0f);
+    //      shootRobot(power);
+    //    } else if(i>1600+3*x+2*y&&i<1700+3*x+2*y&&/*120*/angle<=potToDegrees(armPot.GetAverageVoltage())){
+    //      //Wait
+    //      driveRobot(0.0f,0.0f);
+    //      shootRobot(0.0f);
+    //    } else if(i>1700+3*x+2*y&&40.0f<=potToDegrees(armPot.GetAverageVoltage())) {
+    //      //Stop robot after auto, let down shooter
+    //      driveRobot(0.0f,0.0f);
+    //      shootRobot(-0.15);
+    //    } else if(i>1700+3*x+2*y&&40.0f>=potToDegrees(armPot.GetAverageVoltage())) {
+    //      //Stop all motors
+    //      driveRobot(0.0f,0.0f);
+    //      shootRobot(0.0f);
+    //    }
+    //  }
       updateDashboard();
       if(i % 100 == 0 && compressing && compressor.GetPressureSwitchValue() == 1) {
         compressor.Stop();
@@ -360,7 +456,7 @@ public:
       }
       Wait(0.005f);
       i++;
-      cur++;
+      c++;
     }
     i=0;
     compressing = false;
@@ -405,15 +501,17 @@ public:
         //logMsg("armPot value: "+toString(armPot.GetAverageVoltage(),11));
         //logMsg("Converted armPot value: "+toString(armPot.GetAverageVoltage(),11));
       }
-      if(i % 100 == 0 && compressing && compressor.GetPressureSwitchValue() == 1) {
-        compressor.Stop();
-        compressing = false;
-        logMsg("Stopping the compressor",2);
-      }
-      if(i % 100 == 0 && !compressing && compressor.GetPressureSwitchValue() == 0) {
-        compressor.Start();
-        compressing = true;
-        logMsg("Starting the compressor... again",2);
+      if(SmartDashboard::GetBoolean("Compressor Enabled")){
+        if(i % 100 == 0 && compressing && compressor.GetPressureSwitchValue() == 1) {
+          compressor.Stop();
+          compressing = false;
+          logMsg("Stopping the compressor",2);
+        }
+        if(i % 100 == 0 && !compressing && compressor.GetPressureSwitchValue() == 0) {
+          compressor.Start();
+          compressing = true;
+          logMsg("Starting the compressor... again",2);
+        }
       }
       if(Lstick.GetRawButton(3)){
         upLimit=100.0f;
@@ -427,33 +525,42 @@ public:
       if(Lstick.GetRawButton(6)){
         upLimit=130.0f;
       }
-      //TODO
       updateDashboard();
       if(Lstick.GetRawButton(1)==1&&Lstick.GetRawButton(2)==1){
         throttle=SmartDashboard::GetNumber("ShortRange");
-        if(collectorExtended){
-          shooting = true;
-          logMsg("Firing",13);
-          logMsg("Collector is extended, going to fire",17);
-          shootRobot(throttle);
-          setMotorValue(6, 1, 1);
-        }else{
-          shooting = false;
-          logMsg("Collector is NOT extended, not going to fire",17);
-        }
+        shooting = true;
+        logMsg("Firing",13);
+        logMsg("Collector is extended, going to fire",17);
+        shootRobot(throttle);
+        setMotorValue(6, 1, 1);
+      //  if(collectorExtended){
+      //    shooting = true;
+      //    logMsg("Firing",13);
+      //    logMsg("Collector is extended, going to fire",17);
+      //    shootRobot(throttle);
+      //    setMotorValue(6, 1, 1);
+      //  }else{
+      //    shooting = false;
+      //    logMsg("Collector is NOT extended, not going to fire",17);
+      //  }
      }else if(Lstick.GetRawButton(1)==1) {
         //Move arm motors based on throttle
-        if(collectorExtended == false) {
-          shooting = false;
-          logMsg("Collector is NOT extended, not going to fire",17);
-        }
-        if(collectorExtended == true&&(upLimit>=potToDegrees(armPot.GetAverageVoltage()))) {
-          shooting = true;
-          logMsg("Firing",13);
-          logMsg("Collector is extended, going to fire",17);
-          shootRobot(throttle);
-          setMotorValue(6, 1, 1);
-        }
+        shooting = true;
+        logMsg("Firing",13);
+        logMsg("Collector is extended, going to fire",17);
+        shootRobot(throttle);
+        setMotorValue(6, 1, 1);
+      //  if(collectorExtended == false) {
+      //    shooting = false;
+      //    logMsg("Collector is NOT extended, not going to fire",17);
+      //  }
+      //  if(collectorExtended == true&&(upLimit>=potToDegrees(armPot.GetAverageVoltage()))) {
+      //    shooting = true;
+      //    logMsg("Firing",13);
+      //    logMsg("Collector is extended, going to fire",17);
+      //    shootRobot(throttle);
+      //    setMotorValue(6, 1, 1);
+      //  }
       } else if(Lstick.GetRawButton(1)==1&&(upLimit<=potToDegrees(armPot.GetAverageVoltage()))) {
         shooting = false;
         logMsg("Stopping shooter motor",13);
@@ -462,13 +569,14 @@ public:
       } else if(Lstick.GetRawButton(2)==1) {
         //Reverse the arm motors
         shooting = false;
-        if(collectorExtended == false) {
-          logMsg("Collector is not extended, not going to fire",17);
-        }
-        if(collectorExtended == true) {
-          shootRobot(-0.1f);
-          logMsg("Collector is extended, going to fire",17);
-        }
+        shootRobot(-0.1f);
+      //  if(collectorExtended == false) {
+      //    logMsg("Collector is not extended, not going to fire",17);
+      //  }
+      //  if(collectorExtended == true) {
+      //    shootRobot(-0.1f);
+      //    logMsg("Collector is extended, going to fire",17);
+      //  }
       } else {
         shooting = false;
         //Stop all motors
