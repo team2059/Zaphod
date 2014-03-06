@@ -1,4 +1,3 @@
-//TODO
 //Add a button on joystick that activates "auto" to drive to 40 inches away and another to shoot when at 40 inches away (use the little joystick on both drive and shooter stick)
 //Sonar in auto: drive till 40in away (dashboard value) and shoot
 #include "WPILib.h"
@@ -11,12 +10,10 @@ class RobotDemo : public SimpleRobot
 {
   RobotDrive myRobot;
   float potVal, multiplier, throttle;
-  bool collectorExtended, shooting, compressing;
+  bool collectorExtended, shooting, compressing, allowCompressing;
   float upLimit;
   Joystick Rstick, Lstick;
   Solenoid collectorSole1, collectorSole2;
-  //Do we need this? TODO - Austen
-  Relay collectorSpike;
   Compressor compressor;
   Jaguar Left1, Left2, Left3, Right1, Right2, Right3, RightArmMotor1, RightArmMotor2, LeftArmMotor1, LeftArmMotor2, CollectorMotor1;
   AnalogChannel armPot;
@@ -50,8 +47,6 @@ public:
     Right1(2,1),
     Right2(2,2),
     Right3(2,3),
-    //Spikes
-    collectorSpike(2, 7),
     //Shooter Motors
     LeftArmMotor1(1, 4),
     LeftArmMotor2(1, 5),
@@ -69,6 +64,7 @@ public:
     compressor.Start();
     shooting = false;
     compressing = true;
+    allowCompressing = true;
     throttle=0;
   }
   void DashboardSetup() {
@@ -88,14 +84,19 @@ public:
     SmartDashboard::PutNumber("AutoPower",0.455f);
     SmartDashboard::PutNumber("AutoAngle",130.0f);
     SmartDashboard::PutNumber("AutoCorrection",0.06f);
+    SmartDashboard::PutNumber("Inital Drive Timeout", 2);
+    SmartDashboard::PutNumber("First Shot Start", 2.5);
+    SmartDashboard::PutNumber("First Shot Stop", 3);
+    SmartDashboard::PutNumber("Reverse direction start",3.5);
+    SmartDashboard::PutNumber("Reverse direction stop",5.5);
     //Shooter presets
     SmartDashboard::PutNumber("ShortRange",0.465f); //Power for the shooter when against the low goal
     SmartDashboard::PutNumber("ShooterButtonPower10",0.605f);
     SmartDashboard::PutNumber("ShooterButtonPower7",1.0f);
     SmartDashboard::PutNumber("ShooterButtonPower8",0.5f);
     //Bool switches
-    SmartDashboard::PutBoolean("OneBallAuto",true);
-    SmartDashboard::PutBoolean("Use Ultrasonic",false);
+    SmartDashboard::PutBoolean("OneBallAuto",false);
+    SmartDashboard::PutBoolean("Use Ultrasonic",true);
     SmartDashboard::PutBoolean("Daniel Mode",false);
     SmartDashboard::PutBoolean("CollectorState",false);
     SmartDashboard::PutBoolean("Compressor Enabled", allowCompressing);
@@ -240,16 +241,19 @@ public:
     int commandIndex=0;
     int averageAmount=5;
     int i=0;
-    int cur=0;
-    int averageAmount=5;
-    float shooterMaxAngle=125; //The maximum angle that the arm can shoot to during all of auto
-    float shooterDelay = 2;    //The amount of time in seconds between the inital drive time and the shooter firing
-    float shooterDuration = .5;//The amount of time in seconds that the shooter motors will be moving
-    shooterDelay = (shooterDelay*200); //Do math to figure out the times to start the shooting
-    float sampleCount=12;
-    float avgRight=0;
-    float curDist;
-    float thisIsATest;
+    int c=0;
+    float initalDriveTimeout=(SmartDashboard::GetNumber("Inital Drive Timeout"))*200;
+    //Incase the wall ultrasonic fails, there will be a timeout that will force the motors to stop after a given time.
+    float startShootingFirst=(SmartDashboard::GetNumber("First Shot Start"))*200;
+    //The time when the shooter motors will begin to fire the ball
+    float stopShootingFirst=(SmartDashboard::GetNumber("First Shot Stop"))*200;
+    //The time when the shooter motors will stop (set power to 0)
+    float getSecondBallStart=(SmartDashboard::GetNumber("Reverse direction start"))*200;
+    //The time to start when getting the second ball
+    float getSecondBallStop=(SmartDashboard::GetNumber("Reverse direction stop"))*200;
+    //The time to stop when getting the second ball
+    float power=SmartDashboard::GetNumber("AutoPower");
+    //The power the shooter will use (in a percent)
     compressing=false;
     collectorSole1.Set(false);
     collectorSole2.Set(true);
@@ -259,96 +263,26 @@ public:
     BallRight.Set(0);
     SmartDashboard::PutBoolean("CollectorState",true);
     while(IsEnabled()&&IsAutonomous()) {
-      int x=SmartDashboard::GetNumber("AutoDistance");
-      int y=SmartDashboard::GetNumber("AutoYValue");
-      float power=SmartDashboard::GetNumber("AutoPower");
-      int angle=SmartDashboard::GetNumber("AutoAngle");
-      float correction=SmartDashboard::GetNumber("AutoCorrection");
-      if(SmartDashboard::GetBoolean("OneBallAuto")){
-        setMotorValue(6, 1, 1);
-        if(i<200+x) {
-          //Forward .5s
-          driveRobot(-1.0f,correction);
-          shootRobot(0.0f);
-        }else if(i>=200+x&&i<=400+x){
-          //Wait
-          driveRobot(0.0f, 0.0f);
-          shootRobot(0.0f);
-        } else if(i>400+x&&i<500+x&&angle>=potToDegrees(armPot.GetAverageVoltage())) {
-          //Shoot
-          driveRobot(0.0f, 0.0f);
-          shootRobot(power);
-        } else if(i>400+x&&i<500+x&&angle<=potToDegrees(armPot.GetAverageVoltage())) {
-          //Wait
-          driveRobot(0.0f, 0.0f);
-          shootRobot(0.0f);
-        } else if(i>=500) {
-          //Kill robit
-          driveRobot(0.0f, 0.0f);
-          shootRobot(0.0f);
-        }
-      }else if(SmartDashboard::GetBoolean("Use Ultrasonic")){
-        if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=40.0f){
+    //int x=SmartDashboard::GetNumber("AutoDistance");
+    //int y=SmartDashboard::GetNumber("AutoYValue");
+    //int angle=SmartDashboard::GetNumber("AutoAngle");
+    //float correction=SmartDashboard::GetNumber("AutoCorrection");
+      if(i-c==0){ //The first statement to check for. Will run at start because i-c will be 0 (shouldn't need to be changed)
+        if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=40.0f){ //Particular only to the first drive step
           driveRobot(1.0f,correction);
-        }else{
-          driveRobot(0.0f,0.0f);
         }
-      }else{
-        if(i<1700+3*x+2*y){
-          setMotorValue(6, 1, 1);
+        if(c==initalDriveTimeout){ //Acts as the else (ie: motor stopping, etc)
+          driveRobot(0.0f,0.0f);
+          i=1; //Could be added to the dashboard as a step custimization thing (basically 'i' is the next step to run)
+          c=0; //Reset the timer
         }
       }
       if(i-c==1&&c>startShootingFirst){ //The next 'step' in auto, shooting the motors when startShootingFirst is true
         shootRobot(power);
         if(c==stopShootingFirst){ //Stop the motors when the end time is reached
           shootRobot(0.0f);
-        }else if(i>=200+x&&i<=400+x){
-          //Wait
-          driveRobot(0.0f, 0.0f);
-          shootRobot(0.0f);
-        } else if(i>400+x&&i<500+x&&angle>=potToDegrees(armPot.GetAverageVoltage())) {
-          //Shoot
-          driveRobot(0.0f, 0.0f);
-          shootRobot(power);
-        } else if(i>400+x&&i<500+x&&angle<=potToDegrees(armPot.GetAverageVoltage())) {
-          //Wait
-          driveRobot(0.0f, 0.0f);
-          shootRobot(0.0f);
-        } else if(i>500+x&&i<700+2*x+y) {
-          //Drive backward 1s, Collect ball
-          if(40.0f<=potToDegrees(armPot.GetAverageVoltage())){
-            shootRobot(-0.30f);
-          }
-          driveRobot(0.6f,correction);
-          shootRobot(0.0f);
-        } else if(i>=700+2*x+y&&i<=1300+2*x+y){
-          //Wait
-          driveRobot(0.0f,0.0f);
-          shootRobot(0.0f);
-        } else if(i>1300+2*x+y&&i<1500+3*x+2*y) {
-          //Drive forward 1s
-          driveRobot(-1.0f,correction);
-          shootRobot(0.0f);
-        } else if(i>=1500+3*x+2*y&&i<=1600+3*x+2*y){
-          //Wait
-          driveRobot(0.0f,0.0f);
-          shootRobot(0.0f);
-        } else if(i>1600+3*x+2*y&&i<1700+3*x+2*y&&/*120*/angle>=potToDegrees(armPot.GetAverageVoltage())){
-          //Shoot
-          driveRobot(0.0f,0.0f);
-          shootRobot(power);
-        } else if(i>1600+3*x+2*y&&i<1700+3*x+2*y&&/*120*/angle<=potToDegrees(armPot.GetAverageVoltage())){
-          //Wait
-          driveRobot(0.0f,0.0f);
-          shootRobot(0.0f);
-        } else if(i>1700+3*x+2*y&&40.0f<=potToDegrees(armPot.GetAverageVoltage())) {
-          //Stop robot after auto, let down shooter
-          driveRobot(0.0f,0.0f);
-          shootRobot(-0.15);
-        } else if(i>1700+3*x+2*y&&40.0f>=potToDegrees(armPot.GetAverageVoltage())) {
-          //Stop all motors
-          driveRobot(0.0f,0.0f);
-          shootRobot(0.0f);
+          i=2; //Run step 2 next
+          c=0;
         }
       }
     //  if(i-c==2&&c>getSecondBallStart){
