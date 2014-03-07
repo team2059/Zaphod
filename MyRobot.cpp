@@ -80,12 +80,12 @@ public:
     //Autonomous values
     SmartDashboard::PutNumber("AutoPower",0.455f);
     SmartDashboard::PutNumber("AutoCorrection",0.06f);
-    SmartDashboard::PutNumber("Inital Drive Timeout", 2);
-    SmartDashboard::PutNumber("First Shot Start", 2.5);
-    SmartDashboard::PutNumber("First Shot Stop", 3);
-    SmartDashboard::PutNumber("Reverse direction start",3.5);
-    SmartDashboard::PutNumber("Reverse direction stop",5.5);
-    SmartDashboard::PutNumber("Autonomous step",0);
+    SmartDashboard::PutNumber("Inital Drive Timeout", 2.5f);
+    SmartDashboard::PutNumber("First Shot Start", 2.5f);
+    SmartDashboard::PutNumber("First Shot Stop", 0.5f);
+    SmartDashboard::PutNumber("Reverse direction start",3.5.0f);
+    SmartDashboard::PutNumber("Reverse direction stop",5.5.0f);
+    SmartDashboard::PutNumber("Autonomous step",0.0f);
     //Shooter presets
     SmartDashboard::PutNumber("ShortRange",0.465f); //Power for the shooter when against the low goal
     SmartDashboard::PutNumber("ShooterButtonPower10",0.605f);
@@ -98,6 +98,7 @@ public:
     SmartDashboard::PutBoolean("CollectorState",false);
     SmartDashboard::PutBoolean("Compressor Enabled", allowCompressing);
     SmartDashboard::PutBoolean("Compressor Running", compressing);
+    SmartDashboard::PutBoolean("Ignore Pot",false);
     //Battery voltage
   }
   void updateDashboard() {
@@ -236,21 +237,11 @@ public:
     myRobot.SetSafetyEnabled(false);
     int i=0;
     int c=0;
-    //Incase the wall ultrasonic fails, there will be a timeout that will force the motors to stop after a given time.
-    float initalDriveTimeout=(SmartDashboard::GetNumber("Inital Drive Timeout"))*200;
-    //The time when the shooter motors will begin to fire the ball
-    float startShootingFirst=(SmartDashboard::GetNumber("First Shot Start"))*200;
-    //The time when the shooter motors will stop (set power to 0)
-    float stopShootingFirst=(SmartDashboard::GetNumber("First Shot Stop"))*200;
-    //The time to start when getting the second ball
+    //TODO delete this and implement it
     float getSecondBallStart=(SmartDashboard::GetNumber("Reverse direction start"))*200;
-    //The time to stop when getting the second ball
     float getSecondBallStop=(SmartDashboard::GetNumber("Reverse direction stop"))*200;
-    //The power the shooter will use (in a percent)
     float power=SmartDashboard::GetNumber("AutoPower");
-    //The correction value for the X axis
     float correction=SmartDashboard::GetNumber("AutoCorrection");
-    //Current step of auto
     int currentStep=0;
     compressing=false;
     collectorSole1.Set(false);
@@ -267,21 +258,21 @@ public:
         if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=40.0f){ //Particular only to the first drive step
           driveRobot(1.0f,correction);
         }
-        if(c==initalDriveTimeout){ //Acts as the else (ie: motor stopping, etc)
+        if(c==(SmartDashboard::GetNumber("Inital Drive Timeout"))*200){ //Acts as the else (ie: motor stopping, etc)
           driveRobot(0.0f,0.0f);
           currentStep=1;
           c=0; //Reset the timer
         }
       }
-      if(currentStep==1&&c>startShootingFirst){ //The next 'step' in auto, shooting the motors when startShootingFirst is true
+      if(currentStep==1&&c>(SmartDashboard::GetNumber("First Shot Start"))*200){ //The next 'step' in auto, shooting the motors when startShootingFirst is true
         //Displays the step that is currently running in Autonomous
         SmartDashboard::PutNumber("Autonomous step", currentStep);
-        if(upLimit<=potToDegrees(armPot.GetAverageVoltage())){
+        if(SmartDashboard::GetBoolean("Ignore Pot")||upLimit>=potToDegrees(armPot.GetAverageVoltage())){
           shootRobot(power);
         }else{
           shootRobot(0.0f);
         }
-        if(c==stopShootingFirst){ //Stop the motors when the end time is reached
+        if(c==(SmartDashboard::GetNumber("First Shot Stop"))*200){ //Stop the motors when the end time is reached
           shootRobot(0.0f);
           currentStep=2;
           c=0; //Reset the timer again
@@ -377,16 +368,16 @@ public:
         logMsg("Collector is extended, going to fire",17);
         shootRobot(throttle);
         setMotorValue(6, 1, 1);
-      //  if(collectorExtended){
-      //    shooting = true;
-      //    logMsg("Firing",13);
-      //    logMsg("Collector is extended, going to fire",17);
-      //    shootRobot(throttle);
-      //    setMotorValue(6, 1, 1);
-      //  }else{
-      //    shooting = false;
-      //    logMsg("Collector is NOT extended, not going to fire",17);
-      //  }
+        if(collectorExtended){
+          shooting = true;
+          logMsg("Firing",13);
+          logMsg("Collector is extended, going to fire",17);
+          shootRobot(throttle);
+          setMotorValue(6, 1, 1);
+        }else{
+          shooting = false;
+          logMsg("Collector is NOT extended, not going to fire",17);
+        }
      }else if(Lstick.GetRawButton(1)==1) {
         //Move arm motors based on throttle
         shooting = true;
@@ -394,18 +385,18 @@ public:
         logMsg("Collector is extended, going to fire",17);
         shootRobot(throttle);
         setMotorValue(6, 1, 1);
-      //  if(collectorExtended == false) {
-      //    shooting = false;
-      //    logMsg("Collector is NOT extended, not going to fire",17);
-      //  }
-      //  if(collectorExtended == true&&(upLimit>=potToDegrees(armPot.GetAverageVoltage()))) {
-      //    shooting = true;
-      //    logMsg("Firing",13);
-      //    logMsg("Collector is extended, going to fire",17);
-      //    shootRobot(throttle);
-      //    setMotorValue(6, 1, 1);
-      //  }
-      } else if(Lstick.GetRawButton(1)==1&&(upLimit<=potToDegrees(armPot.GetAverageVoltage()))) {
+        if(collectorExtended == false) {
+          shooting = false;
+          logMsg("Collector is NOT extended, not going to fire",17);
+        }
+        if(collectorExtended == true&&(upLimit>=potToDegrees(armPot.GetAverageVoltage()))) {
+          shooting = true;
+          logMsg("Firing",13);
+          logMsg("Collector is extended, going to fire",17);
+          shootRobot(throttle);
+          setMotorValue(6, 1, 1);
+        }
+      } else if(Lstick.GetRawButton(1)==1&&(SmartDashboard::GetBoolean("Ignore Pot")||upLimit<=potToDegrees(armPot.GetAverageVoltage()))) {
         shooting = false;
         logMsg("Stopping shooter motor",13);
         logMsg("Stopping collector motor",17);
@@ -414,13 +405,13 @@ public:
         //Reverse the arm motors
         shooting = false;
         shootRobot(-0.1f);
-      //  if(collectorExtended == false) {
-      //    logMsg("Collector is not extended, not going to fire",17);
-      //  }
-      //  if(collectorExtended == true) {
-      //    shootRobot(-0.1f);
-      //    logMsg("Collector is extended, going to fire",17);
-      //  }
+        if(collectorExtended == false) {
+          logMsg("Collector is not extended, not going to fire",17);
+        }
+        if(collectorExtended == true) {
+          shootRobot(-0.1f);
+          logMsg("Collector is extended, going to fire",17);
+        }
       } else {
         shooting = false;
         //Stop all motors
