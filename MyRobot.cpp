@@ -78,6 +78,8 @@ public:
     SmartDashboard::PutNumber("Ball Left", voltToDistance(BallSonicLeft.GetAverageVoltage()));
     SmartDashboard::PutNumber("Ball Right", voltToDistance(BallSonicRight.GetAverageVoltage()));
     //Autonomous values
+    SmartDashboard::PutNumber("AutoPower",0.455f);
+    SmartDashboard::PutNumber("AutoCorrection",0.06f);
     SmartDashboard::PutNumber("Inital Drive Timeout", 2);
     SmartDashboard::PutNumber("First Shot Start", 2.5);
     SmartDashboard::PutNumber("First Shot Stop", 3);
@@ -248,6 +250,8 @@ public:
     float power=SmartDashboard::GetNumber("AutoPower");
     //The correction value for the X axis
     float correction=SmartDashboard::GetNumber("AutoCorrection");
+    //Current step of auto
+    int currentStep=0;
     compressing=false;
     collectorSole1.Set(false);
     collectorSole2.Set(true);
@@ -257,25 +261,29 @@ public:
     BallRight.Set(0);
     SmartDashboard::PutBoolean("CollectorState",true);
     while(IsEnabled()&&IsAutonomous()) {
-      if(i-c==0){ //The first statement to check for. Will run at start because i-c will be 0 (shouldn't need to be changed)
+      if(currentStep==0){ //The first statement to check for. Will run at start because i-c will be 0 (shouldn't need to be changed)
         //Displays the step that is currently running in Autonomous
-        SmartDashboard::PutNumber("Autonomous step", i-c);
+        SmartDashboard::PutNumber("Autonomous step", currentStep);
         if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=40.0f){ //Particular only to the first drive step
           driveRobot(1.0f,correction);
         }
         if(c==initalDriveTimeout){ //Acts as the else (ie: motor stopping, etc)
           driveRobot(0.0f,0.0f);
-          i=1; //Could be added to the dashboard as a step custimization thing (basically 'i' is the next step to run)
+          currentStep=1;
           c=0; //Reset the timer
         }
       }
-      if(i-c==1&&c>startShootingFirst){ //The next 'step' in auto, shooting the motors when startShootingFirst is true
+      if(currentStep==1&&c>startShootingFirst){ //The next 'step' in auto, shooting the motors when startShootingFirst is true
         //Displays the step that is currently running in Autonomous
-        SmartDashboard::PutNumber("Autonomous step", i-c);
-        shootRobot(power);
+        SmartDashboard::PutNumber("Autonomous step", currentStep);
+        if(upLimit<=potToDegrees(armPot.GetAverageVoltage())){
+          shootRobot(power);
+        }else{
+          shootRobot(0.0f);
+        }
         if(c==stopShootingFirst){ //Stop the motors when the end time is reached
           shootRobot(0.0f);
-          i=2; //Run step 2 next
+          currentStep=2;
           c=0; //Reset the timer again
         }
       }
