@@ -70,7 +70,6 @@ public:
   void DashboardSetup() {
     SmartDashboard::PutNumber("Throttle", throttle);
     SmartDashboard::PutNumber("upLimit", 120.0f);
-    //SmartDashboard::PutString("Auto", cmd);
     SmartDashboard::PutNumber("armPot", potToDegrees(armPot.GetAverageVoltage()));
     SmartDashboard::PutNumber("Log Level", 1);
     //Ultrasonic
@@ -79,16 +78,12 @@ public:
     SmartDashboard::PutNumber("Ball Left", voltToDistance(BallSonicLeft.GetAverageVoltage()));
     SmartDashboard::PutNumber("Ball Right", voltToDistance(BallSonicRight.GetAverageVoltage()));
     //Autonomous values
-    SmartDashboard::PutNumber("AutoDistance",350.0f);
-    SmartDashboard::PutNumber("AutoYValue",350.0f);
-    SmartDashboard::PutNumber("AutoPower",0.455f);
-    SmartDashboard::PutNumber("AutoAngle",130.0f);
-    SmartDashboard::PutNumber("AutoCorrection",0.06f);
     SmartDashboard::PutNumber("Inital Drive Timeout", 2);
     SmartDashboard::PutNumber("First Shot Start", 2.5);
     SmartDashboard::PutNumber("First Shot Stop", 3);
     SmartDashboard::PutNumber("Reverse direction start",3.5);
     SmartDashboard::PutNumber("Reverse direction stop",5.5);
+    SmartDashboard::PutNumber("Autonomous step",0);
     //Shooter presets
     SmartDashboard::PutNumber("ShortRange",0.465f); //Power for the shooter when against the low goal
     SmartDashboard::PutNumber("ShooterButtonPower10",0.605f);
@@ -237,25 +232,22 @@ public:
   }
   void Autonomous() {
     myRobot.SetSafetyEnabled(false);
-    int avgDist;
-    int commandIndex=0;
-    int averageAmount=5;
     int i=0;
     int c=0;
-    float initalDriveTimeout=(SmartDashboard::GetNumber("Inital Drive Timeout"))*200;
     //Incase the wall ultrasonic fails, there will be a timeout that will force the motors to stop after a given time.
-    float startShootingFirst=(SmartDashboard::GetNumber("First Shot Start"))*200;
+    float initalDriveTimeout=(SmartDashboard::GetNumber("Inital Drive Timeout"))*200;
     //The time when the shooter motors will begin to fire the ball
-    float stopShootingFirst=(SmartDashboard::GetNumber("First Shot Stop"))*200;
+    float startShootingFirst=(SmartDashboard::GetNumber("First Shot Start"))*200;
     //The time when the shooter motors will stop (set power to 0)
-    float getSecondBallStart=(SmartDashboard::GetNumber("Reverse direction start"))*200;
+    float stopShootingFirst=(SmartDashboard::GetNumber("First Shot Stop"))*200;
     //The time to start when getting the second ball
-    float getSecondBallStop=(SmartDashboard::GetNumber("Reverse direction stop"))*200;
+    float getSecondBallStart=(SmartDashboard::GetNumber("Reverse direction start"))*200;
     //The time to stop when getting the second ball
-    float power=SmartDashboard::GetNumber("AutoPower");
+    float getSecondBallStop=(SmartDashboard::GetNumber("Reverse direction stop"))*200;
     //The power the shooter will use (in a percent)
-    float correction=SmartDashboard::GetNumber("AutoCorrection");
+    float power=SmartDashboard::GetNumber("AutoPower");
     //The correction value for the X axis
+    float correction=SmartDashboard::GetNumber("AutoCorrection");
     compressing=false;
     collectorSole1.Set(false);
     collectorSole2.Set(true);
@@ -266,6 +258,8 @@ public:
     SmartDashboard::PutBoolean("CollectorState",true);
     while(IsEnabled()&&IsAutonomous()) {
       if(i-c==0){ //The first statement to check for. Will run at start because i-c will be 0 (shouldn't need to be changed)
+        //Displays the step that is currently running in Autonomous
+        SmartDashboard::PutNumber("Autonomous step", i-c);
         if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=40.0f){ //Particular only to the first drive step
           driveRobot(1.0f,correction);
         }
@@ -276,11 +270,13 @@ public:
         }
       }
       if(i-c==1&&c>startShootingFirst){ //The next 'step' in auto, shooting the motors when startShootingFirst is true
+        //Displays the step that is currently running in Autonomous
+        SmartDashboard::PutNumber("Autonomous step", i-c);
         shootRobot(power);
         if(c==stopShootingFirst){ //Stop the motors when the end time is reached
           shootRobot(0.0f);
           i=2; //Run step 2 next
-          c=0;
+          c=0; //Reset the timer again
         }
       }
       updateDashboard();
