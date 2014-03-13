@@ -277,8 +277,6 @@ public:
     myRobot.SetSafetyEnabled(false);
     int i=0;
     int c=0;
-    float getSecondBallStart=(SmartDashboard::GetNumber("Reverse direction start"))*200;
-    float getSecondBallStop=(SmartDashboard::GetNumber("Reverse direction stop"))*200;
     float power=SmartDashboard::GetNumber("AutoPower");
     float correction=SmartDashboard::GetNumber("AutoCorrection");
     int currentStep=0;
@@ -340,7 +338,7 @@ public:
         }
         //}}}
         //}}}
-      }else(SmartDashboard::GetNumber("Autonomous Sequence")==1){
+      }else if(SmartDashboard::GetNumber("Autonomous Sequence")==1){
         //Autonomous1{{{
         //Drive{{{
         if(currentStep==0){
@@ -419,7 +417,7 @@ public:
         }
         //}}}
         //}}}
-      }else(SmartDashboard::GetNumber("Autonomous Sequence")==2){
+      }else if(SmartDashboard::GetNumber("Autonomous Sequence")==2){
         //Autonomous2{{{
         //Drive{{{
         if(currentStep==0){
