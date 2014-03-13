@@ -87,7 +87,7 @@ public:
     SmartDashboard::PutNumber("Ball Left", voltToDistance(BallSonicLeft.GetAverageVoltage()));
     SmartDashboard::PutNumber("Ball Right", voltToDistance(BallSonicRight.GetAverageVoltage()));
     //Autonomous values
-    SmartDashboard::PutNumber("Auto Distance",70.0f);
+    SmartDashboard::PutNumber("Auto Distance",65.0f);
     SmartDashboard::PutNumber("Collector Speed",1.0f);
     SmartDashboard::PutNumber("AutoPower",0.455f);
     SmartDashboard::PutNumber("AutoCorrection",0.06f);
@@ -430,7 +430,6 @@ public:
           }else{
             shootRobot(0.0f);
           }
-          setMotorValue(6, 1, 1);
           if(c==SmartDashboard::GetNumber("First Shot Stop")*200){
             shootRobot(0.0f);
             setMotorValue(6, 1, 0);
