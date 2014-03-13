@@ -1,3 +1,4 @@
+//Test comment!!
 //Add a button on joystick that activates "auto" to drive to 40 inches away and another to shoot when at 40 inches away (use the little joystick on both drive and shooter stick)
 //Sonar in auto: drive till 40in away (dashboard value) and shoot
 //Includes{{{
@@ -143,21 +144,6 @@ public:
       setMotorValue(5, 2, cvt(-power));
     }
   //}}}
-  //logMsg{{{
-  void logMsg(std::string message, int level) {
-    if((int)SmartDashboard::GetNumber("Log Level") % level == 0) {
-      printf((message+"\n").c_str());
-    }
-  }
-  //}}}
-    //toString{{{
-    template<typename numbertype> string toString(numbertype a) {
-      stringstream ss;
-      ss<<a;
-      string s = ss.str();
-      return s;
-    }
-  //}}}
     //driveRobot{{{
     void driveRobot(float x, float y) {
       if(y>1.0f) {
@@ -167,10 +153,6 @@ public:
       }
       int leftPower = ((y+x)/2+1)*127+1;
       int rightPower = ((y-x)/2+1)*127+1;
-      //logMsg("leftPower: "+toString<int>(leftPower),3);
-      //logMsg("rightPower: "+toString<int>(rightPower),3);
-      //logMsg("JoyX: "+toString<float>(Rstick.GetX()),3);
-      //logMsg("JoyY: "+toString<float>(Rstick.GetY()),3);
       setMotorValue(1, 1, leftPower);
       setMotorValue(2, 1, leftPower);
       setMotorValue(3, 1, leftPower);
@@ -510,12 +492,10 @@ public:
       if(i % 100 == 0 && compressing && compressor.GetPressureSwitchValue() == 1) {
         compressor.Stop();
         compressing = false;
-        logMsg("Stopping the compressor",2);
       }
       if(i % 100 == 0 && !compressing && compressor.GetPressureSwitchValue() == 0) {
         compressor.Start();
         compressing = true;
-        logMsg("Starting the compressor",2);
       }
       //}}}
       i++;
@@ -531,12 +511,9 @@ public:
     //Initializations{{{
     myRobot.SetSafetyEnabled(false);
     int i = 0;
-    int cur=0;
-    bool swap=false;
     collectorSole1.Set(true);
     collectorSole2.Set(false);
     compressing = false;
-    logMsg("Starting Teleop",1);
     SmartDashboard::PutBoolean("CollectorState",false);
     //}}}
     while(IsEnabled() && IsOperatorControl()) {
@@ -565,18 +542,13 @@ public:
       if(Lstick.GetRawButton(1)==1) {
         //Shoot{{{
         shooting = true;
-        logMsg("Firing",13);
-        logMsg("Collector is extended, going to fire",17);
         shootRobot(throttle);
         setMotorValue(6, 1, 1);
         if(collectorExtended == false) {
           shooting = false;
-          logMsg("Collector is NOT extended, not going to fire",17);
         }
         if(collectorExtended == true&&(SmartDashboard::GetBoolean("Ignore Pot")||upLimit>=potToDegrees(armPot.GetAverageVoltage()))) {
           shooting = true;
-          logMsg("Firing",13);
-          logMsg("Collector is extended, going to fire",17);
           shootRobot(throttle);
           setMotorValue(6, 1, 1);
         }
@@ -585,12 +557,8 @@ public:
         //Lower Shooter{{{
         shooting = false;
         shootRobot(-0.1f);
-        if(collectorExtended == false) {
-          logMsg("Collector is not extended, not going to fire",17);
-        }
         if(collectorExtended == true) {
           shootRobot(-0.1f);
-          logMsg("Collector is extended, going to fire",17);
         }
         //}}}
       } else {
@@ -644,17 +612,14 @@ public:
         if(i % 100 == 0 && compressing && compressor.GetPressureSwitchValue() == 1) {
           compressor.Stop();
           compressing = false;
-          logMsg("Stopping the compressor",2);
         }
         if(i % 100 == 0 && !compressing && compressor.GetPressureSwitchValue() == 0) {
           compressor.Start();
           compressing = true;
-          logMsg("Starting the compressor... again",2);
         }
       }
       //}}}
       updateDashboard();
-      cur++;
       i++;
       Wait(0.005f);
     }
