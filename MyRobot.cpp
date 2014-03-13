@@ -290,12 +290,12 @@ public:
     SmartDashboard::PutBoolean("CollectorState",true);
     //}}}
     while(IsEnabled()&&IsAutonomous()) {
-      if(SmartDashboard::GetNumber("Autonomous Sequence")==0){
+      if(SmartDashboard::GetNumber("Autonomous sequence")==0){
         //Autonomous0{{{
         //Drive{{{
         if(currentStep==0){
           if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=40.0f){
-            driveRobot(1.0f,correction);
+            driveRobot(-1.0f,correction);
           }else{
             driveRobot(0.0f,0.0f);
           }
@@ -338,12 +338,12 @@ public:
         }
         //}}}
         //}}}
-      }else if(SmartDashboard::GetNumber("Autonomous Sequence")==1){
+      }else if(SmartDashboard::GetNumber("Autonomous sequence")==1){
         //Autonomous1{{{
         //Drive{{{
         if(currentStep==0){
           if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=40.0f){
-            driveRobot(1.0f,correction);
+            driveRobot(-1.0f,correction);
           }else{
             driveRobot(0.0f,0.0f);
           }
@@ -372,7 +372,7 @@ public:
         //}}}
         //Drive Backwards{{{
         if(currentStep==2&&c>SmartDashboard::GetNumber("Reverse direction start")*200){
-          driveRobot(-1.0f,correction);
+          driveRobot(1.0f,correction);
           if(40.0f<=potToDegrees(armPot.GetAverageVoltage())){
             shootRobot(-0.2f);
           }else{
@@ -389,7 +389,7 @@ public:
         //Drive{{{
         if(currentStep==3&&c>SmartDashboard::GetNumber("Second Drive Start")*200){
           if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=40.0f){
-            driveRobot(1.0f,correction);
+            driveRobot(-1.0f,correction);
           }else{
             driveRobot(0.0f,0.0f);
           }
@@ -417,12 +417,12 @@ public:
         }
         //}}}
         //}}}
-      }else if(SmartDashboard::GetNumber("Autonomous Sequence")==2){
+      }else if(SmartDashboard::GetNumber("Autonomous sequence")==2){
         //Autonomous2{{{
         //Drive{{{
         if(currentStep==0){
           if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=40.0f){
-            driveRobot(1.0f,correction);
+            driveRobot(-1.0f,correction);
           }else{
             driveRobot(0.0f,0.0f);
           }
