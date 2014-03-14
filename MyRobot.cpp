@@ -1,3 +1,5 @@
+//STABLE CODE
+//as of 3/14 at 8:07am
 //Add a button on joystick that activates "auto" to drive to 40 inches away and another to shoot when at 40 inches away (use the little joystick on both drive and shooter stick)
 //Sonar in auto: drive till 40in away (dashboard value) and shoot
 //Includes{{{
