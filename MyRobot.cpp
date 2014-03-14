@@ -80,16 +80,19 @@ public:
     SmartDashboard::PutNumber("Throttle", throttle);
     SmartDashboard::PutNumber("upLimit", 120.0f);
     SmartDashboard::PutNumber("armPot", potToDegrees(armPot.GetAverageVoltage()));
-    SmartDashboard::PutNumber("Log Level", 1);
+    SmartDashboard::PutNumber("Log Level", 1.0f);
     //Ultrasonic
     SmartDashboard::PutNumber("Wall Left", voltToDistance(WallSonicLeft.GetAverageVoltage(),true));
     SmartDashboard::PutNumber("Wall Right", voltToDistance(WallSonicRight.GetAverageVoltage(),true));
     SmartDashboard::PutNumber("Ball Left", voltToDistance(BallSonicLeft.GetAverageVoltage()));
     SmartDashboard::PutNumber("Ball Right", voltToDistance(BallSonicRight.GetAverageVoltage()));
     //Autonomous values
+    SmartDashboard::PutNumber("Auto Distance",70.0f);
+    SmartDashboard::PutNumber("Collector Speed",1.0f);
     SmartDashboard::PutNumber("AutoPower",0.455f);
     SmartDashboard::PutNumber("AutoCorrection",0.06f);
-    SmartDashboard::PutNumber("Inital Drive Timeout", 2.5f);
+    SmartDashboard::PutNumber("Initial Drive Delay",2.0f);
+    SmartDashboard::PutNumber("Inital Drive Timeout", 4.5f);
     SmartDashboard::PutNumber("First Shot Start", 0.5f);
     SmartDashboard::PutNumber("First Shot Stop", 1.0f);
     SmartDashboard::PutNumber("Reverse direction start",0.0f);
@@ -99,7 +102,7 @@ public:
     SmartDashboard::PutNumber("Second Shot Start", 0.5f);
     SmartDashboard::PutNumber("Second Shot Stop", 1.0f);
     SmartDashboard::PutNumber("Autonomous step",0.0f);
-    SmartDashboard::PutNumber("Autonomous sequence", 0.0f);
+    SmartDashboard::PutNumber("Autonomous sequence", 2.0f);
     //Shooter presets
     SmartDashboard::PutNumber("ShortRange",0.465f); //Power for the shooter when against the low goal
     SmartDashboard::PutNumber("ShooterButtonPower10",0.605f);
@@ -271,7 +274,7 @@ public:
         //Autonomous0{{{
         //Drive{{{
         if(currentStep==0){
-          if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=40.0f){
+          if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=SmartDashboard::GetNumber("Auto Distance")){
             driveRobot(-1.0f,correction);
           }else{
             driveRobot(0.0f,0.0f);
@@ -301,7 +304,6 @@ public:
         //}}}
         //Lower Shooter{{{
         if(currentStep==2&&c>SmartDashboard::GetNumber("Reverse direction start")*200){
-          driveRobot(-1.0f,correction);
           if(40.0f<=potToDegrees(armPot.GetAverageVoltage())){
             shootRobot(-0.3f);
           }else{
@@ -319,7 +321,7 @@ public:
         //Autonomous1{{{
         //Drive{{{
         if(currentStep==0){
-          if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=40.0f){
+          if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=SmartDashboard::GetNumber("Auto Distance")){
             driveRobot(-1.0f,correction);
           }else{
             driveRobot(0.0f,0.0f);
@@ -365,7 +367,7 @@ public:
         //}}}
         //Drive{{{
         if(currentStep==3&&c>SmartDashboard::GetNumber("Second Drive Start")*200){
-          if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=40.0f){
+          if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=SmartDashboard::GetNumber("Auto Distance")){
             driveRobot(-1.0f,correction);
           }else{
             driveRobot(0.0f,0.0f);
@@ -397,13 +399,15 @@ public:
       }else if(SmartDashboard::GetNumber("Autonomous sequence")==2){
         //Autonomous2{{{
         //Drive{{{
-        if(currentStep==0){
-          if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=40.0f){
+        if(currentStep==0&&c>SmartDashboard::GetNumber("Initial Drive Delay")*200){
+          setMotorValue(6, 1, SmartDashboard::GetNumber("Collector Speed"));
+          if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=SmartDashboard::GetNumber("Auto Distance")){
             driveRobot(-1.0f,correction);
           }else{
             driveRobot(0.0f,0.0f);
           }
           if(c==SmartDashboard::GetNumber("Inital Drive Timeout")*200){
+            setMotorValue(6, 1, 0);
             driveRobot(0.0f,0.0f);
             currentStep++;
             c=0;
@@ -547,7 +551,7 @@ public:
           shootRobot(throttle);
           setMotorValue(6, 1, 1);
         }else{
-          shooting = true;
+          shooting = false;
           shootRobot(0.0f);
           setMotorValue(6, 1, 0);
         }
