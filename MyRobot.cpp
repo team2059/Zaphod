@@ -1,7 +1,3 @@
-//STABLE CODE
-//as of 3/14 at 8:07am
-//Add a button on joystick that activates "auto" to drive to 40 inches away and another to shoot when at 40 inches away (use the little joystick on both drive and shooter stick)
-//Sonar in auto: drive till 40in away (dashboard value) and shoot
 //Includes{{{
 #include "WPILib.h"
 #include "SmartDashboard/SmartDashboard.h"
@@ -89,6 +85,7 @@ public:
     SmartDashboard::PutNumber("Ball Left", voltToDistance(BallSonicLeft.GetAverageVoltage()));
     SmartDashboard::PutNumber("Ball Right", voltToDistance(BallSonicRight.GetAverageVoltage()));
     //Autonomous values
+    SmartDashboard::PutNumber("AutoSpeed",0.8f);
     SmartDashboard::PutNumber("Auto Distance",80.0f);
     SmartDashboard::PutNumber("Collector Speed",1.0f);
     SmartDashboard::PutNumber("AutoPower",0.440f);
@@ -404,7 +401,7 @@ public:
         if(currentStep==0&&c>SmartDashboard::GetNumber("Initial Drive Delay")*200){
           setMotorValue(6, 1, SmartDashboard::GetNumber("Collector Speed"));
           if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=SmartDashboard::GetNumber("Auto Distance")){
-            driveRobot(-1.0f,correction);
+            driveRobot(-1*(SmartDashboard::GetNumber("AutoSpeed")),correction);
           }else{
             driveRobot(0.0f,0.0f);
           }
@@ -511,8 +508,6 @@ public:
     collectorSole2.Set(false);
     compressing = false;
     SmartDashboard::PutBoolean("CollectorState",false);
-    int c=0;
-    int currentStep=0;
     //}}}
     while(IsEnabled() && IsOperatorControl()) {
       //Joystick{{{
@@ -587,95 +582,6 @@ public:
         collectorSole1.Set(true);
         collectorSole2.Set(false);
         //}}}
-      }
-      if(Rstick.GetRawButton(2)==1){
-        c++;
-        //Autonomous From Joystick{{{
-        //Drive{{{
-        if(currentStep==0&&c>SmartDashboard::GetNumber("Initial Drive Delay")*200){
-          setMotorValue(6, 1, SmartDashboard::GetNumber("Collector Speed"));
-          if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=SmartDashboard::GetNumber("Auto Distance")){
-            driveRobot(-1.0f,SmartDashboard::GetNumber("AutoCorrection"));
-          }else{
-            driveRobot(0.0f,0.0f);
-          }
-          if(c==SmartDashboard::GetNumber("Inital Drive Timeout")*200){
-            setMotorValue(6, 1, 0);
-            driveRobot(0.0f,0.0f);
-            currentStep++;
-            c=0;
-          }
-        }
-        //}}}
-        //Release Ball{{{
-        if(currentStep==1){
-          setMotorValue(6, 1, 102);
-          if(c==50){
-            currentStep++;
-            c=0;
-          }
-        }
-        //}}}
-        //Shoot{{{
-        if(currentStep==2&&c>SmartDashboard::GetNumber("First Shot Start")*200){
-          if(SmartDashboard::GetBoolean("Ignore Pot")||upLimit>=potToDegrees(armPot.GetAverageVoltage())){
-            shootRobot(SmartDashboard::GetNumber("AutoPower"));
-          }else{
-            shootRobot(0.0f);
-          }
-          setMotorValue(6, 1, 1);
-          if(c==SmartDashboard::GetNumber("First Shot Stop")*200){
-            shootRobot(0.0f);
-            setMotorValue(6, 1, 0);
-            currentStep++;
-            c=0;
-          }
-        }
-        //}}}
-        //Lower Shooter{{{
-        if(currentStep==3){
-          if(40.0f<=potToDegrees(armPot.GetAverageVoltage())){
-            shootRobot(-0.3f);
-          }else{
-            shootRobot(0.0f);
-          }
-          if(c==1*200){
-            shootRobot(0.0f);
-            currentStep++;
-            c=0;
-          }
-        }
-        //}}}
-        //Collect Ball{{{
-        if(currentStep==4&&c>SmartDashboard::GetNumber("Second Shot Start")){
-          setMotorValue(6, 1, 1);
-          if(c==SmartDashboard::GetNumber("Second Shot Stop")*200){
-            setMotorValue(6, 1, 0);
-            currentStep++;
-            c=0;
-          }
-        }
-        //}}}
-        //Shoot{{{
-        if(currentStep==5&&c>(SmartDashboard::GetNumber("Second Shot Start"))*200){
-          if(SmartDashboard::GetBoolean("Ignore Pot")||upLimit>=potToDegrees(armPot.GetAverageVoltage())){
-            shootRobot(SmartDashboard::GetNumber("AutoPower"));
-          }else{
-            shootRobot(0.0f);
-          }
-          setMotorValue(6, 1, 1);
-          if(c==(SmartDashboard::GetNumber("First Shot Stop"))*200){
-            setMotorValue(6, 1, 0);
-            shootRobot(0.0f);
-            currentStep++;
-            c=0;
-          }
-        }
-        //}}}
-        //}}}
-      }else{
-        c=0;
-        currentStep=0;
       }
       //Collector Motor{{{
       if(Lstick.GetRawButton(11)==1) {
