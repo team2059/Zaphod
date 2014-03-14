@@ -1,4 +1,3 @@
-//Test comment!!
 //Add a button on joystick that activates "auto" to drive to 40 inches away and another to shoot when at 40 inches away (use the little joystick on both drive and shooter stick)
 //Sonar in auto: drive till 40in away (dashboard value) and shoot
 //Includes{{{
@@ -250,10 +249,6 @@ public:
       }
       //}}}
     }
-  }
-  //}}}
-  //Test{{{
-  void Test() {
   }
   //}}}
   //Autonomous{{{
@@ -518,6 +513,7 @@ public:
     //}}}
     while(IsEnabled() && IsOperatorControl()) {
       //Joystick{{{
+      //Shooter{{{
       if(Lstick.GetRawButton(9)==1){
         throttle = (-Lstick.GetRawAxis(4)+1)/2;
       }else if(Lstick.GetRawButton(10)){
@@ -527,6 +523,8 @@ public:
       }else if(Lstick.GetRawButton(8)){
         throttle = SmartDashboard::GetNumber("ShooterButtonPower8");
       }
+      //}}}
+      //Shooter upLimit{{{
       if(Lstick.GetRawButton(3)){
         upLimit=100.0f;
       }
@@ -539,6 +537,7 @@ public:
       if(Lstick.GetRawButton(6)){
         upLimit=130.0f;
       }
+      //}}}
       if(Lstick.GetRawButton(1)==1) {
         //Shoot{{{
         shooting = true;
@@ -625,6 +624,10 @@ public:
     }
     compressing = false;
     compressor.Stop();
+  }
+  //}}}
+  //Test{{{
+  void Test() {
   }
   //}}}
 };
