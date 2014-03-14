@@ -550,6 +550,10 @@ public:
           shooting = true;
           shootRobot(throttle);
           setMotorValue(6, 1, 1);
+        }else{
+          shooting = true;
+          shootRobot(0.0f);
+          setMotorValue(6, 1, 0);
         }
         //}}}
       } else if(Lstick.GetRawButton(2)==1) {
