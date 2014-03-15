@@ -88,7 +88,7 @@ public:
     SmartDashboard::PutNumber("AutoSpeed",0.95f);
     SmartDashboard::PutNumber("Auto Distance",65.0f);
     SmartDashboard::PutNumber("Collector Speed",1.0f);
-    SmartDashboard::PutNumber("AutoPower",0.460f);
+    SmartDashboard::PutNumber("AutoPower",0.45f);
     SmartDashboard::PutNumber("AutoCorrection",0.032f);
     SmartDashboard::PutNumber("Initial Drive Delay",2.0f);
     SmartDashboard::PutNumber("Inital Drive Timeout", 4.5f);
