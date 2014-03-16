@@ -70,7 +70,7 @@ public:
     shooting = false;
     compressing = true;
     allowCompressing = true;
-    throttle=0;
+    throttle=(-Lstick.GetRawAxis(4)+1)/2;
   }
   //}}}
   //DashboardSetup{{{
