@@ -3,22 +3,19 @@
 #include "SmartDashboard/SmartDashboard.h"
 #include <iostream>
 #include <math.h>
-#include <vector>
 #include <sstream>
 //}}}
 class RobotDemo : public SimpleRobot
 {
   //Declarations{{{
   RobotDrive myRobot;
-  float potVal, multiplier, throttle;
   bool collectorExtended, shooting, compressing, allowCompressing;
-  float upLimit;
+  float upLimit, throttle;
   Joystick Rstick, Lstick;
   Solenoid collectorSole1, collectorSole2;
   Compressor compressor;
   Jaguar Left1, Left2, Left3, Right1, Right2, Right3, RightArmMotor1, RightArmMotor2, LeftArmMotor1, LeftArmMotor2, CollectorMotor1;
-  AnalogChannel armPot;
-  AnalogChannel BallSonicLeft, BallSonicRight, WallSonicLeft, WallSonicRight;
+  AnalogChannel armPot, BallSonicLeft, BallSonicRight, WallSonicLeft, WallSonicRight;
   DigitalOutput BallLeft, BallRight, WallLeft, WallRight;
   //}}}
 public:
@@ -64,7 +61,6 @@ public:
   //RobotInit{{{
   void RobotInit() {
     DashboardSetup();
-    multiplier = 1.0f;
     upLimit = 130.0;
     compressor.Start();
     shooting = false;
