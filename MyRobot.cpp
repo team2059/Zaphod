@@ -254,7 +254,6 @@ public:
     int c=0;
     float power=SmartDashboard::GetNumber("AutoPower");
     float correction=SmartDashboard::GetNumber("AutoCorrection");
-    float autoSeq=SmartDashboard::GetNumber("Autonomous Sequence");
     int currentStep=0;
     compressing=false;
     collectorSole1.Set(false);
@@ -266,7 +265,7 @@ public:
     SmartDashboard::PutBoolean("CollectorState",true);
     //}}}
     while(IsEnabled()&&IsAutonomous()) {
-      switch (autoSeq) {
+      switch (SmartDashboard::GetNumber("Autonomous Sequence")){
         //Autonomous0{{{
         case 0:
           //Drive{{{
