@@ -539,11 +539,12 @@ public:
       if(Lstick.GetRawButton(1)==1){
         //Shoot{{{
         shooting=true;
-        shootRobot(throttle);
         setMotorValue(6,1,1);
         if(collectorExtended==false){
           shooting=false;
         }
+        //shootRobot(throttle);
+        //TODO: test this code, we don't know if it works, but if it does not, run this code: ^
         if(collectorExtended==true&&(SmartDashboard::GetBoolean("Ignore Pot")||upLimit>=potToDegrees(armPot.GetAverageVoltage()))){
           shooting=true;
           shootRobot(throttle);
