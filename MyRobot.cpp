@@ -184,7 +184,7 @@ public:
   //}}}
   //setMotorValue{{{
   void setMotorValue(int motor,int subwayStation=1,int value=127){
-    if(subwayStation == 1){
+    if(subwayStation==1){
       //subwayStation1{{{
       switch(motor){
       case 1:
@@ -215,7 +215,7 @@ public:
         break;
       }
       //}}}
-    }else if(subwayStation == 2){
+    }else if(subwayStation==2){
       //subwayStation2{{{
       switch(motor){
         //Shooter motors
@@ -482,11 +482,11 @@ public:
       SmartDashboard::PutNumber("Autonomous step", currentStep);
       updateDashboard();
       //Compressor{{{
-      if(i % 100 == 0 && compressing && compressor.GetPressureSwitchValue() == 1){
+      if(i%100==0&&compressing&&compressor.GetPressureSwitchValue()==1){
         compressor.Stop();
         compressing=false;
       }
-      if(i % 100 == 0 && !compressing && compressor.GetPressureSwitchValue() == 0){
+      if(i%100==0&&!compressing&&compressor.GetPressureSwitchValue()==0){
         compressor.Start();
         compressing=true;
       }
@@ -509,7 +509,7 @@ public:
     compressing=false;
     SmartDashboard::PutBoolean("CollectorState",false);
     //}}}
-    while(IsEnabled() && IsOperatorControl()){
+    while(IsEnabled()&&IsOperatorControl()){
       //Joystick{{{
       //Throttle values{{{
       if(Lstick.GetRawButton(9)==1){
@@ -541,10 +541,10 @@ public:
         shooting=true;
         shootRobot(throttle);
         setMotorValue(6,1,1);
-        if(collectorExtended == false){
+        if(collectorExtended==false){
           shooting=false;
         }
-        if(collectorExtended == true&&(SmartDashboard::GetBoolean("Ignore Pot")||upLimit>=potToDegrees(armPot.GetAverageVoltage()))){
+        if(collectorExtended==true&&(SmartDashboard::GetBoolean("Ignore Pot")||upLimit>=potToDegrees(armPot.GetAverageVoltage()))){
           shooting=true;
           shootRobot(throttle);
           setMotorValue(6,1,1);
@@ -558,7 +558,7 @@ public:
         //Lower Shooter{{{
         shooting=false;
         shootRobot(-0.1f);
-        if(collectorExtended == true){
+        if(collectorExtended==true){
           shootRobot(-0.1f);
         }
         //}}}
@@ -610,11 +610,11 @@ public:
       //}}}
       //Compressor{{{
       if(SmartDashboard::GetBoolean("Compressor Enabled")){
-        if(i % 100 == 0 && compressing && compressor.GetPressureSwitchValue() == 1){
+        if(i%100==0&&compressing&&compressor.GetPressureSwitchValue()==1){
           compressor.Stop();
           compressing=false;
         }
-        if(i % 100 == 0 && !compressing && compressor.GetPressureSwitchValue() == 0){
+        if(i%100==0&&!compressing&&compressor.GetPressureSwitchValue()==0){
           compressor.Start();
           compressing=true;
         }
@@ -630,6 +630,11 @@ public:
   //}}}
   //Test{{{
   void Test(){
+    int i=0;
+    while(IsEnabled()&&IsTest()){
+      i++;
+      Wait(0.005f);
+    }
   }
   //}}}
 };
