@@ -503,6 +503,7 @@ public:
     compressing=false;
     compressor.Stop();
   }
+}
   //}}}
   //Teleop{{{
   void OperatorControl(){
@@ -571,7 +572,7 @@ public:
       }else{
         //Stop Shooting{{{
         shooting=false;
-        shootRobot(0);
+        shootRobot(0.0f);
         //}}}
       }
       if(Rstick.GetRawButton(9)==1){
