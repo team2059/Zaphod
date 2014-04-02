@@ -249,7 +249,7 @@ public:
   }
   //}}}
   //runCompressor{{{
-  bool runCompressor(int timer, int refreshInterval){
+  void runCompressor(int timer, int refreshInterval){
     if(timer%refreshInterval==0&compressing&comressor.GetPressureSwitchValue()==1){
       compressing=false;
       compressor.Stop();
