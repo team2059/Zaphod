@@ -170,7 +170,6 @@ public:
   }
   //}}}
   //potToDegrees{{{
-  //TODO: Test this!
   float potToDegrees(float a){
     float max=-.0003948;
     float min=5.0245547;
@@ -249,6 +248,17 @@ public:
     }
   }
   //}}}
+  //runCompressor{{{
+  bool runCompressor(int timer, int refreshInterval){
+    if(timer%refreshInterval==0&compressing&comressor.GetPressureSwitchValue()==1){
+      compressing=false;
+      return false;
+    }
+    if(timer%refreshInterval==0&!compressing&comressor.GetPressureSwitchValue()==0){
+      compressing=true;
+      return true;
+    }
+    //}}}
   //Autonomous{{{
   void Autonomous(){
     //Initializations{{{
@@ -482,13 +492,13 @@ public:
       SmartDashboard::PutNumber("Autonomous step", currentStep);
       updateDashboard();
       //Compressor{{{
-      if(i%100==0&&compressing&&compressor.GetPressureSwitchValue()==1){
-        compressor.Stop();
-        compressing=false;
-      }
-      if(i%100==0&&!compressing&&compressor.GetPressureSwitchValue()==0){
-        compressor.Start();
-        compressing=true;
+      if(SmartDashboard::GetBoolean("Compressor Enabled")){
+        if((runCompressor(i, 100))==true){
+          compressor.Start();
+        }
+        if((runCompressor(i, 100))==false){
+          commpressor.Stop();
+        }
       }
       //}}}
       i++;
@@ -611,13 +621,11 @@ public:
       //}}}
       //Compressor{{{
       if(SmartDashboard::GetBoolean("Compressor Enabled")){
-        if(i%100==0&&compressing&&compressor.GetPressureSwitchValue()==1){
-          compressor.Stop();
-          compressing=false;
-        }
-        if(i%100==0&&!compressing&&compressor.GetPressureSwitchValue()==0){
+        if((runCompressor(i, 100))==true){
           compressor.Start();
-          compressing=true;
+        }
+        if((runCompressor(i, 100))==false){
+          commpressor.Stop();
         }
       }
       //}}}
