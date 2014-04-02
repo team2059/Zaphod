@@ -170,11 +170,6 @@ public:
   }
   //}}}
   //potToDegrees{{{
-  float potToDegrees(float a){
-    float max=-.0003948;
-    float min=5.0245547;
-    return 300-(a*(300/(min-max)));
-  }
   //}}}
   //cvt{{{
   int cvt(float input){
