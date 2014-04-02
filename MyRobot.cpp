@@ -493,12 +493,7 @@ public:
       updateDashboard();
       //Compressor{{{
       if(SmartDashboard::GetBoolean("Compressor Enabled")){
-        if((runCompressor(i, 100))==true){
-          compressor.Start();
-        }
-        if((runCompressor(i, 100))==false){
-          commpressor.Stop();
-        }
+        runCompressor(i,100);
       }
       //}}}
       i++;
@@ -621,12 +616,7 @@ public:
       //}}}
       //Compressor{{{
       if(SmartDashboard::GetBoolean("Compressor Enabled")){
-        if((runCompressor(i, 100))==true){
-          compressor.Start();
-        }
-        if((runCompressor(i, 100))==false){
-          commpressor.Stop();
-        }
+        runCompressor(i,100);
       }
       //}}}
       updateDashboard();
