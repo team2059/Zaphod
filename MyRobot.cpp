@@ -252,11 +252,11 @@ public:
   bool runCompressor(int timer, int refreshInterval){
     if(timer%refreshInterval==0&compressing&comressor.GetPressureSwitchValue()==1){
       compressing=false;
-      return false;
+      compressor.Stop();
     }
     if(timer%refreshInterval==0&!compressing&comressor.GetPressureSwitchValue()==0){
       compressing=true;
-      return true;
+      compressor.Start();
     }
     //}}}
   //Autonomous{{{
