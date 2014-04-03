@@ -595,7 +595,7 @@ public:
         //}}}
       }
       //Collector Motor{{{
-      if(Lstick.GetRawButton(11)==1){
+      if(Lstick.GetRawButton(11)==1&&50<=potToDegrees(armPot.GetAverageVoltage())){
         setMotorValue(6,1,1);
       }else if(Lstick.GetRawButton(12)==1){
         setMotorValue(6,1,255);
