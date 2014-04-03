@@ -170,10 +170,13 @@ public:
   }
   //}}}
   //potToDegrees{{{
-  float potToDegrees(float a){
-    float max=-.0003948;
-    float min=5.0245547;
-    return 300-(a*(300/(min-max)));
+  float potToDegrees(float a) {
+    float max = -.0003948;
+    float min = 5.0245547;
+    float b = a - max;
+    min = min - max; // ~5.0027
+    max = max - max; //=0
+    return 300 - ((b + max) * (300 / min));
   }
   //}}}
   //cvt{{{
@@ -249,15 +252,16 @@ public:
   }
   //}}}
   //runCompressor{{{
-  void runCompressor(int timer, int refreshInterval){
-    if(timer%refreshInterval==0&compressing&comressor.GetPressureSwitchValue()==1){
+  void runCompressor(int i, int refreshInterval){
+    if(i%refreshInterval==0&compressing&compressor.GetPressureSwitchValue()==1){
       compressing=false;
       compressor.Stop();
     }
-    if(timer%refreshInterval==0&!compressing&comressor.GetPressureSwitchValue()==0){
+    if(i%refreshInterval==0&!compressing&compressor.GetPressureSwitchValue()==0){
       compressing=true;
       compressor.Start();
     }
+  }
     //}}}
   //Autonomous{{{
   void Autonomous(){
@@ -503,6 +507,7 @@ public:
     compressing=false;
     compressor.Stop();
   }
+}
   //}}}
   //Teleop{{{
   void OperatorControl(){
@@ -571,7 +576,7 @@ public:
       }else{
         //Stop Shooting{{{
         shooting=false;
-        shootRobot(0);
+        shootRobot(0.0f);
         //}}}
       }
       if(Rstick.GetRawButton(9)==1){
