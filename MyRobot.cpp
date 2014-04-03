@@ -264,19 +264,11 @@ public:
   }
     //}}}
     //updateJoystick{{{
-    bool* updateJoystick(int joystick){
-      if(joystick==1){
-        for(i=1,i<=12,i++){
-          state[joystick][i] = Lstick.GetRawButton(i);
-        }
-        return state;
+    bool updateJoystick(*stick){
+      for(i=1,i<=12,i++){
+      state[i] = stick.GetRawButton(i);
       }
-      if(joystick==2){
-        for(i=1,i<=12,i++){
-          state[joystick][i] = Rstick.GetRawButton(i);
-        }
-        return state;
-      }
+      return state;
     }
     //}}}
   //Autonomous{{{
@@ -534,6 +526,8 @@ public:
     collectorSole2.Set(false);
     compressing=false;
     SmartDashboard::PutBoolean("CollectorState",false);
+    ShootStick = *updateJoystick(joystick &Lstick);
+    DriveStick = *updateJoystick(joystick &Rstick);
     //}}}
     while(IsEnabled()&&IsOperatorControl()){
       //Joystick{{{
