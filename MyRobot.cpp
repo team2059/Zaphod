@@ -253,14 +253,15 @@ public:
   //}}}
   //runCompressor{{{
   void runCompressor(int timer, int refreshInterval){
-    if(timer%refreshInterval==0&compressing&comressor.GetPressureSwitchValue()==1){
+    if(timer%refreshInterval==0&compressing&compressor.GetPressureSwitchValue()==1){
       compressing=false;
       compressor.Stop();
     }
-    if(timer%refreshInterval==0&!compressing&comressor.GetPressureSwitchValue()==0){
+    if(timer%refreshInterval==0&!compressing&compressor.GetPressureSwitchValue()==0){
       compressing=true;
       compressor.Start();
     }
+  }
     //}}}
   //Autonomous{{{
   void Autonomous(){
