@@ -263,6 +263,22 @@ public:
     }
   }
     //}}}
+    //{{{updateJoystick
+    bool* updateJoystick(int joystick){
+      if(joystick==1){
+        for(i=1,i<=12,i++){
+          state[joystick][i] = Lstick.GetRawButton(i);
+        }
+        return state;
+      }
+      if(joystick==2){
+        for(i=1,i<=12,i++){
+          state[joystick][i] = Rstick.GetRawButton(i);
+        }
+        return state;
+      }
+    }
+    //}}}
   //Autonomous{{{
   void Autonomous(){
     //Initializations{{{
