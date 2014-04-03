@@ -263,7 +263,7 @@ public:
     }
   }
     //}}}
-    //{{{updateJoystick
+    //updateJoystick{{{
     bool* updateJoystick(int joystick){
       if(joystick==1){
         for(i=1,i<=12,i++){
