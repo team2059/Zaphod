@@ -264,7 +264,7 @@ public:
   }
     //}}}
     //updateJoystick{{{
-    bool updateJoystick(*stick){
+    int updateJoystick(*stick){
       for(i=1,i<=12,i++){
       state[i] = stick.GetRawButton(i);
       }
