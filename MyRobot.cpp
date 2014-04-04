@@ -171,12 +171,12 @@ public:
   //}}}
   //potToDegrees{{{
   float potToDegrees(float a) {
-    float max = -.0003948;
-    float min = 5.0245547;
-    float b = a - max;
-    min = min - max; // ~5.0027
-    max = max - max; //=0
-    return 300 - ((b + max) * (300 / min));
+    float max=-.0003948;
+    float min=5.0245547;
+    float b=a-max;
+    min=min-max; // ~5.0027
+    max=max-max; //=0
+    return 300-((b+max)*(300/min));
   }
   //}}}
   //cvt{{{
