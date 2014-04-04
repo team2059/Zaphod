@@ -263,6 +263,14 @@ public:
     }
   }
     //}}}
+    //updateJoystick{{{
+    bool updateJoystick(*stick){
+      for(i=1,i<=12,i++){
+      state[i] = stick.GetRawButton(i);
+      }
+      return state;
+    }
+    //}}}
   //Autonomous{{{
   void Autonomous(){
     //Initializations{{{
@@ -518,6 +526,8 @@ public:
     collectorSole2.Set(false);
     compressing=false;
     SmartDashboard::PutBoolean("CollectorState",false);
+    ShootStick = *updateJoystick(joystick &Lstick);
+    DriveStick = *updateJoystick(joystick &Rstick);
     //}}}
     while(IsEnabled()&&IsOperatorControl()){
       //Joystick{{{
@@ -595,7 +605,7 @@ public:
         //}}}
       }
       //Collector Motor{{{
-      if(Lstick.GetRawButton(11)==1){
+      if(Lstick.GetRawButton(11)==1&&50<=potToDegrees(armPot.GetAverageVoltage())){
         setMotorValue(6,1,1);
       }else if(Lstick.GetRawButton(12)==1){
         setMotorValue(6,1,255);
