@@ -146,12 +146,12 @@ public:
     }else if(y!=0.0f&&y<-1.0f){
       y=-1.0f;
     }
+    if(SmartDashboard::GetBoolean("HalfPower")){
+      x/=2;
+      y/=2;
+    }
     int leftPower=((y+x)/2+1)*127+1;
     int rightPower=((y-x)/2+1)*127+1;
-    if(SmartDashboard::GetBoolean("HalfPower")){
-      leftPower/=2;
-      rightPower/=2;
-    }
     setMotorValue(1,1,leftPower);
     setMotorValue(2,1,leftPower);
     setMotorValue(3,1,leftPower);
@@ -262,15 +262,15 @@ public:
       compressor.Start();
     }
   }
-    //}}}
-    //updateJoystick{{{
-    int updateJoystick(*stick){
-      for(i=1,i<=12,i++){
-      state[i] = stick.GetRawButton(i);
-      }
-      return state;
+  //}}}
+  //updateJoystick{{{
+  int updateJoystick(*stick){
+    for(i=1,i<=12,i++){
+      state[i]=stick.GetRawButton(i);
     }
-    //}}}
+    return state;
+  }
+  //}}}
   //Autonomous{{{
   void Autonomous(){
     //Initializations{{{
@@ -291,215 +291,216 @@ public:
     //}}}
     while(IsEnabled()&&IsAutonomous()){
       if(!SmartDashboard::GetBoolean("HalfPower")){
-      if(SmartDashboard::GetNumber("Autonomous sequence")==0){
-        //Autonomous0{{{
-        //Drive{{{
-        if(currentStep==0){
-          if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=SmartDashboard::GetNumber("Auto Distance")){
-            driveRobot(-1.0f,correction);
-          }else{
-            driveRobot(0.0f,0.0f);
+        if(SmartDashboard::GetNumber("Autonomous sequence")==0){
+          //Autonomous0{{{
+          //Drive{{{
+          if(currentStep==0){
+            if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=SmartDashboard::GetNumber("Auto Distance")){
+              driveRobot(-1.0f,correction);
+            }else{
+              driveRobot(0.0f,0.0f);
+            }
+            if(c==SmartDashboard::GetNumber("Inital Drive Timeout")*200){
+              driveRobot(0.0f,0.0f);
+              currentStep++;
+              c=0;
+            }
           }
-          if(c==SmartDashboard::GetNumber("Inital Drive Timeout")*200){
-            driveRobot(0.0f,0.0f);
-            currentStep++;
-            c=0;
+          //}}}
+          //Shoot{{{
+          if(currentStep==1&&c>SmartDashboard::GetNumber("First Shot Start")*200){
+            if(SmartDashboard::GetBoolean("Ignore Pot")||upLimit>=potToDegrees(armPot.GetAverageVoltage())){
+              shootRobot(power);
+            }else{
+              shootRobot(0.0f);
+            }
+            setMotorValue(6, 1, 1);
+            if(c==(SmartDashboard::GetNumber("First Shot Stop"))*200){
+              shootRobot(0.0f);
+              setMotorValue(6, 1, 0);
+              currentStep++;
+              c=0;
+            }
           }
+          //}}}
+          //Lower Shooter{{{
+          if(currentStep==2&&c>SmartDashboard::GetNumber("Reverse direction start")*200){
+            if(40.0f<=potToDegrees(armPot.GetAverageVoltage())){
+              shootRobot(-0.3f);
+            }else{
+              shootRobot(0.0f);
+            }
+            if(c==(3.0f)*200){
+              shootRobot(0.0f);
+              currentStep++;
+              c=0;
+            }
+          }
+          //}}}
+          //}}}
+        }else if(SmartDashboard::GetNumber("Autonomous sequence")==1){
+          //Autonomous1{{{
+          //Drive{{{
+          if(currentStep==0){
+            if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=SmartDashboard::GetNumber("Auto Distance")){
+              driveRobot(-1.0f,correction);
+            }else{
+              driveRobot(0.0f,0.0f);
+            }
+            if(c==SmartDashboard::GetNumber("Inital Drive Timeout")*200){
+              driveRobot(0.0f,0.0f);
+              currentStep++;
+              c=0;
+            }
+          }
+          //}}}
+          //Shoot{{{
+          if(currentStep==1&&c>SmartDashboard::GetNumber("First Shot Start")*200){
+            if(SmartDashboard::GetBoolean("Ignore Pot")||upLimit>=potToDegrees(armPot.GetAverageVoltage())){
+              shootRobot(power);
+            }else{
+              shootRobot(0.0f);
+            }
+            setMotorValue(6, 1, 1);
+            if(c==(SmartDashboard::GetNumber("First Shot Stop"))*200){
+              shootRobot(0.0f);
+              setMotorValue(6, 1, 0);
+              currentStep++;
+              c=0;
+            }
+          }
+          //}}}
+          //Drive Backwards{{{
+          if(currentStep==2&&c>SmartDashboard::GetNumber("Reverse direction start")*200){
+            driveRobot(1.0f,correction);
+            if(40.0f<=potToDegrees(armPot.GetAverageVoltage())){
+              shootRobot(-0.2f);
+            }else{
+              shootRobot(0.0f);
+            }
+            if(c==(SmartDashboard::GetNumber("Reverse direction stop"))*200){
+              driveRobot(0.0f,0.0f);
+              shootRobot(0.0f);
+              currentStep++;
+              c=0;
+            }
+          }
+          //}}}
+          //Drive{{{
+          if(currentStep==3&&c>SmartDashboard::GetNumber("Second Drive Start")*200){
+            if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=SmartDashboard::GetNumber("Auto Distance")){
+              driveRobot(-1.0f,correction);
+            }else{
+              driveRobot(0.0f,0.0f);
+            }
+            if(c==(SmartDashboard::GetNumber("Inital Drive Timeout"))*200){
+              driveRobot(0.0f,0.0f);
+              currentStep++;
+              c=0;
+            }
+          }
+          //}}}
+          //Shoot{{{
+          if(currentStep==4&&c>(SmartDashboard::GetNumber("Second Shot Start"))*200){
+            if(SmartDashboard::GetBoolean("Ignore Pot")||upLimit>=potToDegrees(armPot.GetAverageVoltage())){
+              shootRobot(power);
+            }else{
+              shootRobot(0.0f);
+            }
+            setMotorValue(6, 1, 1);
+            if(c==(SmartDashboard::GetNumber("First Shot Stop"))*200){
+              shootRobot(0.0f);
+              setMotorValue(6, 1, 0);
+              currentStep++;
+              c=0;
+            }
+          }
+          //}}}
+          //}}}
+        }else if(SmartDashboard::GetNumber("Autonomous sequence")==2){
+          //Autonomous2{{{
+          //Drive{{{
+          if(currentStep==0&&c>SmartDashboard::GetNumber("Initial Drive Delay")*200){
+            setMotorValue(6, 1, SmartDashboard::GetNumber("Collector Speed"));
+            if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=SmartDashboard::GetNumber("Auto Distance")){
+              driveRobot(-1*(SmartDashboard::GetNumber("AutoSpeed")),correction);
+            }else{
+              driveRobot(0.0f,0.0f);
+            }
+            if(c==SmartDashboard::GetNumber("Inital Drive Timeout")*200){
+              setMotorValue(6, 1, 0);
+              driveRobot(0.0f,0.0f);
+              currentStep++;
+              c=0;
+            }
+          }
+          //}}}
+          //Release Ball{{{
+          if(currentStep==1){
+            setMotorValue(6, 1, 102);
+            if(c==50){
+              currentStep++;
+              c=0;
+            }
+          }
+          //}}}
+          //Shoot{{{
+          if(currentStep==2&&c>SmartDashboard::GetNumber("First Shot Start")*200){
+            if(SmartDashboard::GetBoolean("Ignore Pot")||upLimit>=potToDegrees(armPot.GetAverageVoltage())){
+              shootRobot(power);
+            }else{
+              shootRobot(0.0f);
+            }
+            if(c==SmartDashboard::GetNumber("First Shot Stop")*200){
+              shootRobot(0.0f);
+              setMotorValue(6, 1, 0);
+              currentStep++;
+              c=0;
+            }
+          }
+          //}}}
+          //Lower Shooter{{{
+          if(currentStep==3){
+            if(40.0f<=potToDegrees(armPot.GetAverageVoltage())){
+              shootRobot(-0.3f);
+            }else{
+              shootRobot(0.0f);
+            }
+            if(c==1*200){
+              shootRobot(0.0f);
+              currentStep++;
+              c=0;
+            }
+          }
+          //}}}
+          //Collect Ball{{{
+          if(currentStep==4&&c>SmartDashboard::GetNumber("Second Shot Start")){
+            setMotorValue(6, 1, 1);
+            if(c==SmartDashboard::GetNumber("Second Shot Stop")*200){
+              setMotorValue(6, 1, 0);
+              currentStep++;
+              c=0;
+            }
+          }
+          //}}}
+          //Shoot{{{
+          if(currentStep==5&&c>(SmartDashboard::GetNumber("Second Shot Start"))*200){
+            if(SmartDashboard::GetBoolean("Ignore Pot")||upLimit>=potToDegrees(armPot.GetAverageVoltage())){
+              shootRobot(power);
+            }else{
+              shootRobot(0.0f);
+            }
+            setMotorValue(6, 1, 1);
+            if(c==(SmartDashboard::GetNumber("First Shot Stop"))*200){
+              setMotorValue(6, 1, 0);
+              shootRobot(0.0f);
+              currentStep++;
+              c=0;
+            }
+          }
+          //}}}
+          //}}}
         }
-        //}}}
-        //Shoot{{{
-        if(currentStep==1&&c>SmartDashboard::GetNumber("First Shot Start")*200){
-          if(SmartDashboard::GetBoolean("Ignore Pot")||upLimit>=potToDegrees(armPot.GetAverageVoltage())){
-            shootRobot(power);
-          }else{
-            shootRobot(0.0f);
-          }
-          setMotorValue(6, 1, 1);
-          if(c==(SmartDashboard::GetNumber("First Shot Stop"))*200){
-            shootRobot(0.0f);
-            setMotorValue(6, 1, 0);
-            currentStep++;
-            c=0;
-          }
-        }
-        //}}}
-        //Lower Shooter{{{
-        if(currentStep==2&&c>SmartDashboard::GetNumber("Reverse direction start")*200){
-          if(40.0f<=potToDegrees(armPot.GetAverageVoltage())){
-            shootRobot(-0.3f);
-          }else{
-            shootRobot(0.0f);
-          }
-          if(c==(3.0f)*200){
-            shootRobot(0.0f);
-            currentStep++;
-            c=0;
-          }
-        }
-        //}}}
-        //}}}
-      }else if(SmartDashboard::GetNumber("Autonomous sequence")==1){
-        //Autonomous1{{{
-        //Drive{{{
-        if(currentStep==0){
-          if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=SmartDashboard::GetNumber("Auto Distance")){
-            driveRobot(-1.0f,correction);
-          }else{
-            driveRobot(0.0f,0.0f);
-          }
-          if(c==SmartDashboard::GetNumber("Inital Drive Timeout")*200){
-            driveRobot(0.0f,0.0f);
-            currentStep++;
-            c=0;
-          }
-        }
-        //}}}
-        //Shoot{{{
-        if(currentStep==1&&c>SmartDashboard::GetNumber("First Shot Start")*200){
-          if(SmartDashboard::GetBoolean("Ignore Pot")||upLimit>=potToDegrees(armPot.GetAverageVoltage())){
-            shootRobot(power);
-          }else{
-            shootRobot(0.0f);
-          }
-          setMotorValue(6, 1, 1);
-          if(c==(SmartDashboard::GetNumber("First Shot Stop"))*200){
-            shootRobot(0.0f);
-            setMotorValue(6, 1, 0);
-            currentStep++;
-            c=0;
-          }
-        }
-        //}}}
-        //Drive Backwards{{{
-        if(currentStep==2&&c>SmartDashboard::GetNumber("Reverse direction start")*200){
-          driveRobot(1.0f,correction);
-          if(40.0f<=potToDegrees(armPot.GetAverageVoltage())){
-            shootRobot(-0.2f);
-          }else{
-            shootRobot(0.0f);
-          }
-          if(c==(SmartDashboard::GetNumber("Reverse direction stop"))*200){
-            driveRobot(0.0f,0.0f);
-            shootRobot(0.0f);
-            currentStep++;
-            c=0;
-          }
-        }
-        //}}}
-        //Drive{{{
-        if(currentStep==3&&c>SmartDashboard::GetNumber("Second Drive Start")*200){
-          if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=SmartDashboard::GetNumber("Auto Distance")){
-            driveRobot(-1.0f,correction);
-          }else{
-            driveRobot(0.0f,0.0f);
-          }
-          if(c==(SmartDashboard::GetNumber("Inital Drive Timeout"))*200){
-            driveRobot(0.0f,0.0f);
-            currentStep++;
-            c=0;
-          }
-        }
-        //}}}
-        //Shoot{{{
-        if(currentStep==4&&c>(SmartDashboard::GetNumber("Second Shot Start"))*200){
-          if(SmartDashboard::GetBoolean("Ignore Pot")||upLimit>=potToDegrees(armPot.GetAverageVoltage())){
-            shootRobot(power);
-          }else{
-            shootRobot(0.0f);
-          }
-          setMotorValue(6, 1, 1);
-          if(c==(SmartDashboard::GetNumber("First Shot Stop"))*200){
-            shootRobot(0.0f);
-            setMotorValue(6, 1, 0);
-            currentStep++;
-            c=0;
-          }
-        }
-        //}}}
-        //}}}
-      }else if(SmartDashboard::GetNumber("Autonomous sequence")==2){
-        //Autonomous2{{{
-        //Drive{{{
-        if(currentStep==0&&c>SmartDashboard::GetNumber("Initial Drive Delay")*200){
-          setMotorValue(6, 1, SmartDashboard::GetNumber("Collector Speed"));
-          if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=SmartDashboard::GetNumber("Auto Distance")){
-            driveRobot(-1*(SmartDashboard::GetNumber("AutoSpeed")),correction);
-          }else{
-            driveRobot(0.0f,0.0f);
-          }
-          if(c==SmartDashboard::GetNumber("Inital Drive Timeout")*200){
-            setMotorValue(6, 1, 0);
-            driveRobot(0.0f,0.0f);
-            currentStep++;
-            c=0;
-          }
-        }
-        //}}}
-        //Release Ball{{{
-        if(currentStep==1){
-          setMotorValue(6, 1, 102);
-          if(c==50){
-            currentStep++;
-            c=0;
-          }
-        }
-        //}}}
-        //Shoot{{{
-        if(currentStep==2&&c>SmartDashboard::GetNumber("First Shot Start")*200){
-          if(SmartDashboard::GetBoolean("Ignore Pot")||upLimit>=potToDegrees(armPot.GetAverageVoltage())){
-            shootRobot(power);
-          }else{
-            shootRobot(0.0f);
-          }
-          if(c==SmartDashboard::GetNumber("First Shot Stop")*200){
-            shootRobot(0.0f);
-            setMotorValue(6, 1, 0);
-            currentStep++;
-            c=0;
-          }
-        }
-        //}}}
-        //Lower Shooter{{{
-        if(currentStep==3){
-          if(40.0f<=potToDegrees(armPot.GetAverageVoltage())){
-            shootRobot(-0.3f);
-          }else{
-            shootRobot(0.0f);
-          }
-          if(c==1*200){
-            shootRobot(0.0f);
-            currentStep++;
-            c=0;
-          }
-        }
-        //}}}
-        //Collect Ball{{{
-        if(currentStep==4&&c>SmartDashboard::GetNumber("Second Shot Start")){
-          setMotorValue(6, 1, 1);
-          if(c==SmartDashboard::GetNumber("Second Shot Stop")*200){
-            setMotorValue(6, 1, 0);
-            currentStep++;
-            c=0;
-          }
-        }
-        //}}}
-        //Shoot{{{
-        if(currentStep==5&&c>(SmartDashboard::GetNumber("Second Shot Start"))*200){
-          if(SmartDashboard::GetBoolean("Ignore Pot")||upLimit>=potToDegrees(armPot.GetAverageVoltage())){
-            shootRobot(power);
-          }else{
-            shootRobot(0.0f);
-          }
-          setMotorValue(6, 1, 1);
-          if(c==(SmartDashboard::GetNumber("First Shot Stop"))*200){
-            setMotorValue(6, 1, 0);
-            shootRobot(0.0f);
-            currentStep++;
-            c=0;
-          }
-        }
-        //}}}
-        //}}}
       }
       SmartDashboard::PutNumber("Autonomous step", currentStep);
       updateDashboard();
@@ -511,7 +512,6 @@ public:
       i++;
       c++;
       Wait(0.005f);
-    }
     compressing=false;
     compressor.Stop();
   }
