@@ -298,7 +298,7 @@ public:
   }
   //}}}
   //{{{shooter_lower
-  bool shooter_lower(float shooter_speed, float shooter_lower_limit, float shooter_current_angle){
+  void shooter_lower(float shooter_speed, float shooter_lower_limit, float shooter_current_angle){
     //Used to lower the shooter to the lower limit
     if(shooter_lower_limit<=shooter_current_angle){
       setMotorValue(4,1,cvt(shooter_speed));
