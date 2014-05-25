@@ -4,7 +4,8 @@
 ZaphodRobot::ZaphodRobot():
   ControlSystem(new JoystickController()),
   shooter(new ZaphodShooter()),
-  collector(new ZaphodCollector())
+  collector(new ZaphodCollector()),
+  compressorSystem(new ZaphodCompressor())
 {
   left1 = new Jaguar(DRIVE_LEFT_SIDECAR, DRIVE_LEFT_MOTOR_ONE);
   left2 = new Jaguar(DRIVE_LEFT_SIDECAR, DRIVE_LEFT_MOTOR_TWO);
@@ -12,10 +13,6 @@ ZaphodRobot::ZaphodRobot():
   right1 = new Jaguar(DRIVE_RIGHT_SIDECAR, DRIVE_RIGHT_MOTOR_ONE);
   right2 = new Jaguar(DRIVE_RIGHT_SIDECAR, DRIVE_RIGHT_MOTOR_ONE);
   right3 = new Jaguar(DRIVE_RIGHT_SIDECAR, DRIVE_RIGHT_MOTOR_ONE);
-
-  compressor = new Compressor(COMPRESSOR_GAUGE_SIDECAR, COMPRESSOR_GAUGE, COMPRESSOR_RELAY_SIDECAR, COMPRESSOR_RELAY);
-  solenoid1 = new Solenoid(COMPRESSOR_SOLENOID_ONE);
-  solenoid2 = new Solenoid(COMPRESSOR_SOLENOID_TWO);
 
   frontSonarLeftD = new DigitalOutput(SONAR_LEFT_DIO_SIDECAR, SONAR_FRONT_LEFT_DIO);
   frontSonarRightD = new DigitalOutput(SONAR_RIGHT_DIO_SIDECAR, SONAR_FRONT_RIGHT_DIO);
@@ -68,6 +65,7 @@ void ZaphodRobot::handler()
   ControlSystem->getRightJoystick();
   ControlSystem->getLeftJoystick();
   shooter->updateShooterPosition();
+  compressorSystem->compressorSystemPeriodic();
   collector->updateCollector(shooter->isShooting, shooter->getAngle());
   if(ControlSystem->leftJoystickValues[SHOOTER_FIRE])
   {
@@ -78,8 +76,16 @@ void ZaphodRobot::handler()
   {
     collector->collectBall();
   }
-  if(ControlSystem->rightJoystickValues[COLLETOR_OUTTAKE])
+  if(ControlSystem->rightJoystickValues[COLLECTOR_OUTTAKE])
   {
     collector->releaseBall();
+  }
+  if(ControlSystem->rightJoystickValues[COLLECTOR_EXTEND])
+  {
+    compressorSystem->extendCollector();
+  }
+  if(ControlSystem->rightJoystickValues[COLLECTOR_RETRACT])
+  {
+    compressorSystem->retractCollector();
   }
 }

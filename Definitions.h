@@ -62,6 +62,8 @@
 
 #define SHOOTER_FIRE            1
 #define COLLECTOR_INTAKE        1
-#define COLLETOR_OUTTAKE        2
+#define COLLECTOR_OUTTAKE       2
+#define COLLECTOR_EXTEND        9
+#define COLLECTOR_RETRACT       10
 
 #endif

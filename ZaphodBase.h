@@ -7,11 +7,13 @@
 #include "Subsystems/Controller.h"
 #include "Subsystems/Shooter.h"
 #include "Subsystems/Collector.h"
+#include "Subsystems/Compressor.h"
 
 //Because this is the first header to be compiled, classes need to be declared here
 class ZaphodRobot;
 class ZaphodShooter;
 class ZaphodCollector;
+class ZaphodCompressor;
 class JoystickController;
 
 class ZaphodBase : public IterativeRobot

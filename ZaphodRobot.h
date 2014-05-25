@@ -8,18 +8,18 @@
 class JoystickController;
 class ZaphodShooter;
 class ZaphodCollector;
+class ZaphodCompressor;
 
 class ZaphodRobot
 {
   private:
     Jaguar *right1, *right2, *right3, *left1, *left2, *left3;
-    Compressor *compressor;
-    Solenoid *solenoid1, *solenoid2;
     DigitalOutput *frontSonarLeftD, *frontSonarRightD, *rearSonarLeftD, *rearSonarRightD;
     AnalogChannel *frontSonarLeftA, *frontSonarRightA, *rearSonarLeftA, *rearSonarRightA;
     JoystickController *ControlSystem;
     ZaphodShooter *shooter;
     ZaphodCollector *collector;
+    ZaphodCompressor *compressorSystem;
   public:
     ZaphodRobot();
 
