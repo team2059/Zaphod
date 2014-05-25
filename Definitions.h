@@ -61,5 +61,7 @@
 //Static button assignments
 
 #define SHOOTER_FIRE            1
+#define COLLECTOR_INTAKE        1
+#define COLLETOR_OUTTAKE        2
 
 #endif

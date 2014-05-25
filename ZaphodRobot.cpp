@@ -68,12 +68,18 @@ void ZaphodRobot::handler()
   ControlSystem->getRightJoystick();
   ControlSystem->getLeftJoystick();
   shooter->updateShooterPosition();
+  collector->updateCollector(shooter->isShooting, shooter->getAngle());
   if(ControlSystem->leftJoystickValues[SHOOTER_FIRE])
   {
     //TODO Needs a power input
     shooter->startShootingSequence();
-    //TODO Needs to be moved to run with the shooter class
-    collector->spinWithShot(shooter->getAngle());
   }
-
+  if(ControlSystem->rightJoystickValues[COLLECTOR_INTAKE])
+  {
+    collector->collectBall();
+  }
+  if(ControlSystem->rightJoystickValues[COLLETOR_OUTTAKE])
+  {
+    collector->releaseBall();
+  }
 }

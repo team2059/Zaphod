@@ -69,14 +69,17 @@ void ZaphodShooter::updateShooterPosition()
 {
   if(e_ShooterState == IDLE_PRESHOT)
   {
+    isShooting = false;
     stopShooter();
   }
   if(e_ShooterState == FIRING)
   {
+    isShooting = true;
     shootForAngle(1,110);
   }
   if(e_ShooterState == IDLE_POSTSHOT)
   {
+    isShooting = false;
     lower(40);
   }
 }
