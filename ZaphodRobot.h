@@ -26,6 +26,7 @@ class ZaphodRobot
     float frontSonarLeftV, frontSonarRightV, rearSonarLeftV, rearSonarRightV;
     float getFrontSonar();
     float getRearSonar();
+    void driveRobot(float,float);
     void handler();
 };
 #endif

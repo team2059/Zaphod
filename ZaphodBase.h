@@ -1,4 +1,3 @@
-
 #ifndef __ZAPHOD_BASE_H__
 #define __ZAPHOD_BASE_H__
 

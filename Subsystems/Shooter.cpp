@@ -11,10 +11,11 @@ ZaphodShooter::ZaphodShooter()
   e_ShooterState = IDLE_PRESHOT;
 }
 
-void ZaphodShooter::startShootingSequence()
+void ZaphodShooter::startShootingSequence(float throttle)
 {
   //Changes the enum to tell the shooter to be firing
   e_ShooterState = FIRING;
+  shootingPower = throttle;
 }
 
 //First step in shooting process
@@ -75,7 +76,7 @@ void ZaphodShooter::updateShooterPosition()
   if(e_ShooterState == FIRING)
   {
     isShooting = true;
-    shootForAngle(1,110);
+    shootForAngle(shootingPower,110);
   }
   if(e_ShooterState == IDLE_POSTSHOT)
   {

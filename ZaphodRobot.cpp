@@ -57,20 +57,26 @@ float ZaphodRobot::getRearSonar()
   return (rearSonarRightV+rearSonarLeftV)/2;
 }
 
+void driveRobot(float x, float y)
+{
+}
+
 //Main function used to handle periodic tasks on the robot
  
 void ZaphodRobot::handler()
 {
   //Periodic tasks that should be run by every loop
-  ControlSystem->getRightJoystick();
-  ControlSystem->getLeftJoystick();
+  ControlSystem->updateJoysticks();
   shooter->updateShooterPosition();
+  //TODO Need to implement a timing system to not break the spike (this function doesn't run the compressor at the moment)
   compressorSystem->compressorSystemPeriodic();
   collector->updateCollector(shooter->isShooting, shooter->getAngle());
+  
+  //Button assignments to actions
   if(ControlSystem->leftJoystickValues[SHOOTER_FIRE])
   {
     //TODO Needs a power input
-    shooter->startShootingSequence();
+    shooter->startShootingSequence(ControlSystem->throttle);
   }
   if(ControlSystem->rightJoystickValues[COLLECTOR_INTAKE])
   {

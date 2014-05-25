@@ -16,7 +16,8 @@ class ZaphodShooter
       IDLE_POSTSHOT
     }e_ShooterState;
     bool isShooting;
-    void startShootingSequence();
+    float shootingPower;
+    void startShootingSequence(float);
     void shootForAngle(float, float);
     void shootRaw(float);
     void lower(float);
