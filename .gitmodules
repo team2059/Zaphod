@@ -1,9 +1,0 @@
-[submodule "python/robotpy"]
-	path = python/robotpy
-	url = https://github.com/robotpy/robotpy.git
-[submodule "python/pyfrc"]
-	path = python/pyfrc
-	url = https://github.com/robotpy/pyfrc.git
-[submodule "python/pynetworktables"]
-	path = python/pynetworktables
-	url = https://github.com/robotpy/pynetworktables.git
