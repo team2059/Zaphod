@@ -1,0 +1,4 @@
+#!/bin/bash
+cd src
+make && cp PPC603gnu/src/Debug/src.out ../bin/Zaphod.out
+cd ..
