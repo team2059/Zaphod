@@ -57,8 +57,35 @@ float ZaphodRobot::getRearSonar()
   return (rearSonarRightV+rearSonarLeftV)/2;
 }
 
-void driveRobot(float x, float y)
+bool ZaphodRobot::checkJoystickValues()
 {
+  float x = ControlSystem->rightJoystickAxisValues[1];
+  float y = ControlSystem->rightJoystickAxisValues[2];
+  if((-.1 < x && x < .1) && (-.1 < y && y < .1))
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+void ZaphodRobot::driveRobot(float x, float y)
+{ 
+    if(y>1.0f){
+    y=1.0f;
+    }else if(y!=0.0f&&y<-1.0f){
+    y=-1.0f;
+    }
+    float leftPower=((y+x)/2+1)*127+1;
+    float rightPower=((y-x)/2+1)*127+1;
+    right1->SetRaw(int(rightPower));
+    right2->SetRaw(int(rightPower));
+    right3->SetRaw(int(rightPower));
+    left1->SetRaw(int(leftPower));
+    left2->SetRaw(int(leftPower));
+    left3->SetRaw(int(leftPower));
 }
 
 //Main function used to handle periodic tasks on the robot
@@ -71,11 +98,11 @@ void ZaphodRobot::handler()
   //TODO Need to implement a timing system to not break the spike (this function doesn't run the compressor at the moment)
   compressorSystem->compressorSystemPeriodic();
   collector->updateCollector(shooter->isShooting, shooter->getAngle());
+  driveRobot(ControlSystem->rightJoystickAxisValues[3]+ControlSystem->rightJoystickAxisValues[1], -ControlSystem->rightJoystickAxisValues[2]);
   
   //Button assignments to actions
   if(ControlSystem->leftJoystickValues[SHOOTER_FIRE])
   {
-    //TODO Needs a power input
     shooter->startShootingSequence(ControlSystem->throttle);
   }
   if(ControlSystem->rightJoystickValues[COLLECTOR_INTAKE])

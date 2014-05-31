@@ -66,4 +66,9 @@
 #define COLLECTOR_EXTEND        9
 #define COLLECTOR_RETRACT       10
 
+//Drive threshold definitions
+
+#define DRIVE_MAX_VALUE_CHANGE  .05
+#define DRIVE_SPEED_FALLBACK    2
+
 #endif

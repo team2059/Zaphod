@@ -22,10 +22,10 @@ class ZaphodRobot
     ZaphodCompressor *compressorSystem;
   public:
     ZaphodRobot();
-
     float frontSonarLeftV, frontSonarRightV, rearSonarLeftV, rearSonarRightV;
     float getFrontSonar();
     float getRearSonar();
+    bool checkJoystickValues();
     void driveRobot(float,float);
     void handler();
 };

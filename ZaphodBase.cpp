@@ -7,6 +7,12 @@ ZaphodBase::ZaphodBase():
 }
 void ZaphodBase::RobotInit()
 {
+  //Checks the state of the drive joystick to make sure it was not moved
+  //while plugged in, giving inaccurate readings
+  if(!zBot->checkJoystickValues())
+  {
+    printf("***UNPLUG AND REPLUG THE JOYSTICKS***\n"); 
+  }
 }
 void ZaphodBase::DisabledInit()
 {
