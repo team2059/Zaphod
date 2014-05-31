@@ -1,0 +1,3 @@
+[submodule "bin/ucpp"]
+	path = bin/ucpp
+	url = git://github.com/nikitakit/ucpp.git
