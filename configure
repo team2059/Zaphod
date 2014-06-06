@@ -1,8 +1,11 @@
 #!/bin/bash
 git submodule init
 git submodule update
-export PATH=$PATH:$(pwd)/bin/ucpp/ucpp
+echo "export PATH=$PATH:$(pwd)/bin/ucpp/ucpp" >> ~/.bashrc
+echo "alias frcbot='python build.py'" >> ~/.bashrc
 cd src
 ucpp setup -t 2059
 ucpp init 
 ucpp configure
+cd ..
+source ~/.bashrc

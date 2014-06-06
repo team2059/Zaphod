@@ -66,6 +66,7 @@ void ZaphodShooter::shootRaw(float power)
   shooterRight2->SetRaw(int(floatToPWM(-power)));
 }
 
+//Should be run in a loop
 void ZaphodShooter::updateShooterPosition()
 {
   if(e_ShooterState == IDLE_PRESHOT)
