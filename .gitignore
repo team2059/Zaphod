@@ -1,2 +1,3 @@
-Makefile
-.ucpp
+src/PPC603gnu
+src/Makefile
+src/.ucpp
