@@ -31,8 +31,8 @@ if sys.argv[1] == 'clean':
     clean()
 
 if sys.argv[1] == 'buildclean':
-    build()
     clean()
+    build()
 
 if sys.argv[1] == 'deploy':
     deploy()
