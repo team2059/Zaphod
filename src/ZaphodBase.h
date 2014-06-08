@@ -7,6 +7,7 @@
 #include "Subsystems/Shooter.h"
 #include "Subsystems/Collector.h"
 #include "Subsystems/Compressor.h"
+#include "Subsystems/Dashboard.h"
 
 //Because this is the first header to be compiled, classes need to be declared here
 class ZaphodRobot;

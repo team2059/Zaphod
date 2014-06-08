@@ -5,7 +5,8 @@ ZaphodRobot::ZaphodRobot():
   ControlSystem(new JoystickController()),
   shooter(new ZaphodShooter()),
   collector(new ZaphodCollector()),
-  compressorSystem(new ZaphodCompressor())
+  compressorSystem(new ZaphodCompressor()),
+  dashboard(new ZaphodDashboard())
 {
   left1 = new Jaguar(DRIVE_LEFT_SIDECAR, DRIVE_LEFT_MOTOR_ONE);
   left2 = new Jaguar(DRIVE_LEFT_SIDECAR, DRIVE_LEFT_MOTOR_TWO);

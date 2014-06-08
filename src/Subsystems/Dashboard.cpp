@@ -1,6 +1,10 @@
 #include "Dashboard.h"
 
-class Dashboard
+ZaphodDashboard::ZaphodDashboard()
 {
+}
 
-};
+float ZaphodDashboard::getKeyValue(const char* key)
+{
+  return 1.0f;
+}

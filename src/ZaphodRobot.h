@@ -9,6 +9,8 @@ class JoystickController;
 class ZaphodShooter;
 class ZaphodCollector;
 class ZaphodCompressor;
+class ZaphodDashboard;
+class ZaphodRobot;
 
 class ZaphodRobot
 {
@@ -20,6 +22,7 @@ class ZaphodRobot
     ZaphodShooter *shooter;
     ZaphodCollector *collector;
     ZaphodCompressor *compressorSystem;
+    ZaphodDashboard *dashboard;
   public:
     ZaphodRobot();
     float frontSonarLeftV, frontSonarRightV, rearSonarLeftV, rearSonarRightV;
