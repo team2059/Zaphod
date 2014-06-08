@@ -31,5 +31,6 @@ class ZaphodBase : public IterativeRobot
     void DisabledPeriodic();
     void AutonomousPeriodic();
     void TeleopPeriodic();
+    void Test();
 };
 #endif

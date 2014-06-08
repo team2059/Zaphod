@@ -42,4 +42,7 @@ void ZaphodBase::TeleopPeriodic()
 {
   zBot->handler();
 }
+void ZaphodBase::Test()
+{
+}
 START_ROBOT_CLASS(ZaphodBase);
