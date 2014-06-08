@@ -2,3 +2,4 @@ src/PPC603gnu
 src/Makefile
 src/.ucpp
 src/.wrmakefile
+bin/Zaphod.out
