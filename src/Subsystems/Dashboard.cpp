@@ -2,11 +2,14 @@
 
 ZaphodDashboard::ZaphodDashboard()
 {
+  //Add Dashboard Initalizations here (for now)
+  SmartDashboard::PutNumber("Shooting Power", 0.0f);
 }
 
 float ZaphodDashboard::getKeyValue(const char* key)
 {
-  return 1.0f;
+  float value = SmartDashboard::GetNumber(key);
+  return value;
 }
 
 bool ZaphodDashboard::putKeyValue(const char* key, float value)

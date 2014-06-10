@@ -30,6 +30,7 @@ class ZaphodRobot
     float getRearSonar();
     bool checkJoystickValues();
     void driveRobot(float,float);
+    void updateDashboard();
     void handler();
 };
 #endif

@@ -89,6 +89,11 @@ void ZaphodRobot::driveRobot(float x, float y)
     left3->SetRaw(int(leftPower));
 }
 
+void ZaphodRobot::updateDashboard()
+{
+  dashboard->putKeyValue("Shooting Power", ControlSystem->throttle);
+}
+
 //Main function used to handle periodic tasks on the robot
  
 void ZaphodRobot::handler()
@@ -100,6 +105,7 @@ void ZaphodRobot::handler()
   compressorSystem->compressorSystemPeriodic();
   collector->updateCollector(shooter->isShooting, shooter->getAngle());
   driveRobot(ControlSystem->rightJoystickAxisValues[3]+ControlSystem->rightJoystickAxisValues[1], -ControlSystem->rightJoystickAxisValues[2]);
+  updateDashboard();
   
   //Button assignments to actions
   if(ControlSystem->leftJoystickValues[SHOOTER_FIRE])
