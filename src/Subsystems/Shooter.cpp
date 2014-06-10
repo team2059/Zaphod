@@ -21,7 +21,7 @@ void ZaphodShooter::startShootingSequence(float throttle)
 //First step in shooting process
 void ZaphodShooter::shootForAngle(float power, float desiredAngle)
 {
-  if(getAngle() <= desiredAngle)
+  if(getAngle() <= desiredAngle && power >= 15)
   {
     shootRaw(power);
     e_ShooterState = FIRING;
