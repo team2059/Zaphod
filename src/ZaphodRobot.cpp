@@ -64,10 +64,13 @@ bool ZaphodRobot::checkJoystickValues()
   float y = ControlSystem->rightJoystickAxisValues[2];
   if((-.1 < x && x < .1) && (-.1 < y && y < .1))
   {
+    dashboard->putBooleanValue("Joysticks Valid", true);
     return true;
   }
   else
   {
+    dashboard->putBooleanValue("Joysticks Valid", false);
+    return true;
     return false;
   }
 }
@@ -91,7 +94,7 @@ void ZaphodRobot::driveRobot(float x, float y)
 
 void ZaphodRobot::updateDashboard()
 {
-  dashboard->putKeyValue("Shooting Power", ControlSystem->throttle);
+  dashboard->putFloatValue("Shooting Power", ControlSystem->throttle);
 }
 
 //Main function used to handle periodic tasks on the robot
@@ -104,7 +107,10 @@ void ZaphodRobot::handler()
   //TODO Need to implement a timing system to not break the spike (this function doesn't run the compressor at the moment)
   compressorSystem->compressorSystemPeriodic();
   collector->updateCollector(shooter->isShooting, shooter->getAngle());
-  driveRobot(ControlSystem->rightJoystickAxisValues[3]+ControlSystem->rightJoystickAxisValues[1], -ControlSystem->rightJoystickAxisValues[2]);
+  if(checkJoystickValues())
+  {
+    driveRobot(ControlSystem->rightJoystickAxisValues[3]+ControlSystem->rightJoystickAxisValues[1], -ControlSystem->rightJoystickAxisValues[2]);
+  }
   updateDashboard();
   
   //Button assignments to actions

@@ -7,6 +7,8 @@ class ZaphodDashboard
     ZaphodDashboard();
     //Array used to track the values in the dashboard
     bool DashboardValues[];
-    float getKeyValue(const char* key);
-    bool putKeyValue(const char* key, float value);
+    float getFloatValue(const char* key);
+    bool putFloatValue(const char* key, float value);
+    bool getBoolValue(const char* key);
+    bool putBoolValue(const char* key, bool value);
 };
