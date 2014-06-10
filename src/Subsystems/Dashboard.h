@@ -1,8 +1,7 @@
 #include "SmartDashboard/SmartDashboard.h"
 #include <WPILib.h>
 #include "../Definitions.h"
-class ZaphodDashboard
-{
+class ZaphodDashboard{
   public:
     ZaphodDashboard();
     //Array used to track the values in the dashboard

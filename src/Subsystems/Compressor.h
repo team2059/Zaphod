@@ -1,7 +1,7 @@
 #include <WPILib.h>
 #include "../Definitions.h"
 
-class ZaphodCompressor
+class HHCompressor
 {
   private:
     Compressor *compressor;
@@ -13,7 +13,7 @@ class ZaphodCompressor
       RETRACTED,
       IDLE
     }e_CollectorSolenoidState;
-    ZaphodCompressor();
+    HHCompressor();
     void compressorSystemPeriodic();
     void extendCollector();
     void retractCollector();

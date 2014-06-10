@@ -1,27 +1,24 @@
-#ifndef __ZAPHOD_BASE_H__
-#define __ZAPHOD_BASE_H__
-
+#ifndef __HH_BASE_H__
+#define __HH_BASE_H__
 #include <WPILib.h>
-#include "ZaphodRobot.h"
+#include "HHRobot.h"
 #include "Subsystems/Controller.h"
 #include "Subsystems/Shooter.h"
 #include "Subsystems/Collector.h"
 #include "Subsystems/Compressor.h"
 #include "Subsystems/Dashboard.h"
-
-//Because this is the first header to be compiled, classes need to be declared here
-class ZaphodRobot;
-class ZaphodShooter;
-class ZaphodCollector;
-class ZaphodCompressor;
+//Because this is the first header to be included, classes need to be declared here
+class HHRobot;
+class HHShooter;
+class HHCollector;
+class HHCompressor;
 class JoystickController;
-
 class ZaphodBase : public IterativeRobot
 {
   private:
-    ZaphodRobot* zBot;
+    HHRobot* hHBot;
   public:
-    ZaphodBase();
+    HHBase();
     void RobotInit();
     void DisabledInit();
     void AutonomousInit();

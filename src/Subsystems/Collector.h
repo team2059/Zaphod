@@ -1,13 +1,11 @@
 #include <WPILib.h>
 #include "../Definitions.h"
-
 class ZaphodCollector
 {
   private:
     Jaguar *collectorMotor;
   public:
-    enum
-    {
+    enum{
       COLLECTING,
       RELEASE,
       STOP
