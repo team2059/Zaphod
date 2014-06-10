@@ -64,12 +64,12 @@ bool ZaphodRobot::checkJoystickValues()
   float y = ControlSystem->rightJoystickAxisValues[2];
   if((-.1 < x && x < .1) && (-.1 < y && y < .1))
   {
-    dashboard->putBooleanValue("Joysticks Valid", true);
+    dashboard->putBoolValue("Joysticks Valid", true);
     return true;
   }
   else
   {
-    dashboard->putBooleanValue("Joysticks Valid", false);
+    dashboard->putBoolValue("Joysticks Valid", false);
     return true;
     return false;
   }
