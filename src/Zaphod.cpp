@@ -283,7 +283,7 @@ public:
   //{{{shooter_fire
   bool shooter_fire(bool shooter_clear, float shooter_speed, float shooter_max_angle, float shooter_current_angle){
     //Fire the shooter motors at the given shooter_speed while the shooter_max_angle hasn't been hit and that it is clear to shoot
-    if(shooter_max_angle>=shooter_current_angle && shooter_clear==true){
+    if(shooter_max_angle>=shooter_current_angle && shooter_clear==true && shooter_speed >= 50){
       setMotorValue(4,1,cvt(shooter_speed));
       setMotorValue(5,1,cvt(shooter_speed));
       setMotorValue(4,2,cvt(-shooter_speed));
