@@ -1,19 +1,15 @@
 #ifndef __ZAPHOD_ROBOT_H__
 #define __ZAPHOD_ROBOT_H__
-
 #include <WPILib.h>
-#include "ZaphodBase.h"
+#include "HHBase.h"
 #include "Definitions.h"
-
 class JoystickController;
 class ZaphodShooter;
 class ZaphodCollector;
-class ZaphodCompressor;
+class HHCompressor;
 class ZaphodDashboard;
 class ZaphodRobot;
-
-class ZaphodRobot
-{
+class ZaphodRobot{
   private:
     Jaguar *right1, *right2, *right3, *left1, *left2, *left3;
     DigitalOutput *frontSonarLeftD, *frontSonarRightD, *rearSonarLeftD, *rearSonarRightD;
@@ -21,7 +17,7 @@ class ZaphodRobot
     JoystickController *ControlSystem;
     ZaphodShooter *shooter;
     ZaphodCollector *collector;
-    ZaphodCompressor *compressorSystem;
+    HHCompressor *compressorSystem;
     ZaphodDashboard *dashboard;
   public:
     ZaphodRobot();

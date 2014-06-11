@@ -15,8 +15,8 @@ class HHCompressor
     }e_CollectorSolenoidState;
     HHCompressor();
     void compressorSystemPeriodic();
-    void extendCollector();
-    void retractCollector();
-    void startCompressing();
-    void stopCompressing();
+    void ExtendCollector();
+    void RetractCollector();
+    void StartCompressing();
+    void StopCompressing();
 };

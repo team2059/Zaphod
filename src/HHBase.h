@@ -1,22 +1,21 @@
 #ifndef __HH_BASE_H__
 #define __HH_BASE_H__
 #include <WPILib.h>
-#include "HHRobot.h"
+#include "ZaphodRobot.h"
 #include "Subsystems/Controller.h"
 #include "Subsystems/Shooter.h"
 #include "Subsystems/Collector.h"
 #include "Subsystems/Compressor.h"
 #include "Subsystems/Dashboard.h"
 //Because this is the first header to be included, classes need to be declared here
-class HHRobot;
+class ZaphodRobot;
 class HHShooter;
 class HHCollector;
 class HHCompressor;
 class JoystickController;
-class ZaphodBase : public IterativeRobot
-{
+class HHBase : public IterativeRobot{
   private:
-    HHRobot* hHBot;
+    ZaphodRobot* hHBot;
   public:
     HHBase();
     void RobotInit();
