@@ -19,15 +19,15 @@ void HHCompressor::compressorSystemPeriodic(){
   }
   e_CollectorSolenoidState=IDLE;
 }
-void HHCompressor::StartCompressing(){
+void HHCompressor::startCompressing(){
   compressor->Start();
 }
-void HHCompressor::StopCompressing(){
+void HHCompressor::stopCompressing(){
   compressor->Stop();
 }
-void HHCompressor::ExtendCollector(){
+void HHCompressor::extendCollector(){
   e_CollectorSolenoidState=EXTENDED;
 }
-void HHCompressor::RetractCollector(){
+void HHCompressor::retractCollector(){
   e_CollectorSolenoidState=RETRACTED;
 }
