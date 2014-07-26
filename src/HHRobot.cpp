@@ -7,9 +7,7 @@ HHRobot::HHRobot():
   compressorSystem(new HHCompressor()),
   dashboard(new HHDashboard()),
   sonar(new HHSonar()){
-    //comment
   }
-//Functions to get sonar values and return as INCH values
 bool HHRobot::checkJoystickValues(){
   float x=ControlSystem->rightJoystickAxisValues[1];
   float y=ControlSystem->rightJoystickAxisValues[2];

@@ -7,5 +7,5 @@ class HHSonar{
   public:
     HHSonar();
     //from is (in string form) "FRONT", "BACK", "FRONTLEFT", "FRONTRIGHT"...
-    float getInches(const char* from);
+    float getInches(std::string from);
 };
