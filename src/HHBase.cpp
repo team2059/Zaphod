@@ -1,7 +1,7 @@
 #include "HHBase.h"
 
 HHBase::HHBase():
-  hHBot(new ZaphodRobot()){
+  hHBot(new HHRobot()){
     printf("Done\n");
   }
 void HHBase::RobotInit(){

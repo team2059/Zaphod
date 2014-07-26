@@ -1,7 +1,6 @@
 #include <WPILib.h>
 #include "../Definitions.h"
-class ZaphodCollector
-{
+class HHCollector{
   private:
     Jaguar *collectorMotor;
   public:
@@ -10,7 +9,7 @@ class ZaphodCollector
       RELEASE,
       STOP
     }e_CollectorState;
-    ZaphodCollector();
+    HHCollector();
     void updateCollector(bool, float);
     void collectBall();
     void releaseBall();

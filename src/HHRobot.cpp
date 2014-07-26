@@ -1,11 +1,11 @@
-#include "ZaphodRobot.h"
+#include "HHRobot.h"
 #include "HHBase.h"
-ZaphodRobot::ZaphodRobot():
+HHRobot::HHRobot():
   ControlSystem(new JoystickController()),
-  shooter(new ZaphodShooter()),
-  collector(new ZaphodCollector()),
+  shooter(new HHShooter()),
+  collector(new HHCollector()),
   compressorSystem(new HHCompressor()),
-  dashboard(new ZaphodDashboard()){
+  dashboard(new HHDashboard()){
     left1=new Jaguar(DRIVE_LEFT_SIDECAR, DRIVE_LEFT_MOTOR_ONE);
     left2=new Jaguar(DRIVE_LEFT_SIDECAR, DRIVE_LEFT_MOTOR_TWO);
     left3=new Jaguar(DRIVE_LEFT_SIDECAR, DRIVE_LEFT_MOTOR_THREE);
@@ -22,7 +22,7 @@ ZaphodRobot::ZaphodRobot():
     rearSonarRightA=new AnalogChannel(SONAR_REAR_RIGHT_ANA);
   }
 //Functions to get sonar values and return as INCH values
-float ZaphodRobot::getFrontSonar(){
+float HHRobot::getFrontSonar(){
   frontSonarLeftD->Set(1);
   frontSonarLeftV=(frontSonarLeftA->GetAverageVoltage()/0.00488f)/2.54f;
   frontSonarLeftD->Set(0);
@@ -33,7 +33,7 @@ float ZaphodRobot::getFrontSonar(){
   //Returns the average (useful for throwing out useless readings)
   return (frontSonarRightV+frontSonarLeftV)/2;
 }
-float ZaphodRobot::getRearSonar(){
+float HHRobot::getRearSonar(){
   rearSonarLeftD->Set(1);
   rearSonarLeftV=(rearSonarLeftA->GetAverageVoltage()/0.00488f)/2.54f;
   rearSonarLeftD->Set(0);
@@ -44,7 +44,7 @@ float ZaphodRobot::getRearSonar(){
   //Returns the average (useful for throwing out useless readings)
   return (rearSonarRightV+rearSonarLeftV)/2;
 }
-bool ZaphodRobot::checkJoystickValues(){
+bool HHRobot::checkJoystickValues(){
   float x=ControlSystem->rightJoystickAxisValues[1];
   float y=ControlSystem->rightJoystickAxisValues[2];
   if((-.1 < x && x < .1) && (-.1 < y && y < .1)) {
@@ -56,7 +56,7 @@ bool ZaphodRobot::checkJoystickValues(){
     return false;
   }
 }
-void ZaphodRobot::driveRobot(float x, float y){
+void HHRobot::driveRobot(float x, float y){
   if(y>1.0f) {
     y=1.0f;
   } else if(y!=0.0f&&y<-1.0f) {
@@ -71,11 +71,11 @@ void ZaphodRobot::driveRobot(float x, float y){
   left2->SetRaw(int(leftPower));
   left3->SetRaw(int(leftPower));
 }
-void ZaphodRobot::updateDashboard(){
+void HHRobot::updateDashboard(){
   dashboard->putFloatValue("Shooting Power", ControlSystem->throttle);
 }
 //Main function used to handle periodic tasks on the robot
-void ZaphodRobot::handler(){
+void HHRobot::handler(){
   //Periodic tasks that should be run by every loop
   ControlSystem->updateJoysticks();
   shooter->updateShooterPosition();

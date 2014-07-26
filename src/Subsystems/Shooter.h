@@ -1,11 +1,11 @@
 #include <WPILib.h>
 #include "../Definitions.h"
-class ZaphodShooter{
+class HHShooter{
   private:
     Jaguar*shooterLeft1, *shooterLeft2, *shooterRight1, *shooterRight2;
     AnalogChannel*shooterAngle;
   public:
-    ZaphodShooter();
+    HHShooter();
     enum {
       IDLE_PRESHOT,
       FIRING,

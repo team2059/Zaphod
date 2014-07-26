@@ -1,9 +1,9 @@
 #include "SmartDashboard/SmartDashboard.h"
 #include <WPILib.h>
 #include "../Definitions.h"
-class ZaphodDashboard{
+class HHDashboard{
   public:
-    ZaphodDashboard();
+    HHDashboard();
     //Array used to track the values in the dashboard
     bool DashboardValues[];
     float getFloatValue(const char* key);

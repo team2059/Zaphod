@@ -4,23 +4,23 @@
 #include "HHBase.h"
 #include "Definitions.h"
 class JoystickController;
-class ZaphodShooter;
-class ZaphodCollector;
+class HHShooter;
+class HHCollector;
 class HHCompressor;
-class ZaphodDashboard;
-class ZaphodRobot;
-class ZaphodRobot{
+class HHDashboard;
+class HHRobot;
+class HHRobot{
   private:
     Jaguar *right1, *right2, *right3, *left1, *left2, *left3;
     DigitalOutput *frontSonarLeftD, *frontSonarRightD, *rearSonarLeftD, *rearSonarRightD;
     AnalogChannel *frontSonarLeftA, *frontSonarRightA, *rearSonarLeftA, *rearSonarRightA;
     JoystickController *ControlSystem;
-    ZaphodShooter *shooter;
-    ZaphodCollector *collector;
+    HHShooter *shooter;
+    HHCollector *collector;
     HHCompressor *compressorSystem;
-    ZaphodDashboard *dashboard;
+    HHDashboard *dashboard;
   public:
-    ZaphodRobot();
+    HHRobot();
     float frontSonarLeftV, frontSonarRightV, rearSonarLeftV, rearSonarRightV;
     float getFrontSonar();
     float getRearSonar();

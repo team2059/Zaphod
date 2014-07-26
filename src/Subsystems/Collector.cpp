@@ -1,8 +1,8 @@
 #include "Collector.h"
-ZaphodCollector::ZaphodCollector(){
+HHCollector::HHCollector(){
   collectorMotor = new Jaguar(COLLECTOR_SIDECAR, COLLECTOR_MOTOR);
 }
-void ZaphodCollector::updateCollector(bool shooting, float angle){
+void HHCollector::updateCollector(bool shooting, float angle){
   //Needed for the auto running of collector when shooting
   if(shooting){
     if(angle <= 40){
@@ -19,9 +19,9 @@ void ZaphodCollector::updateCollector(bool shooting, float angle){
     collectorMotor->Set(0);
   }
 }
-void ZaphodCollector::collectBall(){
+void HHCollector::collectBall(){
   collectorMotor->Set(1);
 }
-void ZaphodCollector::releaseBall(){
+void HHCollector::releaseBall(){
   collectorMotor->Set(255);
 }

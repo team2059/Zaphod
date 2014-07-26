@@ -1,5 +1,5 @@
 #include "Shooter.h"
-ZaphodShooter::ZaphodShooter(){
+HHShooter::HHShooter(){
   shooterLeft1=new Jaguar(SHOOTER_LEFT_SIDECAR, SHOOTER_LEFT_MOTOR_ONE);
   shooterLeft2=new Jaguar(SHOOTER_LEFT_SIDECAR, SHOOTER_LEFT_MOTOR_TWO);
   shooterRight1=new Jaguar(SHOOTER_RIGHT_SIDECAR, SHOOTER_RIGHT_MOTOR_ONE);
@@ -7,13 +7,13 @@ ZaphodShooter::ZaphodShooter(){
   shooterAngle=new AnalogChannel(SHOOTER_ANGLE_POT);
   e_ShooterState=IDLE_PRESHOT;
 }
-void ZaphodShooter::startShootingSequence(float throttle){
+void HHShooter::startShootingSequence(float throttle){
   //Changes the enum to tell the shooter to be firing
   e_ShooterState=FIRING;
   shootingPower=throttle;
 }
 //First step in shooting process
-void ZaphodShooter::shootForAngle(float power, float desiredAngle){
+void HHShooter::shootForAngle(float power, float desiredAngle){
   if(getAngle() <= desiredAngle && power >= 15){
     shootRaw(power);
     e_ShooterState=FIRING;
@@ -24,7 +24,7 @@ void ZaphodShooter::shootForAngle(float power, float desiredAngle){
 }
 //Second step in shooting process
 //Probably wont need to be used without shootForAngle
-void ZaphodShooter::lower(float desiredAngle){
+void HHShooter::lower(float desiredAngle){
   if(getAngle() >= desiredAngle){
     shootRaw(-0.1f);
     e_ShooterState=LOWERING;
@@ -35,20 +35,20 @@ void ZaphodShooter::lower(float desiredAngle){
   }
 }
 //Not needed anywhere other than after/before the shooting process
-void ZaphodShooter::stopShooter(){
+void HHShooter::stopShooter(){
   if(e_ShooterState == IDLE_PRESHOT){
     shootRaw(0.0f);
   }
 }
 //Shouldn't be used in any other class but this one
-void ZaphodShooter::shootRaw(float power){
+void HHShooter::shootRaw(float power){
   shooterLeft1->SetRaw(int(floatToPWM(power)));
   shooterLeft2->SetRaw(int(floatToPWM(power)));
   shooterRight1->SetRaw(int(floatToPWM(-power)));
   shooterRight2->SetRaw(int(floatToPWM(-power)));
 }
 //Should be run in a loop
-void ZaphodShooter::updateShooterPosition(){
+void HHShooter::updateShooterPosition(){
   if(e_ShooterState == IDLE_PRESHOT){
     isShooting=false;
     stopShooter();
@@ -62,11 +62,11 @@ void ZaphodShooter::updateShooterPosition(){
     lower(40);
   }
 }
-float ZaphodShooter::floatToPWM(float input){
+float HHShooter::floatToPWM(float input){
   return input*127.0+128;
 }
 //Returns angle measure in degrees
-float ZaphodShooter::getAngle(){
+float HHShooter::getAngle(){
   float max=-.0003948;
   float min=5.0245547;
   float b=shooterAngle->GetAverageVoltage()-max;
