@@ -1,14 +1,12 @@
 #include <WPILib.h>
 #include "../Definitions.h"
 
-class HHCompressor
-{
+class HHCompressor{
   private:
     Compressor *compressor;
     Solenoid *solenoid1, *solenoid2;
   public:
-    enum
-    {
+    enum{
       EXTENDED,
       RETRACTED,
       IDLE
