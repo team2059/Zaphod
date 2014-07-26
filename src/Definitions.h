@@ -45,13 +45,13 @@
 //Ultrasonic (DIO, Analog, etc)
 #define SONAR_FRONT_RIGHT_DIO   4
 #define SONAR_FRONT_LEFT_DIO    4
-#define SONAR_REAR_LEFT_DIO     5
-#define SONAR_REAR_RIGHT_DIO    5
+#define SONAR_BACK_LEFT_DIO     5
+#define SONAR_BACK_RIGHT_DIO    5
 
 #define SONAR_FRONT_RIGHT_ANA   2
 #define SONAR_FRONT_LEFT_ANA    1
-#define SONAR_REAR_LEFT_ANA     3
-#define SONAR_REAR_RIGHT_ANA    4
+#define SONAR_BACK_LEFT_ANA     3
+#define SONAR_BACK_RIGHT_ANA    4
 
 //Joystick buttons
 

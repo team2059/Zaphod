@@ -8,6 +8,7 @@ class HHShooter;
 class HHCollector;
 class HHCompressor;
 class HHDashboard;
+class HHSonar;
 class HHRobot;
 class HHRobot{
   private:
@@ -19,6 +20,7 @@ class HHRobot{
     HHCollector *collector;
     HHCompressor *compressorSystem;
     HHDashboard *dashboard;
+    HHSonar *sonar;
   public:
     HHRobot();
     float frontSonarLeftV, frontSonarRightV, rearSonarLeftV, rearSonarRightV;

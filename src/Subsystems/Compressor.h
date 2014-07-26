@@ -1,6 +1,5 @@
 #include <WPILib.h>
 #include "../Definitions.h"
-
 class HHCompressor{
   private:
     Compressor *compressor;

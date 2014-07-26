@@ -6,12 +6,14 @@
 #include "Subsystems/Shooter.h"
 #include "Subsystems/Collector.h"
 #include "Subsystems/Compressor.h"
+#include "Subsystems/Sonar.h"
 #include "Subsystems/Dashboard.h"
 //Because this is the first header to be included, classes need to be declared here
 class HHRobot;
 class HHShooter;
 class HHCollector;
 class HHCompressor;
+class HHSonar;
 class JoystickController;
 class HHBase : public IterativeRobot{
   private:
