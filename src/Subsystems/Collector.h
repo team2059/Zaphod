@@ -4,14 +4,14 @@ class HHCollector{
   private:
     Jaguar *collectorMotor;
   public:
+    HHCollector();
     enum{
       COLLECTING,
       RELEASE,
       STOP
     }e_CollectorState;
-    HHCollector();
-    void updateCollector(bool, float);
-    void collectBall();
-    void releaseBall();
-    void spinWithShot(float);
+    void UpdateCollector(bool, float);
+    void CollectBall();
+    void ReleaseBall();
+    void SpinWithShot(float);
 };

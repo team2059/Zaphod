@@ -8,19 +8,19 @@ HHRobot::HHRobot():
   dashboard(new HHDashboard()),
   sonar(new HHSonar()){
   }
-bool HHRobot::checkJoystickValues(){
+bool HHRobot::CheckJoystickValues(){
   float x=ControlSystem->rightJoystickAxisValues[1];
   float y=ControlSystem->rightJoystickAxisValues[2];
   if((-.1 < x && x < .1) && (-.1 < y && y < .1)) {
-    dashboard->putBoolValue("Joysticks Valid", true);
+    dashboard->PutBoolValue("Joysticks Valid", true);
     return true;
   } else {
-    dashboard->putBoolValue("Joysticks Valid", false);
+    dashboard->PutBoolValue("Joysticks Valid", false);
     return true;
     return false;
   }
 }
-void HHRobot::driveRobot(float x, float y){
+void HHRobot::DriveRobot(float x, float y){
   if(y>1.0f) {
     y=1.0f;
   } else if(y!=0.0f&&y<-1.0f) {
@@ -35,35 +35,35 @@ void HHRobot::driveRobot(float x, float y){
   left2->SetRaw(int(leftPower));
   left3->SetRaw(int(leftPower));
 }
-void HHRobot::updateDashboard(){
-  dashboard->putFloatValue("Shooting Power", ControlSystem->throttle);
+void HHRobot::UpdateDashboard(){
+  dashboard->PutFloatValue("Shooting Power", ControlSystem->throttle);
 }
 //Main function used to handle periodic tasks on the robot
-void HHRobot::handler(){
+void HHRobot::Handler(){
   //Periodic tasks that should be run by every loop
-  ControlSystem->updateJoysticks();
-  shooter->updateShooterPosition();
+  ControlSystem->UpdateJoysticks();
+  shooter->UpdateShooterPosition();
   //TODO Need to implement a timing system to not break the spike (this function doesn't run the compressor at the moment)
-  compressorSystem->compressorSystemPeriodic();
-  collector->updateCollector(shooter->isShooting, shooter->getAngle());
-  if(checkJoystickValues()) {
-    driveRobot(ControlSystem->rightJoystickAxisValues[3]+ControlSystem->rightJoystickAxisValues[1], -ControlSystem->rightJoystickAxisValues[2]);
+  compressorSystem->CompressorSystemPeriodic();
+  collector->UpdateCollector(shooter->isShooting, shooter->GetAngle());
+  if(CheckJoystickValues()) {
+    DriveRobot(ControlSystem->rightJoystickAxisValues[3]+ControlSystem->rightJoystickAxisValues[1], -ControlSystem->rightJoystickAxisValues[2]);
   }
-  updateDashboard();
+  UpdateDashboard();
   //Button assignments to actions
   if(ControlSystem->leftJoystickValues[SHOOTER_FIRE]) {
-    shooter->startShootingSequence(ControlSystem->throttle);
+    shooter->StartShootingSequence(ControlSystem->throttle);
   }
   if(ControlSystem->rightJoystickValues[COLLECTOR_INTAKE]) {
-    collector->collectBall();
+    collector->CollectBall();
   }
   if(ControlSystem->rightJoystickValues[COLLECTOR_OUTTAKE]) {
-    collector->releaseBall();
+    collector->ReleaseBall();
   }
   if(ControlSystem->rightJoystickValues[COLLECTOR_EXTEND]) {
-    compressorSystem->extendCollector();
+    compressorSystem->ExtendCollector();
   }
   if(ControlSystem->rightJoystickValues[COLLECTOR_RETRACT]) {
-    compressorSystem->retractCollector();
+    compressorSystem->RetractCollector();
   }
 }

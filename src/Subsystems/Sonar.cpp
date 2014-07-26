@@ -9,7 +9,7 @@ HHSonar::HHSonar(){
   AnalogChannel backLeftA=new AnalogChannel(SONAR_BACK_LEFT_ANA);
   AnalogChannel backRightA=new AnalogChannel(SONAR_BACK_RIGHT_ANA);
 }
-float HHSonar::getInches(std::string from){
+float HHSonar::GetInches(std::string from){
   switch(from){
     case "FRONT":
       frontLeftD->Set(1);

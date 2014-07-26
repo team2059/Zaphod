@@ -7,7 +7,7 @@ HHBase::HHBase():
 void HHBase::RobotInit(){
   //Checks the state of the drive joystick to make sure it was not moved
   //while plugged in, giving inaccurate readings
-  if(!hHBot->checkJoystickValues()){
+  if(!hHBot->CheckJoystickValues()){
     printf("***UNPLUG AND REPLUG THE JOYSTICKS***\n");
   }
 }
@@ -20,7 +20,7 @@ void HHBase::TeleopContinuous(){}
 void HHBase::DisabledPeriodic(){}
 void HHBase::AutonomousPeriodic(){}
 void HHBase::TeleopPeriodic(){
-  hHBot->handler();
+  hHBot->Handler();
 }
 void HHBase::Test(){}
 START_ROBOT_CLASS(HHBase);

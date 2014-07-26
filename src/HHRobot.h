@@ -24,11 +24,9 @@ class HHRobot{
   public:
     HHRobot();
     float frontSonarLeftV, frontSonarRightV, rearSonarLeftV, rearSonarRightV;
-    float getFrontSonar();
-    float getRearSonar();
-    bool checkJoystickValues();
-    void driveRobot(float,float);
-    void updateDashboard();
-    void handler();
+    bool CheckJoystickValues();
+    void DriveRobot(float,float);
+    void UpdateDashboard();
+    void Handler();
 };
 #endif

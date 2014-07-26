@@ -6,8 +6,8 @@ class HHDashboard{
     HHDashboard();
     //Array used to track the values in the dashboard
     bool DashboardValues[];
-    float getFloatValue(const char* key);
-    bool putFloatValue(const char* key, float value);
-    bool getBoolValue(const char* key);
-    bool putBoolValue(const char* key, bool value);
+    float GetFloatValue(const char* key);
+    bool PutFloatValue(const char* key, float value);
+    bool GetBoolValue(const char* key);
+    bool PutBoolValue(const char* key, bool value);
 };

@@ -2,26 +2,26 @@
 HHCollector::HHCollector(){
   collectorMotor = new Jaguar(COLLECTOR_SIDECAR, COLLECTOR_MOTOR);
 }
-void HHCollector::updateCollector(bool shooting, float angle){
+void HHCollector::UpdateCollector(bool shooting, float angle){
   //Needed for the auto running of collector when shooting
   if(shooting){
     if(angle <= 40){
-      collectBall();
+      CollectBall();
     }
   }
   if(e_CollectorState == COLLECTING){
-    collectBall();
+    CollectBall();
   }
   if(e_CollectorState == RELEASE){
-    releaseBall();
+    ReleaseBall();
   }
   if(e_CollectorState == STOP){
     collectorMotor->Set(0);
   }
 }
-void HHCollector::collectBall(){
+void HHCollector::CollectBall(){
   collectorMotor->Set(1);
 }
-void HHCollector::releaseBall(){
+void HHCollector::ReleaseBall(){
   collectorMotor->Set(255);
 }

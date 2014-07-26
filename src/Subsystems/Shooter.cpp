@@ -7,15 +7,15 @@ HHShooter::HHShooter(){
   shooterAngle=new AnalogChannel(SHOOTER_ANGLE_POT);
   e_ShooterState=IDLE_PRESHOT;
 }
-void HHShooter::startShootingSequence(float throttle){
+void HHShooter::StartShootingSequence(float throttle){
   //Changes the enum to tell the shooter to be firing
   e_ShooterState=FIRING;
   shootingPower=throttle;
 }
 //First step in shooting process
-void HHShooter::shootForAngle(float power, float desiredAngle){
-  if(getAngle() <= desiredAngle && power >= 15){
-    shootRaw(power);
+void HHShooter::ShootForAngle(float power, float desiredAngle){
+  if(GetAngle() <= desiredAngle && power >= 15){
+    ShootRaw(power);
     e_ShooterState=FIRING;
   }
   else{
@@ -23,50 +23,50 @@ void HHShooter::shootForAngle(float power, float desiredAngle){
   }
 }
 //Second step in shooting process
-//Probably wont need to be used without shootForAngle
-void HHShooter::lower(float desiredAngle){
-  if(getAngle() >= desiredAngle){
-    shootRaw(-0.1f);
+//Probably wont need to be used without ShootForAngle
+void HHShooter::Lower(float desiredAngle){
+  if(GetAngle() >= desiredAngle){
+    ShootRaw(-0.1f);
     e_ShooterState=LOWERING;
   }
   else{
-    shootRaw(0.0f);
+    ShootRaw(0.0f);
     e_ShooterState=IDLE_PRESHOT;
   }
 }
 //Not needed anywhere other than after/before the shooting process
-void HHShooter::stopShooter(){
+void HHShooter::StopShooter(){
   if(e_ShooterState == IDLE_PRESHOT){
-    shootRaw(0.0f);
+    ShootRaw(0.0f);
   }
 }
 //Shouldn't be used in any other class but this one
-void HHShooter::shootRaw(float power){
-  shooterLeft1->SetRaw(int(floatToPWM(power)));
-  shooterLeft2->SetRaw(int(floatToPWM(power)));
-  shooterRight1->SetRaw(int(floatToPWM(-power)));
-  shooterRight2->SetRaw(int(floatToPWM(-power)));
+void HHShooter::ShootRaw(float power){
+  shooterLeft1->SetRaw(int(FloatToPWM(power)));
+  shooterLeft2->SetRaw(int(FloatToPWM(power)));
+  shooterRight1->SetRaw(int(FloatToPWM(-power)));
+  shooterRight2->SetRaw(int(FloatToPWM(-power)));
 }
 //Should be run in a loop
-void HHShooter::updateShooterPosition(){
+void HHShooter::UpdateShooterPosition(){
   if(e_ShooterState == IDLE_PRESHOT){
     isShooting=false;
-    stopShooter();
+    StopShooter();
   }
   if(e_ShooterState == FIRING){
     isShooting=true;
-    shootForAngle(shootingPower,110);
+    ShootForAngle(shootingPower,110);
   }
   if(e_ShooterState == IDLE_POSTSHOT){
     isShooting=false;
-    lower(40);
+    Lower(40);
   }
 }
-float HHShooter::floatToPWM(float input){
+float HHShooter::FloatToPWM(float input){
   return input*127.0+128;
 }
 //Returns angle measure in degrees
-float HHShooter::getAngle(){
+float HHShooter::GetAngle(){
   float max=-.0003948;
   float min=5.0245547;
   float b=shooterAngle->GetAverageVoltage()-max;

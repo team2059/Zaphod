@@ -11,9 +11,9 @@ class JoystickController
     float rightJoystickAxisValues[];
     float throttle;
     JoystickController();
-    void updateJoysticks();
-    void getRightJoystick();
-    void getLeftJoystick();
-    void getLeftJoystickAxis();
-    void getRightJoystickAxis();
+    void UpdateJoysticks();
+    void GetRightJoystick();
+    void GetLeftJoystick();
+    void GetLeftJoystickAxis();
+    void GetRightJoystickAxis();
 };

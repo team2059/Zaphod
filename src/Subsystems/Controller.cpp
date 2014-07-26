@@ -3,29 +3,29 @@ JoystickController::JoystickController(){
   rightJoystick=new Joystick(JOYSTICK_RIGHT);
   leftJoystick=new Joystick(JOYSTICK_LEFT);
 }
-void JoystickController::updateJoysticks(){
-  getRightJoystick();
-  getLeftJoystick();
-  getRightJoystickAxis();
-  getLeftJoystickAxis();
+void JoystickController::UpdateJoysticks(){
+  GetRightJoystick();
+  GetLeftJoystick();
+  GetRightJoystickAxis();
+  GetLeftJoystickAxis();
   throttle=(-leftJoystickAxisValues[4]+1)/2;
 }
-void JoystickController::getRightJoystick(){
+void JoystickController::GetRightJoystick(){
   for(int i=1;i<13;i++){
     rightJoystickValues[i]=rightJoystick->GetRawButton(i);
   }
 }
-void JoystickController::getLeftJoystick(){
+void JoystickController::GetLeftJoystick(){
   for(int i=1;i<13;i++){
     leftJoystickValues[i]=leftJoystick->GetRawButton(i);
   }
 }
-void JoystickController::getRightJoystickAxis(){
+void JoystickController::GetRightJoystickAxis(){
   for(int i=1;i<7;i++){
     rightJoystickAxisValues[i]=rightJoystick->GetRawAxis(i);
   }
 }
-void JoystickController::getLeftJoystickAxis(){
+void JoystickController::GetLeftJoystickAxis(){
   for(int i=1;i<7;i++){
     leftJoystickAxisValues[i]=leftJoystick->GetRawAxis(i);
   }

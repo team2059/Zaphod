@@ -4,7 +4,7 @@ HHCompressor::HHCompressor(){
   solenoid1=new Solenoid(COMPRESSOR_SOLENOID_ONE);
   solenoid2=new Solenoid(COMPRESSOR_SOLENOID_TWO);
 }
-void HHCompressor::compressorSystemPeriodic(){
+void HHCompressor::CompressorSystemPeriodic(){
   switch(e_CollectorSolenoidState){
     case EXTENDED:
       solenoid1->Set(false);
@@ -19,15 +19,15 @@ void HHCompressor::compressorSystemPeriodic(){
   }
   e_CollectorSolenoidState=IDLE;
 }
-void HHCompressor::startCompressing(){
+void HHCompressor::StartCompressing(){
   compressor->Start();
 }
-void HHCompressor::stopCompressing(){
+void HHCompressor::StopCompressing(){
   compressor->Stop();
 }
-void HHCompressor::extendCollector(){
+void HHCompressor::ExtendCollector(){
   e_CollectorSolenoidState=EXTENDED;
 }
-void HHCompressor::retractCollector(){
+void HHCompressor::RetractCollector(){
   e_CollectorSolenoidState=RETRACTED;
 }
