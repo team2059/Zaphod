@@ -55,6 +55,6 @@ float HHSonar::GetInches(std::string from){
     //TODO: Delay
     return x;
   }else{
-    return (float)(-1,0);
+    return (float)(-1);
   }
 }
