@@ -1,9 +1,11 @@
 #include <WPILib.h>
 #include "../Definitions.h"
+#include <time.h>
 class HHCompressor{
   private:
     Compressor *compressor;
     Solenoid *solenoid1, *solenoid2;
+    time_t t;
   public:
     enum{
       EXTENDED,
