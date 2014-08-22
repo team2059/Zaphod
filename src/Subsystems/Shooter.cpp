@@ -28,8 +28,7 @@ void HHShooter::Lower(float desiredAngle){
   if(GetAngle() >= desiredAngle){
     ShootRaw(-0.1f);
     e_ShooterState=LOWERING;
-  }
-  else{
+  }else{
     ShootRaw(0.0f);
     e_ShooterState=IDLE_PRESHOT;
   }

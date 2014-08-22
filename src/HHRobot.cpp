@@ -5,8 +5,7 @@ HHRobot::HHRobot():
   shooter(new HHShooter()),
   collector(new HHCollector()),
   compressorSystem(new HHCompressor()),
-  dashboard(new HHDashboard()),
-  sonar(new HHSonar()){
+  dashboard(new HHDashboard()){
   }
 bool HHRobot::CheckJoystickValues(){
   float x=ControlSystem->rightJoystickAxisValues[1];
@@ -14,16 +13,15 @@ bool HHRobot::CheckJoystickValues(){
   if((-.1 < x && x < .1) && (-.1 < y && y < .1)) {
     dashboard->PutBoolValue("Joysticks Valid", true);
     return true;
-  } else {
+  }else{
     dashboard->PutBoolValue("Joysticks Valid", false);
-    return true;
     return false;
   }
 }
 void HHRobot::DriveRobot(float x, float y){
-  if(y>1.0f) {
+  if(y>1.0f){
     y=1.0f;
-  } else if(y!=0.0f&&y<-1.0f) {
+  }else if(y!=0.0f&&y<-1.0f){
     y=-1.0f;
   }
   float leftPower=((y+x)/2+1)*127+1;

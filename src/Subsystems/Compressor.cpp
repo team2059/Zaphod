@@ -9,15 +9,20 @@ void HHCompressor::CompressorSystemPeriodic(){
     case EXTENDED:
       solenoid1->Set(false);
       solenoid2->Set(true);
+      e_CollectorSolenoidState = IDLE;
       break;
     case RETRACTED:
       solenoid1->Set(true);
       solenoid2->Set(false);
+      e_CollectorSolenoidState = IDLE;
+      break;
+    case IDLE:
+      e_CollectorSolenoidState = IDLE;
       break;
     default:
       break;
   }
-  e_CollectorSolenoidState=IDLE;
+  //e_CollectorSolenoidState=IDLE;
 }
 void HHCompressor::StartCompressing(){
   compressor->Start();
