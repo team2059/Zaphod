@@ -1,5 +1,4 @@
 #include "HHBase.h"
-
 HHBase::HHBase():
   hHBot(new HHRobot()){
     printf("Done\n");

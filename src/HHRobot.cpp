@@ -36,6 +36,7 @@ void HHRobot::DriveRobot(float x, float y){
 void HHRobot::UpdateDashboard(){
   dashboard->PutFloatValue("Shooting Power", ControlSystem->throttle);
 }
+
 //Main function used to handle periodic tasks on the robot
 void HHRobot::Handler(){
   //Periodic tasks that should be run by every loop

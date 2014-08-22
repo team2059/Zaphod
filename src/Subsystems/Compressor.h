@@ -14,6 +14,4 @@ class HHCompressor{
     void CompressorSystemPeriodic();
     void ExtendCollector();
     void RetractCollector();
-    void StartCompressing();
-    void StopCompressing();
 };
