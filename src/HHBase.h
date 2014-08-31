@@ -8,6 +8,7 @@
 #include "Subsystems/Compressor.h"
 #include "Subsystems/Sonar.h"
 #include "Subsystems/Dashboard.h"
+#include <string>
 //Because this is the first header to be included, classes need to be declared here
 class HHRobot;
 class HHShooter;

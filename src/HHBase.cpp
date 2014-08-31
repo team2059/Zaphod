@@ -1,4 +1,8 @@
 #include "HHBase.h"
+#include <iostream>
+#include <ifstream.h>
+#include <stdexcept>
+#include <map>
 HHBase::HHBase():
   hHBot(new HHRobot()){
     printf("Done\n");
@@ -8,6 +12,16 @@ void HHBase::RobotInit(){
   //while plugged in, giving inaccurate readings
   if(!hHBot->CheckJoystickValues()){
     printf("***UNPLUG AND REPLUG THE JOYSTICKS***\n");
+  }
+}
+//Config testing
+void parse(std::ifstream & cfgfile){
+std::map<std::string, std::string> options;
+  std::string id, eq, val;
+  while(cfgfile >> id >> eq >> val){
+    if (id[0] == '#') continue;
+    if (eq != "=") throw std::runtime_error("Parse error");
+    options[id] = val;
   }
 }
 void HHBase::DisabledInit(){}
