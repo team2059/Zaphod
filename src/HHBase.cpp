@@ -1,6 +1,6 @@
 #include "HHBase.h"
 #include <iostream>
-#include <ifstream.h>
+#include <fstream>
 #include <stdexcept>
 #include <map>
 HHBase::HHBase():
@@ -15,8 +15,8 @@ void HHBase::RobotInit(){
   }
 }
 //Config testing
-void parse(std::ifstream & cfgfile){
 std::map<std::string, std::string> options;
+void parse(std::ifstream & cfgfile){
   std::string id, eq, val;
   while(cfgfile >> id >> eq >> val){
     if (id[0] == '#') continue;
