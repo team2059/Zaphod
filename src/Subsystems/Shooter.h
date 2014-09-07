@@ -23,3 +23,4 @@ class HHShooter{
     float FloatToPWM(float input);
     float GetAngle();
 };
+// vim: ts=2:sw=2:et

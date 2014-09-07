@@ -25,3 +25,4 @@ void HHCollector::CollectBall(){
 void HHCollector::ReleaseBall(){
   collectorMotor->Set(255);
 }
+// vim: ts=2:sw=2:et

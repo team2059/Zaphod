@@ -20,3 +20,4 @@ bool HHDashboard::PutBoolValue(const char* key, bool value){
   SmartDashboard::PutBoolean(key,value);
   return true;
 }
+// vim: ts=2:sw=2:et

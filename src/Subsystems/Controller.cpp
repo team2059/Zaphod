@@ -30,3 +30,4 @@ void JoystickController::GetLeftJoystickAxis(){
     leftJoystickAxisValues[i]=leftJoystick->GetRawAxis(i);
   }
 }
+// vim: ts=2:sw=2:et

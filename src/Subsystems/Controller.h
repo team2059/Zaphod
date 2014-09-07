@@ -17,3 +17,4 @@ class JoystickController
     void GetLeftJoystickAxis();
     void GetRightJoystickAxis();
 };
+// vim: ts=2:sw=2:et

@@ -73,3 +73,4 @@ float HHShooter::GetAngle(){
   max=max-max;//=0
   return 300-((b+max)*(300/min));
 }
+// vim: ts=2:sw=2:et

@@ -39,3 +39,4 @@ void HHCompressor::ExtendCollector(){
 void HHCompressor::RetractCollector(){
   e_CollectorSolenoidState=RETRACTED;
 }
+// vim: ts=2:sw=2:et

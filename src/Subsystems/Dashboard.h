@@ -11,3 +11,4 @@ class HHDashboard{
     bool GetBoolValue(const char* key);
     bool PutBoolValue(const char* key, bool value);
 };
+// vim: ts=2:sw=2:et

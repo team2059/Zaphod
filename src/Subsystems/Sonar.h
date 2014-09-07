@@ -9,3 +9,4 @@ class HHSonar{
     //from is (in string form) "FRONT", "BACK", "FRONTLEFT", "FRONTRIGHT"...
     float GetInches(std::string from);
 };
+// vim: ts=2:sw=2:et
