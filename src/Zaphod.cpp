@@ -283,7 +283,14 @@ public:
   //{{{shooter_fire
   bool shooter_fire(bool shooter_clear, float shooter_speed, float shooter_max_angle, float shooter_current_angle){
     //Fire the shooter motors at the given shooter_speed while the shooter_max_angle hasn't been hit and that it is clear to shoot
-    if(shooter_max_angle>=shooter_current_angle && shooter_clear==true && shooter_speed >= 15){
+    if(shooter_clear==true){
+      printf("Shooter clear");
+    }else{
+      printf("Shooter not clear");
+    }
+    printf("Max angle: %f, Current angle: %f, shooter_speed: %f\n",shooter_max_angle,shooter_current_angle,shooter_speed);
+    if(shooter_max_angle>=shooter_current_angle && shooter_clear==true){
+      printf("Shooting @ %d",shooter_speed);
       setMotorValue(4,1,cvt(shooter_speed));
       setMotorValue(5,1,cvt(shooter_speed));
       setMotorValue(4,2,cvt(-shooter_speed));
@@ -532,7 +539,7 @@ public:
         //Lower Shooter{{{
         if(currentStep==3){
           if(40.0f<=potToDegrees(armPot.GetAverageVoltage())){
-            shootRobot(-0.3f);
+            shootRobot(-0.1f);
           }else{
             shootRobot(0.0f);
           }
@@ -661,7 +668,7 @@ public:
         }
         if(shooter_fired(2)==true){
           //After the shooter has fired, lower the shooter arm then reset the whole shooting sequence
-          shooter_lower(-0.1, 40, potToDegrees(armPot.GetAverageVoltage()));
+          shooter_lower(-0.1, 47, potToDegrees(armPot.GetAverageVoltage()));
         }
       }
       if(shooter_idle==true){
