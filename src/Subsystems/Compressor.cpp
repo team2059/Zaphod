@@ -3,7 +3,6 @@ HHCompressor::HHCompressor(){
   compressor=new Compressor(COMPRESSOR_GAUGE_SIDECAR, COMPRESSOR_GAUGE, COMPRESSOR_RELAY_SIDECAR, COMPRESSOR_RELAY);
   solenoid1=new Solenoid(COMPRESSOR_SOLENOID_ONE);
   solenoid2=new Solenoid(COMPRESSOR_SOLENOID_TWO);
-  time(&t);
 }
 void HHCompressor::CompressorSystemPeriodic(){
   switch(e_CollectorSolenoidState){
@@ -20,16 +19,10 @@ void HHCompressor::CompressorSystemPeriodic(){
     default:
       break;
   }
-  time_t f;
-  time(&f);
-  printf("%f",difftime(t,f));
-  if(difftime(t,f)>1.0f){
-    if(compressor->GetPressureSwitchValue()==1){
-      compressor->Start();
-    }else{
-      compressor->Stop();
-    }
-    t=clock();
+  if(compressor->GetPressureSwitchValue()==1){
+    compressor->Start()
+  }else{
+    compressor->Stop();
   }
   e_CollectorSolenoidState=IDLE;
 }
