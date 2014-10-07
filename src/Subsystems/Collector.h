@@ -11,6 +11,7 @@ class HHCollector{
       STOP
     }e_CollectorState;
     void UpdateCollector(bool, float);
+    void CollectBallAtSpeed(float speed);
     void CollectBall();
     void ReleaseBall();
     void SpinWithShot(float);

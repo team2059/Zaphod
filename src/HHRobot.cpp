@@ -5,7 +5,9 @@ HHRobot::HHRobot():
   shooter(new HHShooter()),
   collector(new HHCollector()),
   compressorSystem(new HHCompressor()),
-  dashboard(new HHDashboard()){
+  dashboard(new HHDashboard()),
+  autoseq(new HHAuto()),
+  sonar(new HHSonar()){
   }
 bool HHRobot::CheckJoystickValues(){
   float x=ControlSystem->rightJoystickAxisValues[1];
@@ -36,12 +38,24 @@ void HHRobot::DriveRobot(float x, float y){
 void HHRobot::UpdateDashboard(){
   dashboard->PutFloatValue("Shooting Power", ControlSystem->throttle);
 }
+void HHRobot::RunAuto(){
+	int step, time;
+	if(step == 0 && time < 200){
+	compressorSystem->ExtendCollector();
+	collector->CollectBallAtSpeed(50);
+	}
+	else{
+		step = 1;
+	}
+	time++;
+}
 
 //Main function used to handle periodic tasks on the robot
 void HHRobot::Handler(){
+  int targetAngle;
   //Periodic tasks that should be run by every loop
   ControlSystem->UpdateJoysticks();
-  shooter->UpdateShooterPosition();
+  shooter->UpdateShooterPosition(targetAngle);
   //TODO Need to implement a timing system to not break the spike (this function doesn't run the compressor at the moment)
   compressorSystem->CompressorSystemPeriodic();
   collector->UpdateCollector(shooter->isShooting, shooter->GetAngle());
@@ -64,6 +78,26 @@ void HHRobot::Handler(){
   }
   if(ControlSystem->rightJoystickValues[COLLECTOR_RETRACT]) {
     compressorSystem->RetractCollector();
+  }
+  if(ControlSystem->leftJoystickValues[SHOOTER_ANGLE_ONE]){
+	  targetAngle = 100;
+  }
+  if(ControlSystem->leftJoystickValues[SHOOTER_ANGLE_TWO]){
+  	  targetAngle = 120;
+  }
+  if(ControlSystem->leftJoystickValues[SHOOTER_ANGLE_THREE]){
+  	  targetAngle = 90;
+  }
+  if(ControlSystem->leftJoystickValues[SHOOTER_ANGLE_FOUR]){
+  	  targetAngle = 130;
+  }
+  if(ControlSystem->rightJoystickValues[DRIVE_FOR_DISTANCE]){
+	  if(sonar->GetInches("FRONTLEFT") >= 40){
+		  DriveRobot(0,-.5);
+	  }
+	  else{
+		  DriveRobot(0,0);
+	  }
   }
 }
 // vim: ts=2:sw=2:et

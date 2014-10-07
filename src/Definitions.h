@@ -65,6 +65,11 @@
 #define COLLECTOR_OUTTAKE       2
 #define COLLECTOR_EXTEND        9
 #define COLLECTOR_RETRACT       10
+#define SHOOTER_ANGLE_ONE		3
+#define SHOOTER_ANGLE_TWO		4
+#define SHOOTER_ANGLE_THREE		5
+#define SHOOTER_ANGLE_FOUR		6
+#define DRIVE_FOR_DISTANCE		11
 
 //Drive threshold definitions
 

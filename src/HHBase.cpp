@@ -31,7 +31,9 @@ void HHBase::DisabledContinuous(){}
 void HHBase::AutonomousContinuous(){}
 void HHBase::TeleopContinuous(){}
 void HHBase::DisabledPeriodic(){}
-void HHBase::AutonomousPeriodic(){}
+void HHBase::AutonomousPeriodic(){
+  hHBot->RunAuto();
+}
 void HHBase::TeleopPeriodic(){
   hHBot->Handler();
 }

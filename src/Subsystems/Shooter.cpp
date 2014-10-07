@@ -47,14 +47,14 @@ void HHShooter::ShootRaw(float power){
   shooterRight2->SetRaw(int(FloatToPWM(-power)));
 }
 //Should be run in a loop
-void HHShooter::UpdateShooterPosition(){
+void HHShooter::UpdateShooterPosition(int angle){
   if(e_ShooterState == IDLE_PRESHOT){
     isShooting=false;
     StopShooter();
   }
   if(e_ShooterState == FIRING){
     isShooting=true;
-    ShootForAngle(shootingPower,110);
+    ShootForAngle(shootingPower,angle);
   }
   if(e_ShooterState == IDLE_POSTSHOT){
     isShooting=false;
