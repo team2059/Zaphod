@@ -20,7 +20,7 @@ void HHCompressor::CompressorSystemPeriodic(){
       break;
   }
   if(compressor->GetPressureSwitchValue()==1){
-    compressor->Start()
+    compressor->Start();
   }else{
     compressor->Stop();
   }

@@ -92,11 +92,13 @@ void HHRobot::Handler(){
   	  targetAngle = 130;
   }
   if(ControlSystem->rightJoystickValues[DRIVE_FOR_DISTANCE]){
-	  if(sonar->GetInches("FRONTLEFT") >= 40){
+	  targetAngle = 100;
+	  if(sonar->GetInches("FRONTLEFT") >= 45){
 		  DriveRobot(0,-.5);
 	  }
 	  else{
 		  DriveRobot(0,0);
+		  shooter->StartShootingSequence(0.855);
 	  }
   }
 }
