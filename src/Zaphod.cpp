@@ -254,11 +254,11 @@ public:
   //}}}
   //runCompressor{{{
   void runCompressor(int i, int refreshInterval){
-    if(i%refreshInterval==0&compressing&compressor.GetPressureSwitchValue()==1){
+    if(i%refreshInterval==0&&compressing&&compressor.GetPressureSwitchValue()==1){
       compressing=false;
       compressor.Stop();
     }
-    if(i%refreshInterval==0&!compressing&compressor.GetPressureSwitchValue()==0){
+    if(i%refreshInterval==0&&!compressing&&compressor.GetPressureSwitchValue()==0&&shooter_idle){
       compressing=true;
       compressor.Start();
     }
@@ -632,6 +632,8 @@ public:
       //}}}
         //Shoot{{{
       if(Lstick.GetRawButton(1)==1){
+        compressing=false;
+        compressor.Stop();
         shooter_idle=false; //Cause the robot to start the shooting sequence
       }
         //}}}
@@ -693,5 +695,5 @@ public:
     }
   }
   //}}}
-};
+}
 START_ROBOT_CLASS(RobotDemo);
