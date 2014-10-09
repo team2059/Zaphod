@@ -69,7 +69,7 @@ public:
   //RobotInit{{{
   void RobotInit(){
     DashboardSetup();
-    upLimit=130.0;
+    upLimit=100.0;
     //compressor.Start();
     shooting=false;
     compressing=true;
@@ -83,7 +83,7 @@ public:
   //DashboardSetup{{{
   void DashboardSetup(){
     SmartDashboard::PutNumber("Throttle",throttle);
-    SmartDashboard::PutNumber("upLimit",120.0f);
+    SmartDashboard::PutNumber("upLimit",100.0f);
     SmartDashboard::PutNumber("armPot",potToDegrees(armPot.GetAverageVoltage()));
     SmartDashboard::PutNumber("Log Level",1.0f);
     SmartDashboard::PutNumber("ArmSpeed",0.0);
@@ -91,9 +91,9 @@ public:
     SmartDashboard::PutNumber("Wall Left",voltToDistance(WallSonicLeft.GetAverageVoltage(),true));
     //Autonomous values
     SmartDashboard::PutNumber("AutoSpeed",0.95f);
-    SmartDashboard::PutNumber("Auto Distance",65.0f);
+    SmartDashboard::PutNumber("Auto Distance",45.0f);
     SmartDashboard::PutNumber("Collector Speed",1.0f);
-    SmartDashboard::PutNumber("AutoPower",0.46f);
+    SmartDashboard::PutNumber("AutoPower",0.855f);
     SmartDashboard::PutNumber("AutoCorrection",0.032f);
     SmartDashboard::PutNumber("Initial Drive Delay",2.0f);
     SmartDashboard::PutNumber("Inital Drive Timeout",4.5f);
