@@ -9,7 +9,7 @@ class RobotDemo : public SimpleRobot
 {
   //Declarations{{{
   RobotDrive myRobot;
-  bool collectorExtended,shooting,compressing,allowCompressing, hasShot, waitingToFire, shooter_idle;
+  bool collectorExtended,shooting,compressing, compressorEnabled, hasShot, waitingToFire, shooter_idle;
   float upLimit,throttle;
   Joystick Rstick,Lstick;
   Solenoid collectorSole1,collectorSole2;
@@ -73,7 +73,7 @@ public:
     //compressor.Start();
     shooting=false;
     compressing=true;
-    allowCompressing=true;
+	compressorEnabled = true;
     hasShot=false;
     waitingToFire=false;
     shooter_idle=true;
@@ -118,9 +118,9 @@ public:
     SmartDashboard::PutBoolean("Use Ultrasonic",true);
     SmartDashboard::PutBoolean("Daniel Mode",false);
     SmartDashboard::PutBoolean("CollectorState",false);
-    SmartDashboard::PutBoolean("Compressor Enabled",allowCompressing);
     SmartDashboard::PutBoolean("Compressor Running",compressing);
     SmartDashboard::PutBoolean("Ignore Pot",false);
+	SmartDashboard::PutBoolean("Compressor Enabled",compressorEnabled);
   }
   //}}}
   //updateDashboard{{{
@@ -133,7 +133,7 @@ public:
     SmartDashboard::PutNumber("Ball Right",voltToDistance(BallSonicRight.GetAverageVoltage()));
     SmartDashboard::PutNumber("upLimit",upLimit);
     SmartDashboard::PutBoolean("Compressor Running",compressing);
-    allowCompressing=SmartDashboard::GetBoolean("Compressor Enabled");
+	SmartDashboard::PutBoolean("Compressor Enabled",compressorEnabled);
     if(upLimit > 167){
       upLimit=167;
     }
@@ -254,11 +254,11 @@ public:
   //}}}
   //runCompressor{{{
   void runCompressor(int i, int refreshInterval){
-    if(i%refreshInterval==0&&compressing&&compressor.GetPressureSwitchValue()==1){
+    if(i%refreshInterval==0&&compressing&&compressor.GetPressureSwitchValue()==1&&compressorEnabled){
       compressing=false;
       compressor.Stop();
     }
-    if(i%refreshInterval==0&&!compressing&&compressor.GetPressureSwitchValue()==0&&shooter_idle){
+    if(i%refreshInterval==0&&!compressing&&compressor.GetPressureSwitchValue()==0&&shooter_idle&&compressorEnabled){
       compressing=true;
       compressor.Start();
     }
@@ -316,6 +316,7 @@ public:
     }else{
      //Important part the stops the whole shooting sequence and tells the user that the shooter is back at its original state
      shooter_idle=true;
+	 compressorEnabled = true;
      shooter_fired(0);
     }
   }
@@ -632,8 +633,7 @@ public:
       //}}}
         //Shoot{{{
       if(Lstick.GetRawButton(1)==1){
-        compressing=false;
-        compressor.Stop();
+		compressorEnabled= false;
         shooter_idle=false; //Cause the robot to start the shooting sequence
       }
         //}}}
