@@ -120,7 +120,7 @@ public:
     SmartDashboard::PutBoolean("CollectorState",false);
     SmartDashboard::PutBoolean("Compressor Running",compressing);
     SmartDashboard::PutBoolean("Ignore Pot",false);
-	SmartDashboard::PutBoolean("Compressor Enabled",compressorEnabled);
+    SmartDashboard::PutBoolean("Compressor Enabled",compressorEnabled);
   }
   //}}}
   //updateDashboard{{{
@@ -133,7 +133,7 @@ public:
     SmartDashboard::PutNumber("Ball Right",voltToDistance(BallSonicRight.GetAverageVoltage()));
     SmartDashboard::PutNumber("upLimit",upLimit);
     SmartDashboard::PutBoolean("Compressor Running",compressing);
-	SmartDashboard::PutBoolean("Compressor Enabled",compressorEnabled);
+    SmartDashboard::PutBoolean("Compressor Enabled",compressorEnabled);
     if(upLimit > 167){
       upLimit=167;
     }
@@ -316,7 +316,7 @@ public:
     }else{
      //Important part the stops the whole shooting sequence and tells the user that the shooter is back at its original state
      shooter_idle=true;
-	 compressorEnabled = true;
+     compressorEnabled = true;
      shooter_fired(0);
     }
   }
@@ -539,8 +539,7 @@ public:
         //}}}
         //Lower Shooter{{{
         if(currentStep==3){
-          if(40.0f<=potToDegrees(armPot.GetAverageVoltage())){
-            shootRobot(-0.1f);
+          if(40.0f<=potToDegrees(armPot.GetAverageVoltage())){ shootRobot(-0.1f);
           }else{
             shootRobot(0.0f);
           }
@@ -633,7 +632,7 @@ public:
       //}}}
         //Shoot{{{
       if(Lstick.GetRawButton(1)==1){
-		compressorEnabled= false;
+	compressorEnabled= false;
         shooter_idle=false; //Cause the robot to start the shooting sequence
       }
         //}}}
