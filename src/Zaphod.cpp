@@ -109,7 +109,7 @@ public:
     SmartDashboard::PutNumber("Autonomous sequence",2.0f);
     //Shooter presets
     SmartDashboard::PutNumber("ShortRange",0.465f); //Power for the shooter when against the low goal
-    SmartDashboard::PutNumber("ShooterButtonPower10",0.605f);
+    SmartDashboard::PutNumber("ShooterButtonPower10",0.855f);
     SmartDashboard::PutNumber("ShooterButtonPower7",1.0f);
     SmartDashboard::PutNumber("ShooterButtonPower8",0.5f);
     //Bool switches
@@ -549,7 +549,8 @@ public:
         //}}}
         //Lower Shooter{{{
         if(currentStep==3){
-          if(40.0f<=potToDegrees(armPot.GetAverageVoltage())){ shootRobot(-0.1f);
+          if(40.0f<=potToDegrees(armPot.GetAverageVoltage())){
+            shootRobot(-0.1f);
           }else{
             shootRobot(0.0f);
           }
