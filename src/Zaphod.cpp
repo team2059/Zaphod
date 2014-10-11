@@ -91,10 +91,10 @@ public:
     SmartDashboard::PutNumber("Wall Left",voltToDistance(WallSonicLeft.GetAverageVoltage(),true));
     //Autonomous values
     SmartDashboard::PutNumber("AutoSpeed",0.95f);
-    SmartDashboard::PutNumber("Auto Distance",45.0f);
+    SmartDashboard::PutNumber("Auto Distance",51.0f);
     SmartDashboard::PutNumber("Collector Speed",1.0f);
-    SmartDashboard::PutNumber("AutoPower",0.855f);
-    SmartDashboard::PutNumber("AutoCorrection",0.032f);
+    SmartDashboard::PutNumber("AutoPower",0.78f);
+    SmartDashboard::PutNumber("AutoCorrection",0.05f);
     SmartDashboard::PutNumber("Initial Drive Delay",2.0f);
     SmartDashboard::PutNumber("Inital Drive Timeout",4.5f);
     SmartDashboard::PutNumber("First Shot Start",0.5f);
