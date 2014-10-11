@@ -73,7 +73,7 @@ public:
     //compressor.Start();
     shooting=false;
     compressing=true;
-	compressorEnabled = true;
+    compressorEnabled=true;
     hasShot=false;
     waitingToFire=false;
     shooter_idle=true;
@@ -133,7 +133,7 @@ public:
     SmartDashboard::PutNumber("Ball Right",voltToDistance(BallSonicRight.GetAverageVoltage()));
     SmartDashboard::PutNumber("upLimit",upLimit);
     SmartDashboard::PutBoolean("Compressor Running",compressing);
-    SmartDashboard::PutBoolean("Compressor Enabled",compressorEnabled);
+    compressorEnabled=SmartDashboard::GetBoolean("Compressor Enabled");
     if(upLimit > 167){
       upLimit=167;
     }
@@ -254,11 +254,20 @@ public:
   //}}}
   //runCompressor{{{
   void runCompressor(int i, int refreshInterval){
-    if(i%refreshInterval==0&&compressing&&compressor.GetPressureSwitchValue()==1&&compressorEnabled){
+    if(i%refreshInterval==0){
+      if(compressorEnabled){
+        printf("compressorEnabled=true\n");
+      }else{
+        printf("compressorEnabled=false\n");
+      }
+    }
+    if(i%refreshInterval==0&&compressing&&(compressor.GetPressureSwitchValue()==1||!compressorEnabled)){
+      printf("Stopping compressor\n");
       compressing=false;
       compressor.Stop();
     }
-    if(i%refreshInterval==0&&!compressing&&compressor.GetPressureSwitchValue()==0&&shooter_idle&&compressorEnabled){
+    if(i%refreshInterval==0&&!compressing&&compressor.GetPressureSwitchValue()==0&&(shooter_idle&&compressorEnabled)){
+      printf("Starting compressor\n");
       compressing=true;
       compressor.Start();
     }
@@ -316,7 +325,8 @@ public:
     }else{
      //Important part the stops the whole shooting sequence and tells the user that the shooter is back at its original state
      shooter_idle=true;
-     compressorEnabled = true;
+     compressorEnabled=true;
+     SmartDashboard::PutBoolean("Compressor Enabled",true);
      shooter_fired(0);
     }
   }
@@ -632,7 +642,13 @@ public:
       //}}}
         //Shoot{{{
       if(Lstick.GetRawButton(1)==1){
-	compressorEnabled= false;
+        compressorEnabled=false;
+        SmartDashboard::PutBoolean("Compressor Enabled",false);
+        if(compressing){
+          printf("Forcing compressor off\n");
+          compressor.Stop();
+        }
+        compressing=false;
         shooter_idle=false; //Cause the robot to start the shooting sequence
       }
         //}}}
