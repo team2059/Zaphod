@@ -43,6 +43,7 @@
 #define SHOOTER_ANGLE_POT       6
 
 //Ultrasonic (DIO, Analog, etc)
+ 
 #define SONAR_FRONT_RIGHT_DIO   4
 #define SONAR_FRONT_LEFT_DIO    4
 #define SONAR_BACK_LEFT_DIO     5
@@ -61,6 +62,7 @@
 //Static button assignments
 
 #define SHOOTER_FIRE            1
+#define DISABLE_COMPRESSOR	2
 #define COLLECTOR_INTAKE        1
 #define COLLECTOR_OUTTAKE       2
 #define COLLECTOR_EXTEND        9
@@ -69,6 +71,10 @@
 #define SHOOTER_ANGLE_TWO		4
 #define SHOOTER_ANGLE_THREE		5
 #define SHOOTER_ANGLE_FOUR		6
+//#define SHOOTER_POWER_ONE	
+//#define SHOOTER_POWER_TWO
+//#define SHOOTER_POWER_THREE
+//#define SHOOTER_POWER_FOUR
 #define DRIVE_FOR_DISTANCE		11
 
 //Drive threshold definitions

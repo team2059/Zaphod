@@ -20,7 +20,7 @@ void HHCollector::UpdateCollector(bool shooting, float angle){
   }
 }
 void HHCollector::CollectBallAtSpeed(float speed){
-	collectorMotor->Set(speed);
+  collectorMotor->Set(speed);
 }
 void HHCollector::CollectBall(){
   collectorMotor->Set(1);

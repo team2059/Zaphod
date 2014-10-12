@@ -5,7 +5,6 @@ class HHCompressor{
   private:
     Compressor *compressor;
     Solenoid *solenoid1, *solenoid2;
-    time_t t;
   public:
     enum{
       EXTENDED,
@@ -13,7 +12,7 @@ class HHCompressor{
       IDLE
     }e_CollectorSolenoidState;
     HHCompressor();
-    void CompressorSystemPeriodic();
+    void CompressorSystemPeriodic(bool compressorEnabled);
     void ExtendCollector();
     void RetractCollector();
 };

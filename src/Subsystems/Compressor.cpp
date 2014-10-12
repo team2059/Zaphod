@@ -4,7 +4,7 @@ HHCompressor::HHCompressor(){
   solenoid1=new Solenoid(COMPRESSOR_SOLENOID_ONE);
   solenoid2=new Solenoid(COMPRESSOR_SOLENOID_TWO);
 }
-void HHCompressor::CompressorSystemPeriodic(){
+void HHCompressor::CompressorSystemPeriodic(bool compressorEnabled){
   switch(e_CollectorSolenoidState){
     case EXTENDED:
       solenoid1->Set(false);
@@ -19,8 +19,12 @@ void HHCompressor::CompressorSystemPeriodic(){
     default:
       break;
   }
-  if(compressor->GetPressureSwitchValue()==1){
-    compressor->Start();
+  if(compressorEnabled){
+    if(compressor->GetPressureSwitchValue()==1){
+      compressor->Start();
+    }else{
+      compressor->Stop();
+    }
   }else{
     compressor->Stop();
   }

@@ -53,11 +53,12 @@ void HHRobot::RunAuto(){
 //Main function used to handle periodic tasks on the robot
 void HHRobot::Handler(){
   int targetAngle;
+  bool allowCompressing = true;
   //Periodic tasks that should be run by every loop
   ControlSystem->UpdateJoysticks();
   shooter->UpdateShooterPosition(targetAngle);
   //TODO Need to implement a timing system to not break the spike (this function doesn't run the compressor at the moment)
-  compressorSystem->CompressorSystemPeriodic();
+  compressorSystem->CompressorSystemPeriodic(alowCompressing);
   collector->UpdateCollector(shooter->isShooting, shooter->GetAngle());
   if(CheckJoystickValues()) {
     DriveRobot(ControlSystem->rightJoystickAxisValues[3]+ControlSystem->rightJoystickAxisValues[1], -ControlSystem->rightJoystickAxisValues[2]);
@@ -83,14 +84,18 @@ void HHRobot::Handler(){
 	  targetAngle = 100;
   }
   if(ControlSystem->leftJoystickValues[SHOOTER_ANGLE_TWO]){
-  	  targetAngle = 120;
+	  targetAngle = 120;
   }
   if(ControlSystem->leftJoystickValues[SHOOTER_ANGLE_THREE]){
-  	  targetAngle = 90;
+	  targetAngle = 90;
   }
   if(ControlSystem->leftJoystickValues[SHOOTER_ANGLE_FOUR]){
-  	  targetAngle = 130;
+	  targetAngle = 130;
   }
+  if(ControlSystem->rightJoystickValues[DISABLE_COMPRESSOR]){
+    allowCompressing = false;
+  }else{
+    allowCompressing = true;
   if(ControlSystem->rightJoystickValues[DRIVE_FOR_DISTANCE]){
 	  targetAngle = 100;
 	  if(sonar->GetInches("FRONTLEFT") >= 45){
