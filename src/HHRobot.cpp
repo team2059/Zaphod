@@ -52,6 +52,16 @@ void HHRobot::RunAuto(){
   }else{
     step = 1;
   }
+  //TODO Pass the shooting power and sonar distance as variables to the RunAuto function
+  //Shoot at a power
+  if(step == 1){
+    shooter->StartShootingSequence(0.78);
+  }else{
+    step = 2;
+  }
+  if(step == 2){
+    return;
+  }
 }
 
 //Main function used to handle periodic tasks on the robot
