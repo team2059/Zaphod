@@ -39,15 +39,19 @@ void HHRobot::UpdateDashboard(){
   dashboard->PutFloatValue("Shooting Power", ControlSystem->throttle);
 }
 void HHRobot::RunAuto(){
-	int step, time;
-	if(step == 0 && time < 200){
-	compressorSystem->ExtendCollector();
-	collector->CollectBallAtSpeed(50);
-	}
-	else{
-		step = 1;
-	}
-	time++;
+  int step, time;
+  compressorSystem->ExtendCollector();
+  //TODO I have no idea what rate this loop runs at so we are going to have to fine tune the times
+  //Drive for 51 inches/cm/units (or time)
+  if(step == 0 && time < 200){
+    if(sonar->GetInches("FRONTLEFT") >= 51){
+      DriveRobot(0,-.5);
+    }else{
+      DriveRobot(0,0);
+    }
+  }else{
+    step = 1;
+  }
 }
 
 //Main function used to handle periodic tasks on the robot
@@ -58,7 +62,7 @@ void HHRobot::Handler(){
   ControlSystem->UpdateJoysticks();
   shooter->UpdateShooterPosition(targetAngle);
   //TODO Need to implement a timing system to not break the spike (this function doesn't run the compressor at the moment)
-  compressorSystem->CompressorSystemPeriodic(alowCompressing);
+  compressorSystem->CompressorSystemPeriodic(allowCompressing);
   collector->UpdateCollector(shooter->isShooting, shooter->GetAngle());
   if(CheckJoystickValues()) {
     DriveRobot(ControlSystem->rightJoystickAxisValues[3]+ControlSystem->rightJoystickAxisValues[1], -ControlSystem->rightJoystickAxisValues[2]);
@@ -96,6 +100,7 @@ void HHRobot::Handler(){
     allowCompressing = false;
   }else{
     allowCompressing = true;
+  }
   if(ControlSystem->rightJoystickValues[DRIVE_FOR_DISTANCE]){
 	  targetAngle = 100;
 	  if(sonar->GetInches("FRONTLEFT") >= 45){
@@ -103,7 +108,6 @@ void HHRobot::Handler(){
 	  }
 	  else{
 		  DriveRobot(0,0);
-		  shooter->StartShootingSequence(0.855);
 	  }
   }
 }
