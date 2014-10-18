@@ -44,6 +44,17 @@ void HHRobot::RunAuto(){
   compressorSystem->ExtendCollector();
   //TODO I have no idea what rate this loop runs at so we are going to have to fine tune the times
   //Drive for 51 inches/cm/units (or time)
+  if(step==2){
+    return;
+  }
+  if(step==1 && time<300){
+    //TODO Pass the shooting power and sonar distance as variables to the RunAuto function
+    //Shoot at a power
+    shooter->StartShootingSequence(0.78);
+  }else{
+    time=0;
+    step=2;
+  }
   if(step==0 && time<200){
     if(sonar->GetInches("FRONTLEFT")>=51){
       DriveRobot(0,-.5);
@@ -51,17 +62,8 @@ void HHRobot::RunAuto(){
       DriveRobot(0,0);
     }
   }else{
+    time=0;
     step=1;
-  }
-  //TODO Pass the shooting power and sonar distance as variables to the RunAuto function
-  //Shoot at a power
-  if(step==1 && time<500){
-    shooter->StartShootingSequence(0.78);
-  }else{
-    step=2;
-  }
-  if(step==2){
-    return;
   }
   //Important periodic things
   netTable->PutNumber("AutoStep",step); //Debugging purposes
@@ -99,16 +101,16 @@ void HHRobot::Handler(){
     compressorSystem->RetractCollector();
   }
   if(ControlSystem->leftJoystickValues[SHOOTER_ANGLE_ONE]){
-	  targetAngle=100;
+    targetAngle=100;
   }
   if(ControlSystem->leftJoystickValues[SHOOTER_ANGLE_TWO]){
-	  targetAngle=120;
+    targetAngle=120;
   }
   if(ControlSystem->leftJoystickValues[SHOOTER_ANGLE_THREE]){
-	  targetAngle=90;
+    targetAngle=90;
   }
   if(ControlSystem->leftJoystickValues[SHOOTER_ANGLE_FOUR]){
-	  targetAngle=130;
+    targetAngle=130;
   }
   if(ControlSystem->rightJoystickValues[DISABLE_COMPRESSOR]){
     allowCompressing=false;
@@ -116,13 +118,13 @@ void HHRobot::Handler(){
     allowCompressing=true;
   }
   if(ControlSystem->rightJoystickValues[DRIVE_FOR_DISTANCE]){
-	  targetAngle=100;
-	  if(sonar->GetInches("FRONTLEFT")>=45){
-		  DriveRobot(0,-.5);
-	  }
-	  else{
-		  DriveRobot(0,0);
-	  }
+    targetAngle=100;
+    if(sonar->GetInches("FRONTLEFT")>=45){
+      DriveRobot(0,-.5);
+    }
+    else{
+      DriveRobot(0,0);
+    }
   }
 }
 // vim: ts=2:sw=2:et
