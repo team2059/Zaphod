@@ -1,4 +1,5 @@
 #include "HHRobot.h"
+#include "NetworkTables/NetworkTable.h"
 #include "HHBase.h"
 HHRobot::HHRobot():
   ControlSystem(new JoystickController()),
@@ -8,6 +9,7 @@ HHRobot::HHRobot():
   dashboard(new HHDashboard()),
   autoseq(new HHAuto()),
   sonar(new HHSonar()){
+    netTable = NetworkTable::GetTable("datatable");
   }
 bool HHRobot::CheckJoystickValues(){
   float x=ControlSystem->rightJoystickAxisValues[1];
@@ -54,7 +56,7 @@ void HHRobot::RunAuto(){
   }
   //TODO Pass the shooting power and sonar distance as variables to the RunAuto function
   //Shoot at a power
-  if(step == 1){
+  if(step == 1 && time < 500){
     shooter->StartShootingSequence(0.78);
   }else{
     step = 2;
@@ -62,12 +64,15 @@ void HHRobot::RunAuto(){
   if(step == 2){
     return;
   }
+  //Important periodic things
+  netTable->PutNumber("AutoStep",step); //Debugging purposes
+  time++;
 }
 
 //Main function used to handle periodic tasks on the robot
 void HHRobot::Handler(){
   int targetAngle;
-  bool allowCompressing = true;
+  bool allowCompressing;
   //Periodic tasks that should be run by every loop
   ControlSystem->UpdateJoysticks();
   shooter->UpdateShooterPosition(targetAngle);
