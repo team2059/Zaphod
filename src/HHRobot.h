@@ -2,7 +2,6 @@
 #define __ZAPHOD_ROBOT_H__
 #include <WPILib.h>
 #include "HHBase.h"
-#include "Auto/AutoMain.h"
 #include "Definitions.h"
 class JoystickController;
 class HHShooter;
@@ -20,7 +19,6 @@ class HHRobot{
     HHCollector *collector;
     HHCompressor *compressorSystem;
     HHDashboard *dashboard;
-    HHAuto *autoseq;
     HHSonar *sonar;
   public:
     HHRobot();
