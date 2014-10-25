@@ -8,21 +8,6 @@ HHBase::HHBase():
     printf("Done\n");
   }
 void HHBase::RobotInit(){
-  //Checks the state of the drive joystick to make sure it was not moved
-  //while plugged in, giving inaccurate readings
-  if(!hHBot->CheckJoystickValues()){
-    printf("***UNPLUG AND REPLUG THE JOYSTICKS***\n");
-  }
-}
-//Config testing
-std::map<std::string, std::string> options;
-void parse(std::ifstream & cfgfile){
-  std::string id, eq, val;
-  while(cfgfile >> id >> eq >> val){
-    if (id[0] == '#') continue;
-    if (eq != "=") throw std::runtime_error("Parse error");
-    options[id] = val;
-  }
 }
 void HHBase::DisabledInit(){}
 void HHBase::AutonomousInit(){}
