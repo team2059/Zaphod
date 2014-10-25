@@ -613,86 +613,197 @@ public:
     collectorSole2.Set(false);
     compressing=false;
     SmartDashboard::PutBoolean("CollectorState",false);
+    bool runningAuto=false;
+    int c;
+    float power;
+    float correction;
+    int currentStep;
     //}}}
     while(IsEnabled()&&IsOperatorControl()){
       //Joystick{{{
-      //Throttle values{{{
-      if(Lstick.GetRawButton(9)==1){
-        throttle=(-Lstick.GetRawAxis(4)+1)/2;
-      }else if(Lstick.GetRawButton(10)){
-        throttle=SmartDashboard::GetNumber("ShooterButtonPower10");
-      }else if(Lstick.GetRawButton(7)){
-        throttle=SmartDashboard::GetNumber("ShooterButtonPower7");
-      }else if(Lstick.GetRawButton(8)){
-        throttle=SmartDashboard::GetNumber("ShooterButtonPower8");
-      }
-      //}}}
-      //Shooter upLimit{{{
-      if(Lstick.GetRawButton(3)){
-        upLimit=100.0f;
-      }
-      if(Lstick.GetRawButton(4)){
-        upLimit=120.0f;
-      }
-      if(Lstick.GetRawButton(5)){
-        upLimit=90.0f;
-      }
-      if(Lstick.GetRawButton(6)){
-        upLimit=130.0f;
-      }
-      //}}}
-        //Shoot{{{
-      if(Lstick.GetRawButton(1)==1){
-        compressorEnabled=false;
-        SmartDashboard::PutBoolean("Compressor Enabled",false);
-        if(compressing){
-          printf("Forcing compressor off\n");
-          compressor.Stop();
-        }
-        compressing=false;
-        shooter_idle=false; //Cause the robot to start the shooting sequence
-      }
-        //}}}
-      //Collector Arm{{{
-      if(Rstick.GetRawButton(9)==1){
-        SmartDashboard::PutBoolean("CollectorState",true);
-        collectorExtended=true;
+      //Auto in teleop{{{
+      if(!runningAuto&&Rstick.GetRawButton(8)==1){
+        printf("Initializing auto in teleop\n");
+        runningAuto=true;
+        c=0;
         collectorSole1.Set(false);
         collectorSole2.Set(true);
-      }else if(Rstick.GetRawButton(10)==1){
-        SmartDashboard::PutBoolean("CollectorState",false);
-        collectorExtended=false;
-        collectorSole1.Set(true);
-        collectorSole2.Set(false);
+        WallLeft.Set(1);
+        BallLeft.Set(0);
+        WallRight.Set(1);
+        BallRight.Set(0);
+        SmartDashboard::PutBoolean("CollectorState",true);
+        currentStep=0;
+        power=SmartDashboard::GetNumber("AutoPower");
+        correction=SmartDashboard::GetNumber("AutoCorrection");
+        
       }
-      //}}}
-      //Collector Motor{{{
-      if(Rstick.GetRawButton(1)==1&&50>=(potToDegrees(armPot.GetAverageVoltage()))){
-        setMotorValue(6,1,1);
-      }else if(Rstick.GetRawButton(2)==1){
-        setMotorValue(6,1,255);
-      }else if(shooter_idle==true){
-        setMotorValue(6,1,0);
+      if(Rstick.GetRawButton(8)!=1){
+        runningAuto=false;
       }
-      //}}}
-      //}}}
-      //Driving{{{
-      driveRobot(-Rstick.GetY(),Rstick.GetZ()+Rstick.GetX());
-      //printf("GetY: %f, GetX/Z: %f\n", Rstick.GetY()),((Rstick.GetZ()+Rstick.GetX()));
-      //}}}
-      if(shooter_idle==false){ //Start the shooting sequence by telling the robot the arm needs to complete a shot (and isn't finished yet)
-        if(shooter_fired(2)==false){ //Only do this if the shooter hasn't "fired" (in the upwards state)
-          shooter_fire(shooter_clear_to_fire(), throttle, upLimit, potToDegrees(armPot.GetAverageVoltage()));
+      if(runningAuto){
+        //Drive{{{
+        if(currentStep==0&&c>SmartDashboard::GetNumber("Initial Drive Delay")*200){
+          setMotorValue(6, 1, SmartDashboard::GetNumber("Collector Speed"));
+          if(voltToDistance(WallSonicLeft.GetAverageVoltage(),true)>=SmartDashboard::GetNumber("Auto Distance")){
+            driveRobot(-1*(SmartDashboard::GetNumber("AutoSpeed")),correction);
+          }else{
+            driveRobot(0.0f,0.0f);
+          }
+          if(c==SmartDashboard::GetNumber("Inital Drive Timeout")*200){
+            setMotorValue(6, 1, 0);
+            driveRobot(0.0f,0.0f);
+            currentStep++;
+            c=0;
+          }
         }
-        if(shooter_fired(2)==true){
-          //After the shooter has fired, lower the shooter arm then reset the whole shooting sequence
-          shooter_lower(-0.1, 47, potToDegrees(armPot.GetAverageVoltage()));
+        //}}}
+        //Release Ball{{{
+        if(currentStep==1){
+          setMotorValue(6, 1, 102);
+          if(c==50){
+            currentStep++;
+            c=0;
+          }
+        }
+        //}}}
+        //Shoot{{{
+        if(currentStep==2&&c>SmartDashboard::GetNumber("First Shot Start")*200){
+          if(SmartDashboard::GetBoolean("Ignore Pot")||upLimit>=potToDegrees(armPot.GetAverageVoltage())){
+            shootRobot(power);
+          }else{
+            shootRobot(0.0f);
+          }
+          if(c==SmartDashboard::GetNumber("First Shot Stop")*200){
+            shootRobot(0.0f);
+            setMotorValue(6, 1, 0);
+            currentStep++;
+            c=0;
+          }
+        }
+        //}}}
+        //Lower Shooter{{{
+        if(currentStep==3){
+          if(40.0f<=potToDegrees(armPot.GetAverageVoltage())){
+            shootRobot(-0.1f);
+          }else{
+            shootRobot(0.0f);
+          }
+          if(c==1*200){
+            shootRobot(0.0f);
+            currentStep++;
+            c=0;
+          }
+        }
+        //}}}
+        //Collect Ball{{{
+        if(currentStep==4&&c>SmartDashboard::GetNumber("Second Shot Start")){
+          setMotorValue(6, 1, 1);
+          if(c==SmartDashboard::GetNumber("Second Shot Stop")*200){
+            setMotorValue(6, 1, 0);
+            currentStep++;
+            c=0;
+          }
+        }
+        //}}}
+        //Shoot{{{
+        if(currentStep==5&&c>(SmartDashboard::GetNumber("Second Shot Start"))*200){
+          if(SmartDashboard::GetBoolean("Ignore Pot")||upLimit>=potToDegrees(armPot.GetAverageVoltage())){
+            shootRobot(power);
+          }else{
+            shootRobot(0.0f);
+          }
+          setMotorValue(6, 1, 1);
+          if(c==(SmartDashboard::GetNumber("First Shot Stop"))*200){
+            setMotorValue(6, 1, 0);
+            shootRobot(0.0f);
+            currentStep++;
+            c=0;
+          }
+        }
+        //}}}
+        if(currentStep==6){
+          runningAuto=false;
+        }
+        c++;
+      //}}}
+      //Standard Teleop{{{
+      }else{
+        //Throttle values{{{
+        if(Lstick.GetRawButton(9)==1){
+          throttle=(-Lstick.GetRawAxis(4)+1)/2;
+        }else if(Lstick.GetRawButton(10)){
+          throttle=SmartDashboard::GetNumber("ShooterButtonPower10");
+        }else if(Lstick.GetRawButton(7)){
+          throttle=SmartDashboard::GetNumber("ShooterButtonPower7");
+        }else if(Lstick.GetRawButton(8)){
+          throttle=SmartDashboard::GetNumber("ShooterButtonPower8");
+        }
+        //}}}
+        //Shooter upLimit{{{
+        if(Lstick.GetRawButton(3)){
+          upLimit=100.0f;
+        }
+        if(Lstick.GetRawButton(4)){
+          upLimit=120.0f;
+        }
+        if(Lstick.GetRawButton(5)){
+          upLimit=90.0f;
+        }
+        if(Lstick.GetRawButton(6)){
+          upLimit=130.0f;
+        }
+        //}}}
+        //Shoot{{{
+        if(Lstick.GetRawButton(1)==1){
+          compressorEnabled=false;
+          SmartDashboard::PutBoolean("Compressor Enabled",false);
+          if(compressing){
+            printf("Forcing compressor off\n");
+            compressor.Stop();
+          }
+          compressing=false;
+          shooter_idle=false; //Cause the robot to start the shooting sequence
+        }
+        //}}}
+        //Collector Arm{{{
+        if(Rstick.GetRawButton(9)==1){
+          SmartDashboard::PutBoolean("CollectorState",true);
+          collectorExtended=true;
+          collectorSole1.Set(false);
+          collectorSole2.Set(true);
+        }else if(Rstick.GetRawButton(10)==1){
+          SmartDashboard::PutBoolean("CollectorState",false);
+          collectorExtended=false;
+          collectorSole1.Set(true);
+          collectorSole2.Set(false);
+        }
+        //}}}
+        //Collector Motor{{{
+        if(Rstick.GetRawButton(1)==1&&50>=(potToDegrees(armPot.GetAverageVoltage()))){
+          setMotorValue(6,1,1);
+        }else if(Rstick.GetRawButton(2)==1){
+          setMotorValue(6,1,255);
+        }else if(shooter_idle==true){
+          setMotorValue(6,1,0);
+        }
+        //}}}
+        driveRobot(-Rstick.GetY(),Rstick.GetZ()+Rstick.GetX());
+        if(shooter_idle==false){ //Start the shooting sequence by telling the robot the arm needs to complete a shot (and isn't finished yet)
+          if(shooter_fired(2)==false){ //Only do this if the shooter hasn't "fired" (in the upwards state)
+            shooter_fire(shooter_clear_to_fire(), throttle, upLimit, potToDegrees(armPot.GetAverageVoltage()));
+          }
+          if(shooter_fired(2)==true){
+            //After the shooter has fired, lower the shooter arm then reset the whole shooting sequence
+            shooter_lower(-0.1, 47, potToDegrees(armPot.GetAverageVoltage()));
+          }
+        }
+        if(shooter_idle==true){
+          //Stop the shooter if it should be idle
+          shooter_stop();
         }
       }
-      if(shooter_idle==true){
-        //Stop the shooter if it should be idle
-        shooter_stop();
-      }
+      //}}}
       runCompressor(i,100);
       updateDashboard();
       i++;
