@@ -636,7 +636,13 @@ public:
         currentStep=0;
         power=SmartDashboard::GetNumber("AutoPower");
         correction=SmartDashboard::GetNumber("AutoCorrection");
-        
+        compressorEnabled=false;
+        SmartDashboard::PutBoolean("Compressor Enabled",false);
+        if(compressing){
+          printf("Forcing compressor off\n");
+          compressor.Stop();
+        }
+        compressing=false;
       }
       if(Rstick.GetRawButton(8)!=1){
         runningAuto=false;
@@ -724,6 +730,7 @@ public:
         //}}}
         if(currentStep==6){
           runningAuto=false;
+          compressorEnabled=true;
         }
         c++;
       //}}}
@@ -754,7 +761,7 @@ public:
           upLimit=130.0f;
         }
         //}}}
-        //Shoot{{{
+        //Shooter{{{
         if(Lstick.GetRawButton(1)==1){
           compressorEnabled=false;
           SmartDashboard::PutBoolean("Compressor Enabled",false);
@@ -764,6 +771,19 @@ public:
           }
           compressing=false;
           shooter_idle=false; //Cause the robot to start the shooting sequence
+        }
+        if(shooter_idle==false){ //Start the shooting sequence by telling the robot the arm needs to complete a shot (and isn't finished yet)
+          if(shooter_fired(2)==false){ //Only do this if the shooter hasn't "fired" (in the upwards state)
+            shooter_fire(shooter_clear_to_fire(), throttle, upLimit, potToDegrees(armPot.GetAverageVoltage()));
+          }
+          if(shooter_fired(2)==true){
+            //After the shooter has fired, lower the shooter arm then reset the whole shooting sequence
+            shooter_lower(-0.1, 47, potToDegrees(armPot.GetAverageVoltage()));
+          }
+        }
+        if(shooter_idle==true){
+          //Stop the shooter if it should be idle
+          shooter_stop();
         }
         //}}}
         //Collector Arm{{{
@@ -789,19 +809,6 @@ public:
         }
         //}}}
         driveRobot(-Rstick.GetY(),Rstick.GetZ()+Rstick.GetX());
-        if(shooter_idle==false){ //Start the shooting sequence by telling the robot the arm needs to complete a shot (and isn't finished yet)
-          if(shooter_fired(2)==false){ //Only do this if the shooter hasn't "fired" (in the upwards state)
-            shooter_fire(shooter_clear_to_fire(), throttle, upLimit, potToDegrees(armPot.GetAverageVoltage()));
-          }
-          if(shooter_fired(2)==true){
-            //After the shooter has fired, lower the shooter arm then reset the whole shooting sequence
-            shooter_lower(-0.1, 47, potToDegrees(armPot.GetAverageVoltage()));
-          }
-        }
-        if(shooter_idle==true){
-          //Stop the shooter if it should be idle
-          shooter_stop();
-        }
       }
       //}}}
       runCompressor(i,100);
