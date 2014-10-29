@@ -3,7 +3,7 @@
 class HHShooter{
   private:
     Jaguar*shooterLeft1, *shooterLeft2, *shooterRight1, *shooterRight2;
-    AnalogChannel*shooterAngle;
+    AnalogChannel *shooterAngle;
   public:
     HHShooter();
     enum {

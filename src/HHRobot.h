@@ -12,7 +12,7 @@ class HHRobot;
 class HHSonar;
 class HHRobot{
   private:
-    Jaguar *right1, *right2, *right3, *left1, *left2, *left3;
+    Talon *right1, *right2, *right3, *left1, *left2, *left3;
     JoystickController *ControlSystem;
     NetworkTable *netTable;
     HHShooter *shooter;

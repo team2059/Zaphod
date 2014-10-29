@@ -6,9 +6,15 @@ HHRobot::HHRobot():
   shooter(new HHShooter()),
   collector(new HHCollector()),
   compressorSystem(new HHCompressor()),
-  dashboard(new HHDashboard()),
-  sonar(new HHSonar()){
+  dashboard(new HHDashboard()){
+  //sonar(new HHSonar()){
     netTable=NetworkTable::GetTable("datatable");
+    right1 = new Talon(DRIVE_RIGHT_MOTOR_ONE, DRIVE_RIGHT_SIDECAR);
+    right2 = new Talon(DRIVE_RIGHT_MOTOR_TWO, DRIVE_RIGHT_SIDECAR);
+    right3 = new Talon(DRIVE_RIGHT_MOTOR_THREE, DRIVE_RIGHT_SIDECAR);
+    left1 = new Talon(DRIVE_LEFT_MOTOR_ONE, DRIVE_LEFT_SIDECAR);
+    left2 = new Talon(DRIVE_LEFT_MOTOR_TWO, DRIVE_LEFT_SIDECAR);
+    left3 = new Talon(DRIVE_LEFT_MOTOR_THREE, DRIVE_LEFT_SIDECAR);
   }
 bool HHRobot::CheckJoystickValues(){
   float x=ControlSystem->rightJoystickAxisValues[1];

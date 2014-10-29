@@ -1,8 +1,5 @@
 #include "Dashboard.h"
 HHDashboard::HHDashboard(){
-  //Add Dashboard Initalizations here (for now)
-  SmartDashboard::PutNumber("Shooting Power", 0.0f);
-  SmartDashboard::PutBoolean("Joysticks Valid", false);
 }
 float HHDashboard::GetFloatValue(const char* key){
   float value=SmartDashboard::GetNumber(key);
