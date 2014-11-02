@@ -93,8 +93,8 @@ public:
     SmartDashboard::PutNumber("AutoSpeed",0.65f);
     SmartDashboard::PutNumber("Auto Distance",57.0f);
     SmartDashboard::PutNumber("Collector Speed",1.0f);
-    SmartDashboard::PutNumber("AutoPower",0.74f);
-    SmartDashboard::PutNumber("AutoCorrection",0.08f);
+    SmartDashboard::PutNumber("AutoPower",0.72f);
+    SmartDashboard::PutNumber("AutoCorrection",0.05f);
     SmartDashboard::PutNumber("Initial Drive Delay",2.0f);
     SmartDashboard::PutNumber("Inital Drive Timeout",4.5f);
     SmartDashboard::PutNumber("First Shot Start",0.5f);
@@ -731,6 +731,7 @@ public:
         if(currentStep==6){
           runningAuto=false;
           compressorEnabled=true;
+          SmartDashboard::PutBoolean("Compressor Enabled",true);
         }
         c++;
       //}}}
@@ -808,7 +809,13 @@ public:
           setMotorValue(6,1,0);
         }
         //}}}
-        driveRobot(-Rstick.GetY(),Rstick.GetZ()+Rstick.GetX());
+        // Reverse driving direction if throttle is above .5
+        if(Rstick.GetRawAxis(4)>=0.5f){
+          driveRobot(Rstick.GetY(),-(Rstick.GetZ()+Rstick.GetX()));
+        }else{
+          driveRobot(-Rstick.GetY(),Rstick.GetZ()+Rstick.GetX());
+        }
+        
       }
       //}}}
       runCompressor(i,100);
