@@ -35,12 +35,15 @@ void HHRobot::DriveRobot(float x,float y){
   }
   float leftPower=((y+x)/2+1)*127+1;
   float rightPower=((y-x)/2+1)*127+1;
+  printf("Driving and stuff\n");
+  printf("Left: %f\n", leftPower);
+  printf("Right: %f\n", rightPower);
   right1->SetRaw(int(rightPower));
   right2->SetRaw(int(rightPower));
   right3->SetRaw(int(rightPower));
-  left1->SetRaw(int(leftPower));
-  left2->SetRaw(int(leftPower));
-  left3->SetRaw(int(leftPower));
+  left1->SetRaw(int(-leftPower));
+  left2->SetRaw(int(-leftPower));
+  left3->SetRaw(int(-leftPower));
 }
 void HHRobot::UpdateDashboard(){
   dashboard->PutFloatValue("Shooting Power",ControlSystem->throttle);
@@ -86,9 +89,8 @@ void HHRobot::Handler(){
   //TODO Need to implement a timing system to not break the spike (this function doesn't run the compressor at the moment)
   compressorSystem->CompressorSystemPeriodic(allowCompressing);
   collector->UpdateCollector(shooter->isShooting,shooter->GetAngle());
-  if(CheckJoystickValues()) {
-    DriveRobot(ControlSystem->rightJoystickAxisValues[3]+ControlSystem->rightJoystickAxisValues[1],-ControlSystem->rightJoystickAxisValues[2]);
-  }
+
+  DriveRobot(ControlSystem->rightJoystickAxisValues[3]+ControlSystem->rightJoystickAxisValues[1],-ControlSystem->rightJoystickAxisValues[2]);
   UpdateDashboard();
   //Button assignments to actions
   if(ControlSystem->leftJoystickValues[SHOOTER_FIRE]) {
