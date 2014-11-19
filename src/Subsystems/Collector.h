@@ -2,7 +2,7 @@
 #include "../Definitions.h"
 class HHCollector{
   private:
-    Jaguar *collectorMotor;
+    Talon *collectorMotor;
   public:
     HHCollector();
     enum{
@@ -12,6 +12,7 @@ class HHCollector{
     }e_CollectorState;
     void UpdateCollector(bool, float);
     void CollectBallAtSpeed(float speed);
+    void CollectorStop();
     void CollectBall();
     void ReleaseBall();
     void SpinWithShot(float);

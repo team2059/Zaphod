@@ -13,6 +13,7 @@ class HHSonar;
 class HHRobot{
   private:
     Talon *right1, *right2, *right3, *left1, *left2, *left3;
+    Joystick *rightStick, *leftStick;
     JoystickController *ControlSystem;
     NetworkTable *netTable;
     HHShooter *shooter;
@@ -23,6 +24,7 @@ class HHRobot{
   public:
     HHRobot();
     bool CheckJoystickValues();
+    void Init();
     void DriveRobot(float,float);
     void UpdateDashboard();
     void Handler();

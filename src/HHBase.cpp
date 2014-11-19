@@ -8,10 +8,15 @@ HHBase::HHBase():
     printf("Done\n");
   }
 void HHBase::RobotInit(){
+  hHBot->Init();
 }
 void HHBase::DisabledInit(){}
-void HHBase::AutonomousInit(){}
-void HHBase::TeleopInit(){}
+void HHBase::AutonomousInit(){
+  hHBot->Init();
+}
+void HHBase::TeleopInit(){
+  hHBot->Init();
+}
 void HHBase::DisabledContinuous(){}
 void HHBase::AutonomousContinuous(){}
 void HHBase::TeleopContinuous(){}

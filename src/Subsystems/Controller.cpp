@@ -1,7 +1,7 @@
 #include "Controller.h"
 JoystickController::JoystickController(){
-  rightJoystick=new Joystick(JOYSTICK_RIGHT);
-  leftJoystick=new Joystick(JOYSTICK_LEFT);
+  rightJoystick=new Joystick(3);
+  leftJoystick=new Joystick(4);
 }
 void JoystickController::UpdateJoysticks(){
   GetRightJoystick();
