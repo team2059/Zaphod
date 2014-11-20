@@ -1,33 +1,35 @@
 #include "Controller.h"
 JoystickController::JoystickController(){
-  rightJoystick=new Joystick(3);
-  leftJoystick=new Joystick(4);
+  driveJoystick=new Joystick(JOYSTICK_RIGHT);
+  shootJoystick=new Joystick(JOYSTICK_LEFT);
 }
 void JoystickController::UpdateJoysticks(){
-  GetRightJoystick();
-  GetLeftJoystick();
-  GetRightJoystickAxis();
-  GetLeftJoystickAxis();
   throttle=(-leftJoystickAxisValues[4]+1)/2;
 }
-void JoystickController::GetRightJoystick(){
-  for(int i=1;i<13;i++){
-    rightJoystickValues[i]=rightJoystick->GetRawButton(i);
+int JoystickController::GetJoystickButton(int joystick, int button){
+  switch (joystick){
+    case 1:
+      return driveJoystick->GetRawButton(button);
+      break;
+    case 2:
+      return shootJoystick->GetRawButton(button);
+      break;
+    default:
+      return -1;
+      break;
   }
 }
-void JoystickController::GetLeftJoystick(){
-  for(int i=1;i<13;i++){
-    leftJoystickValues[i]=leftJoystick->GetRawButton(i);
-  }
-}
-void JoystickController::GetRightJoystickAxis(){
-  for(int i=1;i<7;i++){
-    rightJoystickAxisValues[i]=rightJoystick->GetRawAxis(i);
-  }
-}
-void JoystickController::GetLeftJoystickAxis(){
-  for(int i=1;i<7;i++){
-    leftJoystickAxisValues[i]=leftJoystick->GetRawAxis(i);
+float JoystickController::GetJoystickAxis(int joystick, int axis){
+  switch (joystick){
+    case 1:
+      return driveJoystick->GetRawAxis(axis);
+      break;
+    case 2:
+      return shootJoystick->GetRawAxis(axis);
+      break;
+    default:
+      return 999;
+      break;
   }
 }
 // vim: ts=2:sw=2:et

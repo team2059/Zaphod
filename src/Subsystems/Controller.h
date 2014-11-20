@@ -3,7 +3,7 @@
 class JoystickController
 {
   private:
-    Joystick *rightJoystick, *leftJoystick;
+    Joystick *driveJoystick, *shootJoystick;
   public:
     int leftJoystickValues[];
     int rightJoystickValues[];
@@ -12,9 +12,7 @@ class JoystickController
     float throttle;
     JoystickController();
     void UpdateJoysticks();
-    void GetRightJoystick();
-    void GetLeftJoystick();
-    void GetLeftJoystickAxis();
-    void GetRightJoystickAxis();
+    int GetJoystickButton(int,int);
+    float GetJoystickAxis(int,int);
 };
 // vim: ts=2:sw=2:et

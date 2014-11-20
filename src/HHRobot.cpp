@@ -15,8 +15,8 @@ HHRobot::HHRobot():
     left1 = new Talon(DRIVE_LEFT_MOTOR_ONE, DRIVE_LEFT_SIDECAR);
     left2 = new Talon(DRIVE_LEFT_MOTOR_TWO, DRIVE_LEFT_SIDECAR);
     left3 = new Talon(DRIVE_LEFT_MOTOR_THREE, DRIVE_LEFT_SIDECAR);
-    rightStick = new Joystick(JOYSTICK_RIGHT);
-    leftStick = new Joystick(JOYSTICK_LEFT);
+    rightStick = new Joystick(3);
+    leftStick = new Joystick(4);
   }
 
 void HHRobot::Init(){
@@ -40,9 +40,8 @@ void HHRobot::DriveRobot(float x,float y){
   }else if(y!=0.0f&&y<-1.0f){
     y=-1.0f;
   }
-  float leftPower=((y+x)/2+1)*127+1;
-  float rightPower=((y-x)/2+1)*127+1;
-  printf("Driving and stuff\n");
+  //float leftPower=((y+x)/2+1)*127+1;
+  //float rightPower=((y-x)/2+1)*127+1;
   //printf("Left: %f\n", leftPower);
   //printf("Right: %f\n", rightPower);
   //right1->SetRaw(int(rightPower));
@@ -51,6 +50,7 @@ void HHRobot::DriveRobot(float x,float y){
   //left1->SetRaw(int(leftPower));
   //left2->SetRaw(int(leftPower));
   //left3->SetRaw(int(leftPower));
+  printf("Driving and stuff\n");
   printf("Left: %f\n",y+x);
   printf("Right: %f\n",y-x);
   right1->Set(y+x);
@@ -102,16 +102,17 @@ void HHRobot::Handler(){
   //TODO Need to implement a timing system to not break the spike (this function doesn't run the compressor at the moment)
   compressorSystem->CompressorSystemPeriodic(allowCompressing);
   collector->UpdateCollector(shooter->isShooting,shooter->GetAngle());
-  DriveRobot(rightStick->GetRawAxis(1),rightStick->GetRawAxis(2));
+  //TODO Fix whatever the heck is wrong with this
+  //DriveRobot(rightStick->GetRawAxis(1),rightStick->GetRawAxis(2));
   UpdateDashboard();
   //Shooting button
   if(ControlSystem->leftJoystickValues[SHOOTER_FIRE]) {
     shooter->StartShootingSequence(ControlSystem->throttle);
   }
   //Collector button assignments
-  if(rightStick->GetRawButton(COLLECTOR_INTAKE)) {
+  if(ControlSystem->GetJoystickButton(2,COLLECTOR_INTAKE)) {
     collector->CollectBall();
-  }else if(rightStick->GetRawButton(COLLECTOR_OUTTAKE)) {
+  }else if(ControlSystem->GetJoystickButton(2,COLLECTOR_OUTTAKE)) {
     collector->ReleaseBall();
   }else{
     collector->CollectorStop();
