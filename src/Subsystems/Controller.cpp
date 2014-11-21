@@ -3,8 +3,8 @@ JoystickController::JoystickController(){
   driveJoystick=new Joystick(JOYSTICK_RIGHT);
   shootJoystick=new Joystick(JOYSTICK_LEFT);
 }
-void JoystickController::UpdateJoysticks(){
-  throttle=(-leftJoystickAxisValues[4]+1)/2;
+float JoystickController::GetThrottle(){
+  return (-GetJoystickAxis(2,4)+1)/2;
 }
 int JoystickController::GetJoystickButton(int joystick, int button){
   switch (joystick){
@@ -15,6 +15,7 @@ int JoystickController::GetJoystickButton(int joystick, int button){
       return shootJoystick->GetRawButton(button);
       break;
     default:
+      printf("Button from joystick %d does not exist!\n", joystick);
       return -1;
       break;
   }
@@ -28,6 +29,7 @@ float JoystickController::GetJoystickAxis(int joystick, int axis){
       return shootJoystick->GetRawAxis(axis);
       break;
     default:
+      printf("Axis from joystick %d does not exist!\n", joystick);
       return 999;
       break;
   }

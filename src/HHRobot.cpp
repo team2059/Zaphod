@@ -2,7 +2,7 @@
 #include "NetworkTables/NetworkTable.h"
 #include "HHBase.h"
 HHRobot::HHRobot():
-  ControlSystem(new JoystickController()),
+  controlSystem(new JoystickController()),
   shooter(new HHShooter()),
   collector(new HHCollector()),
   compressorSystem(new HHCompressor()),
@@ -15,8 +15,6 @@ HHRobot::HHRobot():
     left1 = new Talon(DRIVE_LEFT_MOTOR_ONE, DRIVE_LEFT_SIDECAR);
     left2 = new Talon(DRIVE_LEFT_MOTOR_TWO, DRIVE_LEFT_SIDECAR);
     left3 = new Talon(DRIVE_LEFT_MOTOR_THREE, DRIVE_LEFT_SIDECAR);
-    rightStick = new Joystick(3);
-    leftStick = new Joystick(4);
   }
 
 void HHRobot::Init(){
@@ -24,8 +22,8 @@ void HHRobot::Init(){
   collector->CollectBallAtSpeed(0);
 }
 bool HHRobot::CheckJoystickValues(){
-  float x=ControlSystem->rightJoystickAxisValues[1];
-  float y=ControlSystem->rightJoystickAxisValues[2];
+  float x=controlSystem->GetJoystickAxis(1,1);
+  float y=controlSystem->GetJoystickAxis(1,2);
   if((-.1<x && x<.1) && (-.1<y && y<.1)) {
     dashboard->PutBoolValue("Joysticks Valid",true);
     return true;
@@ -61,7 +59,7 @@ void HHRobot::DriveRobot(float x,float y){
   left3->Set(y-x);
 }
 void HHRobot::UpdateDashboard(){
-  dashboard->PutFloatValue("Shooting Power",ControlSystem->throttle);
+  dashboard->PutFloatValue("Shooting Power",controlSystem->GetThrottle());
 }
 void HHRobot::RunAuto(){
   int step,time;
@@ -97,50 +95,53 @@ void HHRobot::Handler(){
   int targetAngle;
   bool allowCompressing;
   //Periodic tasks that should be run by every loop
-  ControlSystem->UpdateJoysticks();
   shooter->UpdateShooterPosition(targetAngle);
   //TODO Need to implement a timing system to not break the spike (this function doesn't run the compressor at the moment)
   compressorSystem->CompressorSystemPeriodic(allowCompressing);
   collector->UpdateCollector(shooter->isShooting,shooter->GetAngle());
   //TODO Fix whatever the heck is wrong with this
-  //DriveRobot(rightStick->GetRawAxis(1),rightStick->GetRawAxis(2));
+  //DriveRobot(controlSystem->GetJoystickAxis(1,1),controlSystem->GetJoystickAxis(1,2));
   UpdateDashboard();
   //Shooting button
-  if(ControlSystem->leftJoystickValues[SHOOTER_FIRE]) {
-    shooter->StartShootingSequence(ControlSystem->throttle);
+  if(controlSystem->GetJoystickButton(1,SHOOTER_FIRE)){
+    shooter->StartShootingSequence(controlSystem->GetThrottle());
   }
   //Collector button assignments
-  if(ControlSystem->GetJoystickButton(2,COLLECTOR_INTAKE)) {
+  if(controlSystem->GetJoystickButton(2,COLLECTOR_INTAKE)) {
     collector->CollectBall();
-  }else if(ControlSystem->GetJoystickButton(2,COLLECTOR_OUTTAKE)) {
+  }else if(controlSystem->GetJoystickButton(2,COLLECTOR_OUTTAKE)) {
     collector->ReleaseBall();
   }else{
     collector->CollectorStop();
   }
-  if(rightStick->GetRawButton(COLLECTOR_EXTEND)) {
+  if(controlSystem->GetJoystickButton(1,COLLECTOR_EXTEND)){
     compressorSystem->ExtendCollector();
   }
-  if(rightStick->GetRawButton(COLLECTOR_RETRACT)) {
+  if(controlSystem->GetJoystickButton(1,COLLECTOR_RETRACT)){
     compressorSystem->RetractCollector();
   }
-  if(ControlSystem->leftJoystickValues[SHOOTER_ANGLE_ONE]){
+  if(controlSystem->GetJoystickButton(2,SHOOTER_ANGLE_ONE)){
     targetAngle=100;
   }
-  if(ControlSystem->leftJoystickValues[SHOOTER_ANGLE_TWO]){
+  if(controlSystem->GetJoystickButton(2,SHOOTER_ANGLE_TWO)){
     targetAngle=120;
   }
-  if(ControlSystem->leftJoystickValues[SHOOTER_ANGLE_THREE]){
+  if(controlSystem->GetJoystickButton(2,SHOOTER_ANGLE_THREE)){
     targetAngle=90;
   }
-  if(ControlSystem->leftJoystickValues[SHOOTER_ANGLE_FOUR]){
+  if(controlSystem->GetJoystickButton(2,SHOOTER_ANGLE_FOUR)){
     targetAngle=130;
   }
-  if(ControlSystem->rightJoystickValues[DISABLE_COMPRESSOR]){
+  //TODO: Fix whatever this is supposed to do
+  //if(controlSystem->rightJoystickValues[DISABLE_COMPRESSOR]){
+  if(false){
     allowCompressing=false;
   }else{
     allowCompressing=true;
   }
-  if(ControlSystem->rightJoystickValues[DRIVE_FOR_DISTANCE]){
+  //TODO: Fix whatever this is supposed to do
+  //if(controlSystem->rightJoystickValues[DRIVE_FOR_DISTANCE]){
+  if(false){
     targetAngle=100;
     if(sonar->GetInches("FRONTLEFT")>=45){
       DriveRobot(0,-.5);
