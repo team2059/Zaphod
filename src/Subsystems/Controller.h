@@ -8,6 +8,7 @@ class JoystickController
     JoystickController();
     float GetThrottle();
     int GetJoystickButton(int,int);
-    float GetJoystickAxis(int,int);
+    float GetRawJoystickAxis(int,int);
+    float GetJoystickAxis(int, std::string axis);
 };
 // vim: ts=2:sw=2:et

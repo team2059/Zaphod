@@ -4,7 +4,7 @@ JoystickController::JoystickController(){
   shootJoystick=new Joystick(JOYSTICK_LEFT);
 }
 float JoystickController::GetThrottle(){
-  return (-GetJoystickAxis(2,4)+1)/2;
+  return (-GetRawJoystickAxis(2,4)+1)/2;
 }
 int JoystickController::GetJoystickButton(int joystick, int button){
   switch (joystick){
@@ -20,7 +20,7 @@ int JoystickController::GetJoystickButton(int joystick, int button){
       break;
   }
 }
-float JoystickController::GetJoystickAxis(int joystick, int axis){
+float JoystickController::GetRawJoystickAxis(int joystick, int axis){
   switch (joystick){
     case 1:
       return driveJoystick->GetRawAxis(axis);
@@ -32,6 +32,22 @@ float JoystickController::GetJoystickAxis(int joystick, int axis){
       printf("Axis from joystick %d does not exist!\n", joystick);
       return 999;
       break;
+  }
+}
+
+float JoystickController::GetJoystickAxis(int joystick, std::string axis){
+  if (joystick == 1) {
+    if (axis == "x"){
+      return driveJoystick->GetX();
+    }else if (axis == "y"){
+      return driveJoystick->GetY();
+    }else if (axis == "z"){
+      return driveJoystick->GetZ();
+    }else{
+      return 0;
+    }
+  }else{
+    return 0;
   }
 }
 // vim: ts=2:sw=2:et
