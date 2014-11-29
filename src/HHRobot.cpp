@@ -9,16 +9,17 @@ HHRobot::HHRobot():
   dashboard(new HHDashboard()){
   //sonar(new HHSonar()){
     driveTable=NetworkTable::GetTable("ZaphodDrive");
-    right1 = new Talon(DRIVE_RIGHT_MOTOR_ONE, DRIVE_RIGHT_SIDECAR);
-    right2 = new Talon(DRIVE_RIGHT_MOTOR_TWO, DRIVE_RIGHT_SIDECAR);
-    right3 = new Talon(DRIVE_RIGHT_MOTOR_THREE, DRIVE_RIGHT_SIDECAR);
-    left1 = new Talon(DRIVE_LEFT_MOTOR_ONE, DRIVE_LEFT_SIDECAR);
-    left2 = new Talon(DRIVE_LEFT_MOTOR_TWO, DRIVE_LEFT_SIDECAR);
-    left3 = new Talon(DRIVE_LEFT_MOTOR_THREE, DRIVE_LEFT_SIDECAR);
+    right1 = new Talon(DRIVE_RIGHT_SIDECAR,DRIVE_RIGHT_MOTOR_ONE);
+    right2 = new Talon(DRIVE_RIGHT_SIDECAR,DRIVE_RIGHT_MOTOR_TWO);
+    right3 = new Talon(DRIVE_RIGHT_SIDECAR,DRIVE_RIGHT_MOTOR_THREE);
+    left1 = new Talon(DRIVE_LEFT_SIDECAR, DRIVE_LEFT_MOTOR_ONE);
+    left2 = new Talon(DRIVE_LEFT_SIDECAR, DRIVE_LEFT_MOTOR_TWO);
+    left3 = new Talon(DRIVE_LEFT_SIDECAR, DRIVE_LEFT_MOTOR_THREE);
   }
 
 void HHRobot::Init(){
   printf("Initing\n");
+  printf("Code Version: 0.0.04\n");
   collector->CollectBallAtSpeed(0);
 }
 bool HHRobot::CheckJoystickValues(){
@@ -38,8 +39,8 @@ void HHRobot::DriveRobot(float y,float x){
   }else if(y!=0.0f&&y<-1.0f){
     y=-1.0f;
   }
-  float leftPower=((y+x)/2+1)*127+1;
-  float rightPower=((y-x)/2+1)*127+1;
+  float leftPower=((y-x)/2+1)*127+1;
+  float rightPower=((y+x)/2+1)*127+1;
   driveTable->PutNumber("joystickRawX",x);
   driveTable->PutNumber("joystickRawY",y);
   driveTable->PutNumber("leftSidePower",leftPower);
@@ -51,11 +52,11 @@ void HHRobot::DriveRobot(float y,float x){
   driveTable->PutNumber("left2MotorPower",left2->GetRaw());
   driveTable->PutNumber("left3MotorPower",left3->GetRaw());
   right1->SetRaw(int(rightPower));
-  //right2->SetRaw(int(rightPower));
-  //right3->SetRaw(int(rightPower));
-  //left1->SetRaw(int(leftPower));
+  right2->SetRaw(int(rightPower));
+  right3->SetRaw(int(rightPower));
+  left1->SetRaw(int(leftPower));
   left2->SetRaw(int(leftPower));
-  //left3->SetRaw(int(leftPower));
+  left3->SetRaw(int(leftPower));
   //printf("Left: %f\n",y+x);
   //printf("Right: %f\n",y-x);
   //right1->Set(y+x);
