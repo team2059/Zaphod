@@ -9,6 +9,7 @@ HHRobot::HHRobot():
   dashboard(new HHDashboard()){
   //sonar(new HHSonar()){
     driveTable=NetworkTable::GetTable("ZaphodDrive");
+    shooterTable=NetworkTable::GetTable("ZaphodShooter");
     right1 = new Talon(DRIVE_RIGHT_SIDECAR,DRIVE_RIGHT_MOTOR_ONE);
     right2 = new Talon(DRIVE_RIGHT_SIDECAR,DRIVE_RIGHT_MOTOR_TWO);
     right3 = new Talon(DRIVE_RIGHT_SIDECAR,DRIVE_RIGHT_MOTOR_THREE);
@@ -19,8 +20,11 @@ HHRobot::HHRobot():
 
 void HHRobot::Init(){
   printf("Initing\n");
-  printf("Code Version: 0.0.04\n");
+  printf("Code Version: 0.0.06\n");
   collector->CollectBallAtSpeed(0);
+  //Put table values initally to avoid annoying refreshing
+  shooterTable->PutNumber("Target Shooter Angle",90);
+  shooterTable->PutNumber("Current Shooter Angle",-420);
 }
 bool HHRobot::CheckJoystickValues(){
   float x=controlSystem->GetJoystickAxis(1,"x");
@@ -106,16 +110,16 @@ void HHRobot::Handler(){
   compressorSystem->CompressorSystemPeriodic(allowCompressing);
   collector->UpdateCollector(shooter->isShooting,shooter->GetAngle());
   //TODO Fix whatever the heck is wrong with this
-  DriveRobot(controlSystem->GetJoystickAxis(1,"x"),controlSystem->GetJoystickAxis(1,"y"));
+  DriveRobot(controlSystem->GetJoystickAxis(1,"z")+controlSystem->GetJoystickAxis(1,"x"),controlSystem->GetJoystickAxis(1,"y"));
   UpdateDashboard();
   //Shooting button
-  if(controlSystem->GetJoystickButton(1,SHOOTER_FIRE)){
+  if(controlSystem->GetJoystickButton(2,SHOOTER_FIRE)){
     shooter->StartShootingSequence(controlSystem->GetThrottle());
   }
   //Collector button assignments
-  if(controlSystem->GetJoystickButton(2,COLLECTOR_INTAKE)) {
+  if(controlSystem->GetJoystickButton(1,COLLECTOR_INTAKE)) {
     collector->CollectBall();
-  }else if(controlSystem->GetJoystickButton(2,COLLECTOR_OUTTAKE)) {
+  }else if(controlSystem->GetJoystickButton(1,COLLECTOR_OUTTAKE)) {
     collector->ReleaseBall();
   }else{
     collector->CollectorStop();
@@ -128,15 +132,19 @@ void HHRobot::Handler(){
   }
   if(controlSystem->GetJoystickButton(2,SHOOTER_ANGLE_ONE)){
     targetAngle=100;
+    shooterTable->PutNumber("Target Shooter Angle",targetAngle);
   }
   if(controlSystem->GetJoystickButton(2,SHOOTER_ANGLE_TWO)){
     targetAngle=120;
+    shooterTable->PutNumber("Target Shooter Angle",targetAngle);
   }
   if(controlSystem->GetJoystickButton(2,SHOOTER_ANGLE_THREE)){
     targetAngle=90;
+    shooterTable->PutNumber("Target Shooter Angle",targetAngle);
   }
   if(controlSystem->GetJoystickButton(2,SHOOTER_ANGLE_FOUR)){
     targetAngle=130;
+    shooterTable->PutNumber("Target Shooter Angle",targetAngle);
   }
   //TODO: Fix whatever this is supposed to do
   //if(controlSystem->rightJoystickValues[DISABLE_COMPRESSOR]){
@@ -156,5 +164,12 @@ void HHRobot::Handler(){
       DriveRobot(0,0);
     }
   }
+  // Misc periodic tasks
+  //
+  // Shooting stuff
+    shooterTable->PutNumber("Current Shooter Angle",shooter->GetAngle());
+    shooterTable->PutNumber("Current Shooter State",shooter->e_ShooterState);
+    shooterTable->PutNumber("Current Shooter Power",controlSystem->GetThrottle()*100);
+    shooterTable->PutNumber("Current Shooter Power (raw)",controlSystem->GetThrottle() * 127.0f + 128);
 }
 // vim: ts=2:sw=2:et

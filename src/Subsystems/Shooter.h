@@ -15,7 +15,7 @@ class HHShooter{
     bool isShooting;
     float shootingPower;
     void StartShootingSequence(float);
-    void ShootForAngle(float, float);
+    bool ShootForAngle(float, float);
     void ShootRaw(float);
     void Lower(float);
     void StopShooter();
