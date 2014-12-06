@@ -19,8 +19,7 @@ bool HHShooter::ShootForAngle(float power, float desiredAngle){
     ShootRaw(power);
     e_ShooterState=FIRING;
     return true;
-  }
-  else{
+  }else{
     return false;
   }
 }
@@ -53,19 +52,12 @@ void HHShooter::UpdateShooterPosition(double angle){
   if(e_ShooterState == IDLE_PRESHOT){
     isShooting=false;
     StopShooter();
-  }
-  else if(e_ShooterState == FIRING){
+  }else if(e_ShooterState == FIRING){
     isShooting=true;
-    if (ShootForAngle(shootingPower,angle)){
-      printf("Shooting!\n");
-      printf("Shooting at power %d\n",shooterRight1->GetRaw());
-    }
-    else {
-      printf("Done shooting!\n");
+    if (!ShootForAngle(shootingPower,angle)){
       e_ShooterState=IDLE_POSTSHOT;
     }
-  }
-  else if(e_ShooterState == IDLE_POSTSHOT){
+  }else if(e_ShooterState == IDLE_POSTSHOT){
     isShooting=false;
     Lower(40);
   }

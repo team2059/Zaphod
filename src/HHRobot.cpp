@@ -7,7 +7,7 @@ HHRobot::HHRobot():
   collector(new HHCollector()),
   compressorSystem(new HHCompressor()),
   dashboard(new HHDashboard()){
-  //sonar(new HHSonar()){
+    //sonar(new HHSonar()){}
     driveTable=NetworkTable::GetTable("ZaphodDrive");
     shooterTable=NetworkTable::GetTable("ZaphodShooter");
     collectorTable=NetworkTable::GetTable("ZaphodCollector");
@@ -19,7 +19,6 @@ HHRobot::HHRobot():
     left3 = new Talon(DRIVE_LEFT_SIDECAR, DRIVE_LEFT_MOTOR_THREE);
     shooterTable->PutNumber("Target Shooter Angle",90);
   }
-
 void HHRobot::Init(){
   printf("Initing\n");
   printf("Code Version: %f\n",CODE_VERSION);
@@ -47,6 +46,10 @@ void HHRobot::DriveRobot(float y,float x){
   }
   float leftPower=((y-x)/2+1)*127+1;
   float rightPower=((y+x)/2+1)*127+1;
+  if(controlSystem->GetJoystickAxis(1,"throttle")>0.5f){
+    leftPower*=-1;
+    rightPower*=-1;
+  }
   driveTable->PutNumber("joystickRawX",x);
   driveTable->PutNumber("joystickRawY",y);
   driveTable->PutNumber("leftSidePower",leftPower);
@@ -82,13 +85,13 @@ void HHRobot::RunAuto(){
   //Drive for 51 inches/cm/units (or time)
   if(step==2){
     return; } if(step==1 && time<300){
-    //TODO Pass the shooting power and sonar distance as variables to the RunAuto function
-    //Shoot at a power
-    shooter->StartShootingSequence(0.78);
-  }else{
-    time=0;
-    step=2;
-  }
+      //TODO Pass the shooting power and sonar distance as variables to the RunAuto function
+      //Shoot at a power
+      shooter->StartShootingSequence(0.78);
+    }else{
+      time=0;
+      step=2;
+    }
   if(step==0 && time<200){
     if(sonar->GetInches("FRONTLEFT")>=51){
       DriveRobot(0,-.5);
@@ -149,14 +152,14 @@ void HHRobot::Handler(){
   }
   shooterTable->PutNumber("Target Shooter Angle",targetAngle);
   //TODO: Fix whatever this is supposed to do
-  //if(controlSystem->rightJoystickValues[DISABLE_COMPRESSOR]){
+  //if(controlSystem->rightJoystickValues[DISABLE_COMPRESSOR]){}
   if(false){
     allowCompressing=false;
   }else{
     allowCompressing=true;
   }
   //TODO: Fix whatever this is supposed to do
-  //if(controlSystem->rightJoystickValues[DRIVE_FOR_DISTANCE]){
+  //if(controlSystem->rightJoystickValues[DRIVE_FOR_DISTANCE]){}
   if(false){
     targetAngle=100;
     if(sonar->GetInches("FRONTLEFT")>=45){
@@ -168,9 +171,9 @@ void HHRobot::Handler(){
   // Misc periodic tasks
   //
   // Shooting stuff
-    shooterTable->PutNumber("Current Shooter Angle",shooter->GetAngle());
-    shooterTable->PutNumber("Current Shooter State",shooter->e_ShooterState);
-    shooterTable->PutNumber("Current Shooter Power",controlSystem->GetThrottle()*100);
-    shooterTable->PutNumber("Current Shooter Power (raw)",controlSystem->GetThrottle() * 127.0f + 128);
+  shooterTable->PutNumber("Current Shooter Angle",shooter->GetAngle());
+  shooterTable->PutNumber("Current Shooter State",shooter->e_ShooterState);
+  shooterTable->PutNumber("Current Shooter Power",controlSystem->GetThrottle()*100);
+  shooterTable->PutNumber("Current Shooter Power (raw)",controlSystem->GetThrottle() * 127.0f + 128);
 }
 // vim: ts=2:sw=2:et

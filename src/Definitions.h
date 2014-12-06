@@ -2,7 +2,7 @@
 #define __DEFINITIONS_H__
 
 
-#define CODE_VERSION 0.07
+#define CODE_VERSION 0.08
 
 //Sidecar declarations
 #define DRIVE_LEFT_SIDECAR      1

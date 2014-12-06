@@ -43,11 +43,20 @@ float JoystickController::GetJoystickAxis(int joystick, std::string axis){
       return driveJoystick->GetY();
     }else if (axis == "z"){
       return driveJoystick->GetZ();
-    }else{
-      return 0;
+    }else if(axis == "throttle"){
+      return driveJoystick->GetRawAxis(4);
     }
-  }else{
-    return 0;
+  }else if(joystick == 2){
+    if (axis == "x"){
+      return shootJoystick->GetX();
+    }else if (axis == "y"){
+      return shootJoystick->GetY();
+    }else if (axis == "z"){
+      return shootJoystick->GetZ();
+    }else if(axis == "throttle"){
+      return shootJoystick->GetRawAxis(4);
+    }
   }
+  return 0;
 }
 // vim: ts=2:sw=2:et
