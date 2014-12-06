@@ -19,7 +19,7 @@ class HHShooter{
     void ShootRaw(float);
     void Lower(float);
     void StopShooter();
-    void UpdateShooterPosition(int);
+    void UpdateShooterPosition(double);
     float FloatToPWM(float input);
     float GetAngle();
 };

@@ -11,11 +11,11 @@ void HHShooter::StartShootingSequence(float throttle){
   //Changes the enum to tell the shooter to be firing
   e_ShooterState=FIRING;
   // Convert the throttle input to a pwm value
-  shootingPower=throttle * 127.0f + 128;
+  shootingPower=throttle;
 }
 //First step in shooting process
 bool HHShooter::ShootForAngle(float power, float desiredAngle){
-  if(GetAngle() <= desiredAngle && power >= 15){
+  if(GetAngle() <= desiredAngle){
     ShootRaw(power);
     e_ShooterState=FIRING;
     return true;
@@ -49,7 +49,7 @@ void HHShooter::ShootRaw(float power){
   shooterRight2->SetRaw(int(FloatToPWM(-power)));
 }
 //Should be run in a loop
-void HHShooter::UpdateShooterPosition(int angle){
+void HHShooter::UpdateShooterPosition(double angle){
   if(e_ShooterState == IDLE_PRESHOT){
     isShooting=false;
     StopShooter();
@@ -58,7 +58,7 @@ void HHShooter::UpdateShooterPosition(int angle){
     isShooting=true;
     if (ShootForAngle(shootingPower,angle)){
       printf("Shooting!\n");
-      printf("Shooting at power %f\n",shooterRight1->GetRaw());
+      printf("Shooting at power %d\n",shooterRight1->GetRaw());
     }
     else {
       printf("Done shooting!\n");

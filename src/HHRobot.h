@@ -15,7 +15,7 @@ class HHRobot{
     Talon *right1, *right2, *right3, *left1, *left2, *left3;
     Joystick *rightStick, *leftStick;
     JoystickController *controlSystem;
-    NetworkTable *driveTable, *shooterTable;
+    NetworkTable *driveTable, *shooterTable, *collectorTable;
     HHShooter *shooter;
     HHCollector *collector;
     HHCompressor *compressorSystem;

@@ -1,6 +1,9 @@
 #ifndef __DEFINITIONS_H__
 #define __DEFINITIONS_H__
 
+
+#define CODE_VERSION 0.07
+
 //Sidecar declarations
 #define DRIVE_LEFT_SIDECAR      1
 #define DRIVE_RIGHT_SIDECAR     2
