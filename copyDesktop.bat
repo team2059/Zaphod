@@ -1,0 +1,1 @@
+@call Z:\copy.bat
