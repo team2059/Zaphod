@@ -21,6 +21,8 @@ class HHRobot{
     HHCompressor *compressorSystem;
     HHDashboard *dashboard;
     HHSonar *sonar;
+    Timer *timer;
+    double lastTime;
   public:
     HHRobot();
     bool CheckJoystickValues();

@@ -5,6 +5,7 @@ class HHCompressor{
   private:
     Compressor *compressor;
     Solenoid *solenoid1, *solenoid2;
+    bool compressing;
   public:
     enum{
       EXTENDED,
@@ -15,5 +16,7 @@ class HHCompressor{
     void CompressorSystemPeriodic(bool compressorEnabled);
     void ExtendCollector();
     void RetractCollector();
+    void StopCompressor();
+    void StartCompressor();
 };
 // vim: ts=2:sw=2:et

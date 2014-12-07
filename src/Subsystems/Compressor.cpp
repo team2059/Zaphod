@@ -3,6 +3,7 @@ HHCompressor::HHCompressor(){
   compressor=new Compressor(COMPRESSOR_GAUGE_SIDECAR, COMPRESSOR_GAUGE, COMPRESSOR_RELAY_SIDECAR, COMPRESSOR_RELAY);
   solenoid1=new Solenoid(COMPRESSOR_SOLENOID_ONE);
   solenoid2=new Solenoid(COMPRESSOR_SOLENOID_TWO);
+  compressing=false;
 }
 void HHCompressor::CompressorSystemPeriodic(bool compressorEnabled){
   switch(e_CollectorSolenoidState){
@@ -20,13 +21,23 @@ void HHCompressor::CompressorSystemPeriodic(bool compressorEnabled){
       break;
   }
   if(compressorEnabled){
-    if(compressor->GetPressureSwitchValue()==1){
-      compressor->Start();
-    }else{
-      compressor->Stop();
+    printf("Compressor is enabled\n");
+    if(compressing&&compressor->GetPressureSwitchValue()==1){
+      // It is compressing, but the pressure is too high 
+      printf("Condition 1");
+      StopCompressor();
+    }else if(!compressing&&compressor->GetPressureSwitchValue()==0){
+      // It is not compressing and the pressure isn't too high
+      printf("Condition 2");
+      StartCompressor();
     }
   }else{
-    compressor->Stop();
+    printf("Condition 3");
+    if(compressing){
+      // If the compressor is not enabled, but it's still compressing
+      printf("Condition 4");
+      StopCompressor();
+    }
   }
   e_CollectorSolenoidState=IDLE;
 }
@@ -35,5 +46,15 @@ void HHCompressor::ExtendCollector(){
 }
 void HHCompressor::RetractCollector(){
   e_CollectorSolenoidState=RETRACTED;
+}
+void HHCompressor::StopCompressor(){
+  printf("Stopping compressor\n");
+  compressor->Stop();
+  compressing=false;
+}
+void HHCompressor::StartCompressor(){
+  printf("Starting compressor\n");
+  compressor->Start();
+  compressing=true;
 }
 // vim: ts=2:sw=2:et

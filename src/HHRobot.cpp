@@ -18,6 +18,8 @@ HHRobot::HHRobot():
     left2 = new Talon(DRIVE_LEFT_SIDECAR, DRIVE_LEFT_MOTOR_TWO);
     left3 = new Talon(DRIVE_LEFT_SIDECAR, DRIVE_LEFT_MOTOR_THREE);
     shooterTable->PutNumber("Target Shooter Angle",90);
+    timer = new Timer();
+    lastTime = 0;
   }
 void HHRobot::Init(){
   printf("Initing\n");
@@ -26,6 +28,8 @@ void HHRobot::Init(){
   //Put table values initally to avoid annoying refreshing
   shooterTable->PutNumber("Target Shooter Angle",90);
   shooterTable->PutNumber("Current Shooter Angle",-420);
+  timer->Start();
+  compressorSystem->StartCompressor();
 }
 bool HHRobot::CheckJoystickValues(){
   float x=controlSystem->GetJoystickAxis(1,"x");
@@ -79,6 +83,7 @@ void HHRobot::UpdateDashboard(){
   dashboard->PutFloatValue("Shooting Power",controlSystem->GetThrottle());
 }
 void HHRobot::RunAuto(){
+  timer->Reset();
   int step,time;
   compressorSystem->ExtendCollector();
   //TODO I have no idea what rate this loop runs at so we are going to have to fine tune the times
@@ -108,11 +113,14 @@ void HHRobot::RunAuto(){
 //Main function used to handle periodic tasks on the robot
 void HHRobot::Handler(){
   double targetAngle = shooterTable->GetNumber("Target Shooter Angle");
-  bool allowCompressing;
+  bool allowCompressing = true;
   //Periodic tasks that should be run by every loop
   shooter->UpdateShooterPosition(targetAngle);
-  //TODO Need to implement a timing system to not break the spike (this function doesn't run the compressor at the moment)
-  compressorSystem->CompressorSystemPeriodic(allowCompressing);
+  if(timer->Get()-lastTime>=0.5f){
+    // Update compressor when current time-last time is more than .5 seconds
+    lastTime=timer->Get();
+    compressorSystem->CompressorSystemPeriodic(allowCompressing);
+  }
   collector->UpdateCollector(shooter->isShooting,shooter->GetAngle());
   //TODO Fix whatever the heck is wrong with this
   DriveRobot(controlSystem->GetJoystickAxis(1,"z")+controlSystem->GetJoystickAxis(1,"x"),controlSystem->GetJoystickAxis(1,"y"));
@@ -151,13 +159,6 @@ void HHRobot::Handler(){
     targetAngle=130;
   }
   shooterTable->PutNumber("Target Shooter Angle",targetAngle);
-  //TODO: Fix whatever this is supposed to do
-  //if(controlSystem->rightJoystickValues[DISABLE_COMPRESSOR]){}
-  if(false){
-    allowCompressing=false;
-  }else{
-    allowCompressing=true;
-  }
   //TODO: Fix whatever this is supposed to do
   //if(controlSystem->rightJoystickValues[DRIVE_FOR_DISTANCE]){}
   if(false){
