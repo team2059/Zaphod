@@ -1,3 +1,6 @@
 [submodule "bin/ucpp"]
 	path = bin/ucpp
 	url = git://github.com/nikitakit/ucpp.git
+[submodule "src/lib"]
+	path = src/lib
+	url = https://github.com/int0x191f2/hhlib.git
