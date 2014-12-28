@@ -3,8 +3,8 @@
 #include <WPILib.h>
 #include "HHBase.h"
 #include "lib/drive/WCDrive.h"
+#include "lib/controller/Controller.h"
 #include "Definitions.h"
-class JoystickController;
 class HHShooter;
 class HHCollector;
 class HHCompressor;
@@ -13,9 +13,8 @@ class HHRobot;
 class HHSonar;
 class HHRobot{
   private:
-    Joystick *rightStick, *leftStick;
     WCDrive *drive;
-    JoystickController *controlSystem;
+    Extreme3dPro *driveStick, *shootStick;
     NetworkTable *driveTable, *shooterTable, *collectorTable;
     HHShooter *shooter;
     HHCollector *collector;

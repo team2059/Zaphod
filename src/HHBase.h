@@ -2,7 +2,6 @@
 #define __HH_BASE_H__
 #include <WPILib.h>
 #include "HHRobot.h"
-#include "Subsystems/Controller.h"
 #include "Subsystems/Shooter.h"
 #include "Subsystems/Collector.h"
 #include "Subsystems/Compressor.h"

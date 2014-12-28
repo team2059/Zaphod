@@ -3,7 +3,8 @@
 #include "HHBase.h"
 HHRobot::HHRobot():
   drive(new WCDrive(6,1,1,1,2,1,3,2,1,2,2,2,3)),
-  controlSystem(new JoystickController()),
+  driveStick(new Extreme3dPro(1)),
+  shootStick(new Extreme3dPro(2)),
   shooter(new HHShooter()),
   collector(new HHCollector()),
   compressorSystem(new HHCompressor()),
@@ -27,8 +28,8 @@ void HHRobot::Init(){
   compressorSystem->StartCompressor();
 }
 bool HHRobot::CheckJoystickValues(){
-  float x=controlSystem->GetJoystickAxis(1,"x");
-  float y=controlSystem->GetJoystickAxis(1,"y");
+  float x=driveStick->GetJoystickAxis("x");
+  float y=driveStick->GetJoystickAxis("y");
   if((-.1<x && x<.1) && (-.1<y && y<.1)) {
     dashboard->PutBoolValue("Joysticks Valid",true);
     return true;
@@ -38,7 +39,7 @@ bool HHRobot::CheckJoystickValues(){
   }
 }
 void HHRobot::UpdateDashboard(){
-  dashboard->PutFloatValue("Shooting Power",controlSystem->GetThrottle());
+  dashboard->PutFloatValue("Shooting Power",shootStick->GetThrottle());
 }
 void HHRobot::RunAuto(){
   timer->Reset();
@@ -74,6 +75,8 @@ void HHRobot::Handler(){
   bool allowCompressing = true;
   //Periodic tasks that should be run by every loop
   shooter->UpdateShooterPosition(targetAngle);
+  driveStick->handler();
+  shootStick->handler();
   if(timer->Get()-lastTime>=0.5f){
     // Update compressor when current time-last time is more than .5 seconds
     lastTime=timer->Get();
@@ -81,39 +84,39 @@ void HHRobot::Handler(){
   }
   collector->UpdateCollector(shooter->isShooting,shooter->GetAngle());
   //TODO Fix whatever the heck is wrong with this
-  drive->Update(6,controlSystem->GetJoystickAxis(1,"z")+controlSystem->GetJoystickAxis(1,"x"),controlSystem->GetJoystickAxis(1,"y"));
+  drive->Update(6,driveStick->GetJoystickAxis("z")+driveStick->GetJoystickAxis("x"),driveStick->GetJoystickAxis("y"));
   UpdateDashboard();
   //Shooting button
-  if(controlSystem->GetJoystickButton(2,SHOOTER_FIRE)){
-    shooter->StartShootingSequence(controlSystem->GetThrottle());
+  if(shootStick->ButtonValue[1]){
+    shooter->StartShootingSequence(shootStick->GetThrottle());
   }
   //Collector button assignments
-  if(controlSystem->GetJoystickButton(1,COLLECTOR_INTAKE)) {
+  if(driveStick->GetJoystickButton(COLLECTOR_INTAKE)) {
     collector->CollectBall();
     collectorTable->PutNumber("Current Collector Speed",1);
-  }else if(controlSystem->GetJoystickButton(1,COLLECTOR_OUTTAKE)) {
+  }else if(driveStick->GetJoystickButton(COLLECTOR_OUTTAKE)) {
     collectorTable->PutNumber("Current Collector Speed",-1);
     collector->ReleaseBall();
   }else{
     collectorTable->PutNumber("Current Collector Speed",0);
     collector->CollectorStop();
   }
-  if(controlSystem->GetJoystickButton(1,COLLECTOR_EXTEND)){
+  if(driveStick->GetJoystickButton(COLLECTOR_EXTEND)){
     compressorSystem->ExtendCollector();
   }
-  if(controlSystem->GetJoystickButton(1,COLLECTOR_RETRACT)){
+  if(driveStick->GetJoystickButton(COLLECTOR_RETRACT)){
     compressorSystem->RetractCollector();
   }
-  if(controlSystem->GetJoystickButton(2,SHOOTER_ANGLE_ONE)){
+  if(shootStick->GetJoystickButton(SHOOTER_ANGLE_ONE)){
     targetAngle=100;
   }
-  if(controlSystem->GetJoystickButton(2,SHOOTER_ANGLE_TWO)){
+  if(driveStick->GetJoystickButton(SHOOTER_ANGLE_TWO)){
     targetAngle=120;
   }
-  if(controlSystem->GetJoystickButton(2,SHOOTER_ANGLE_THREE)){
+  if(shootStick->GetJoystickButton(SHOOTER_ANGLE_THREE)){
     targetAngle=90;
   }
-  if(controlSystem->GetJoystickButton(2,SHOOTER_ANGLE_FOUR)){
+  if(shootStick->GetJoystickButton(SHOOTER_ANGLE_FOUR)){
     targetAngle=130;
   }
   shooterTable->PutNumber("Target Shooter Angle",targetAngle);
@@ -132,7 +135,7 @@ void HHRobot::Handler(){
   // Shooting stuff
   shooterTable->PutNumber("Current Shooter Angle",shooter->GetAngle());
   shooterTable->PutNumber("Current Shooter State",shooter->e_ShooterState);
-  shooterTable->PutNumber("Current Shooter Power",controlSystem->GetThrottle()*100);
-  shooterTable->PutNumber("Current Shooter Power (raw)",controlSystem->GetThrottle() * 127.0f + 128);
+  shooterTable->PutNumber("Current Shooter Power",shootStick->GetThrottle()*100);
+  shooterTable->PutNumber("Current Shooter Power (raw)",shootStick->GetThrottle() * 127.0f + 128);
 }
 // vim: ts=2:sw=2:et
