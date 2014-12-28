@@ -2,6 +2,7 @@
 #include "NetworkTables/NetworkTable.h"
 #include "HHBase.h"
 HHRobot::HHRobot():
+  drive(new WCDrive(6,1,1,1,2,1,3,2,1,2,2,2,3)),
   controlSystem(new JoystickController()),
   shooter(new HHShooter()),
   collector(new HHCollector()),
@@ -11,12 +12,6 @@ HHRobot::HHRobot():
     driveTable=NetworkTable::GetTable("ZaphodDrive");
     shooterTable=NetworkTable::GetTable("ZaphodShooter");
     collectorTable=NetworkTable::GetTable("ZaphodCollector");
-    right1 = new Talon(DRIVE_RIGHT_SIDECAR,DRIVE_RIGHT_MOTOR_ONE);
-    right2 = new Talon(DRIVE_RIGHT_SIDECAR,DRIVE_RIGHT_MOTOR_TWO);
-    right3 = new Talon(DRIVE_RIGHT_SIDECAR,DRIVE_RIGHT_MOTOR_THREE);
-    left1 = new Talon(DRIVE_LEFT_SIDECAR, DRIVE_LEFT_MOTOR_ONE);
-    left2 = new Talon(DRIVE_LEFT_SIDECAR, DRIVE_LEFT_MOTOR_TWO);
-    left3 = new Talon(DRIVE_LEFT_SIDECAR, DRIVE_LEFT_MOTOR_THREE);
     shooterTable->PutNumber("Target Shooter Angle",90);
     timer = new Timer();
     lastTime = 0;
@@ -41,43 +36,6 @@ bool HHRobot::CheckJoystickValues(){
     dashboard->PutBoolValue("Joysticks Valid",false);
     return false;
   }
-}
-void HHRobot::DriveRobot(float y,float x){
-  if(y>1.0f){
-    y=1.0f;
-  }else if(y!=0.0f&&y<-1.0f){
-    y=-1.0f;
-  }
-  float leftPower=((y-x)/2+1)*127+1;
-  float rightPower=((y+x)/2+1)*127+1;
-  if(controlSystem->GetJoystickAxis(1,"throttle")>0.5f){
-    leftPower*=-1;
-    rightPower*=-1;
-  }
-  driveTable->PutNumber("joystickRawX",x);
-  driveTable->PutNumber("joystickRawY",y);
-  driveTable->PutNumber("leftSidePower",leftPower);
-  driveTable->PutNumber("rightSidePower",rightPower);
-  driveTable->PutNumber("right1MotorPower",right1->GetRaw());
-  driveTable->PutNumber("right2MotorPower",right2->GetRaw());
-  driveTable->PutNumber("right3MotorPower",right3->GetRaw());
-  driveTable->PutNumber("left1MotorPower",left1->GetRaw());
-  driveTable->PutNumber("left2MotorPower",left2->GetRaw());
-  driveTable->PutNumber("left3MotorPower",left3->GetRaw());
-  right1->SetRaw(int(rightPower));
-  right2->SetRaw(int(rightPower));
-  right3->SetRaw(int(rightPower));
-  left1->SetRaw(int(leftPower));
-  left2->SetRaw(int(leftPower));
-  left3->SetRaw(int(leftPower));
-  //printf("Left: %f\n",y+x);
-  //printf("Right: %f\n",y-x);
-  //right1->Set(y+x);
-  //right2->Set(y+x);
-  //right3->Set(y+x);
-  //left1->Set(y-x);
-  //left2->Set(y-x);
-  //left3->Set(y-x);
 }
 void HHRobot::UpdateDashboard(){
   dashboard->PutFloatValue("Shooting Power",controlSystem->GetThrottle());
@@ -123,7 +81,7 @@ void HHRobot::Handler(){
   }
   collector->UpdateCollector(shooter->isShooting,shooter->GetAngle());
   //TODO Fix whatever the heck is wrong with this
-  DriveRobot(controlSystem->GetJoystickAxis(1,"z")+controlSystem->GetJoystickAxis(1,"x"),controlSystem->GetJoystickAxis(1,"y"));
+  drive->Update(6,controlSystem->GetJoystickAxis(1,"z")+controlSystem->GetJoystickAxis(1,"x"),controlSystem->GetJoystickAxis(1,"y"));
   UpdateDashboard();
   //Shooting button
   if(controlSystem->GetJoystickButton(2,SHOOTER_FIRE)){

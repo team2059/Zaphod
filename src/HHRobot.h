@@ -2,6 +2,7 @@
 #define __ZAPHOD_ROBOT_H__
 #include <WPILib.h>
 #include "HHBase.h"
+#include "lib/drive/WCDrive.h"
 #include "Definitions.h"
 class JoystickController;
 class HHShooter;
@@ -12,8 +13,8 @@ class HHRobot;
 class HHSonar;
 class HHRobot{
   private:
-    Talon *right1, *right2, *right3, *left1, *left2, *left3;
     Joystick *rightStick, *leftStick;
+    WCDrive *drive;
     JoystickController *controlSystem;
     NetworkTable *driveTable, *shooterTable, *collectorTable;
     HHShooter *shooter;
