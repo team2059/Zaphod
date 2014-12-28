@@ -4,10 +4,10 @@
 #include "HHBase.h"
 #include "lib/drive/WCDrive.h"
 #include "lib/controller/Controller.h"
+#include "lib/pneumatics/Compressor.h"
 #include "Definitions.h"
 class HHShooter;
 class HHCollector;
-class HHCompressor;
 class HHDashboard;
 class HHRobot;
 class HHSonar;
@@ -15,10 +15,10 @@ class HHRobot{
   private:
     WCDrive *drive;
     Extreme3dPro *driveStick, *shootStick;
+    AirCompressor *compressor;
     NetworkTable *driveTable, *shooterTable, *collectorTable;
     HHShooter *shooter;
     HHCollector *collector;
-    HHCompressor *compressorSystem;
     HHDashboard *dashboard;
     HHSonar *sonar;
     Timer *timer;

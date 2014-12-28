@@ -1,10 +1,11 @@
 #include <WPILib.h>
-#include "../Definitions.h"
 #include <time.h>
-class HHCompressor{
+class AirCompressor{
   private:
     Compressor *compressor;
-    Solenoid *solenoid1, *solenoid2;
+    //Timer used for keeping time?
+    Timer *timer;
+    double lastTime;
     bool compressing;
   public:
     enum{
@@ -12,10 +13,9 @@ class HHCompressor{
       RETRACTED,
       IDLE
     }e_CollectorSolenoidState;
-    HHCompressor();
-    void CompressorSystemPeriodic(bool compressorEnabled);
-    void ExtendCollector();
-    void RetractCollector();
+    explicit AirCompressor(uint8_t,uint8_t);
+    AirCompressor(uint8_t,uint8_t,uint8_t,uint8_t);
+    void CompressorSystemPeriodic();
     void StopCompressor();
     void StartCompressor();
 };

@@ -4,7 +4,6 @@
 #include "HHRobot.h"
 #include "Subsystems/Shooter.h"
 #include "Subsystems/Collector.h"
-#include "Subsystems/Compressor.h"
 #include "Subsystems/Sonar.h"
 #include "Subsystems/Dashboard.h"
 #include <string>
@@ -12,9 +11,7 @@
 class HHRobot;
 class HHShooter;
 class HHCollector;
-class HHCompressor;
 class HHSonar;
-class JoystickController;
 class HHBase : public IterativeRobot{
   private:
     HHRobot* hHBot;

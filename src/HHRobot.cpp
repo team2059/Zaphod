@@ -5,9 +5,9 @@ HHRobot::HHRobot():
   drive(new WCDrive(6,1,1,1,2,1,3,2,1,2,2,2,3)),
   driveStick(new Extreme3dPro(1)),
   shootStick(new Extreme3dPro(2)),
+  compressor(new AirCompressor(2,5,1,3)),
   shooter(new HHShooter()),
   collector(new HHCollector()),
-  compressorSystem(new HHCompressor()),
   dashboard(new HHDashboard()){
     //sonar(new HHSonar()){}
     driveTable=NetworkTable::GetTable("ZaphodDrive");
@@ -24,8 +24,7 @@ void HHRobot::Init(){
   //Put table values initally to avoid annoying refreshing
   shooterTable->PutNumber("Target Shooter Angle",90);
   shooterTable->PutNumber("Current Shooter Angle",-420);
-  timer->Start();
-  compressorSystem->StartCompressor();
+  compressor->StartCompressor();
 }
 bool HHRobot::CheckJoystickValues(){
   float x=driveStick->GetJoystickAxis("x");
@@ -44,7 +43,7 @@ void HHRobot::UpdateDashboard(){
 void HHRobot::RunAuto(){
   timer->Reset();
   int step,time;
-  compressorSystem->ExtendCollector();
+  //CollectorExtend
   //TODO I have no idea what rate this loop runs at so we are going to have to fine tune the times
   //Drive for 51 inches/cm/units (or time)
   if(step==2){
@@ -72,16 +71,10 @@ void HHRobot::RunAuto(){
 //Main function used to handle periodic tasks on the robot
 void HHRobot::Handler(){
   double targetAngle = shooterTable->GetNumber("Target Shooter Angle");
-  bool allowCompressing = true;
   //Periodic tasks that should be run by every loop
   shooter->UpdateShooterPosition(targetAngle);
   driveStick->handler();
   shootStick->handler();
-  if(timer->Get()-lastTime>=0.5f){
-    // Update compressor when current time-last time is more than .5 seconds
-    lastTime=timer->Get();
-    compressorSystem->CompressorSystemPeriodic(allowCompressing);
-  }
   collector->UpdateCollector(shooter->isShooting,shooter->GetAngle());
   //TODO Fix whatever the heck is wrong with this
   drive->Update(6,driveStick->GetJoystickAxis("z")+driveStick->GetJoystickAxis("x"),driveStick->GetJoystickAxis("y"));
@@ -102,10 +95,10 @@ void HHRobot::Handler(){
     collector->CollectorStop();
   }
   if(driveStick->GetJoystickButton(COLLECTOR_EXTEND)){
-    compressorSystem->ExtendCollector();
+    //TODO extend collector
   }
   if(driveStick->GetJoystickButton(COLLECTOR_RETRACT)){
-    compressorSystem->RetractCollector();
+    //TODO retract collector
   }
   if(shootStick->GetJoystickButton(SHOOTER_ANGLE_ONE)){
     targetAngle=100;
