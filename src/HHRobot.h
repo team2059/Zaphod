@@ -3,7 +3,7 @@
 #include <WPILib.h>
 #include "HHBase.h"
 #include "lib/drive/WCDrive.h"
-#include "lib/controller/Controller.h"
+#include "lib/controller/Joystick.h"
 #include "lib/pneumatics/Compressor.h"
 #include "Definitions.h"
 class HHShooter;
