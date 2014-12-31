@@ -3,12 +3,12 @@
 #include <WPILib.h>
 #include "HHBase.h"
 #include "lib/drive/WCDrive.h"
-#include "lib/controller/Joystick.h"
+#include "lib/input/controller/Joystick.h"
+#include "lib/input/dashboard/SmartDash.h"
 #include "lib/pneumatics/Compressor.h"
 #include "Definitions.h"
 class HHShooter;
 class HHCollector;
-class HHDashboard;
 class HHRobot;
 class HHSonar;
 class HHRobot{
@@ -19,7 +19,7 @@ class HHRobot{
     NetworkTable *driveTable, *shooterTable, *collectorTable;
     HHShooter *shooter;
     HHCollector *collector;
-    HHDashboard *dashboard;
+    SmartDash *dashboard;
     HHSonar *sonar;
     Timer *timer;
     double lastTime;

@@ -8,7 +8,7 @@ HHRobot::HHRobot():
   compressor(new AirCompressor(2,5,1,3)),
   shooter(new HHShooter()),
   collector(new HHCollector()),
-  dashboard(new HHDashboard()){
+  dashboard(new SmartDash()){
     //sonar(new HHSonar()){}
     driveTable=NetworkTable::GetTable("ZaphodDrive");
     shooterTable=NetworkTable::GetTable("ZaphodShooter");
