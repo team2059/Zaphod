@@ -3,4 +3,4 @@
 	url = git://github.com/nikitakit/ucpp.git
 [submodule "src/lib"]
 	path = src/lib
-	url = https://github.com/team2059/hhlib.git
+  url = git@github.com:team2059/hhlib.git
