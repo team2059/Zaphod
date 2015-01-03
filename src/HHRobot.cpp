@@ -2,7 +2,7 @@
 #include "NetworkTables/NetworkTable.h"
 #include "HHBase.h"
 HHRobot::HHRobot():
-  drive(new WCDrive(6,1,1,1,2,1,3,2,1,2,2,2,3)),
+  drive(new WCDrive(1,1,1,2,1,3,2,1,2,2,2,3)),
   driveStick(new Extreme3dPro(1)),
   shootStick(new Extreme3dPro(2)),
   compressor(new AirCompressor(2,5,1,3)),
